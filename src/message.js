@@ -142,7 +142,6 @@ class Message {
         : this?.quoted?.key?.id !== undefined
           ? this.quoted
           : this.data;
-    console.log(quoted);
     const msg = await this.client.sendMessage(
       jid,
       {

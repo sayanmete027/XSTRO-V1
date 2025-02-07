@@ -15,7 +15,6 @@ bot(
   async (message, match) => {
     const frames = ['⚁', '⚂', '⚅', '⚃', '⚄', '⚀', '⚂', '⚁', '⚄', '⚁'];
     const msg = await message.send('Rolling...');
-    console.log(frames);
     for (const frame of randomizeArray(frames)) {
       await delay(800);
       await msg.edit(frame);
