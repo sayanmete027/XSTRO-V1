@@ -4,6 +4,7 @@ import { client, eventlogger, initSession, loadPlugins } from '#src';
 import cluster from 'cluster';
 import { mkdir } from 'fs/promises';
 import { fetchPlugins } from '#utils';
+import { SessionMigrator } from '#extension';
 
 config();
 
@@ -48,6 +49,7 @@ if (cluster.isPrimary) {
     await mkdir('store', { recursive: true });
     eventlogger();
     await initSession();
+    await SessionMigrator('session', 'database.db')
     await fetchPlugins();
     await loadPlugins();
     await client();

@@ -10,13 +10,13 @@ bot(
     desc: 'Chat with an AI Bot',
     type: 'ai',
   },
-  async (message, match, { pushName }) => {
-    if (!match && !message.reply_message.text)
-      return message.send('_Hello there ' + pushName + '_');
-    const prompt = match || message.reply_message.text;
-    const msg = await message.send('*Thinking*');
-    const res = (await getJson(`https://bk9.fun/ai/chataibot?q=${prompt}`)).BK9;
-    return await msg.edit(res);
+  async (message, _, { pushName, body, quoted }) => {
+    body = body || quoted?.body;
+    body = body.replace(/^[^A-Za-z0-9]*\s*ai\s*/i, '');
+    if (!body) return message.send(`Hello ${pushName}`);
+    const msg = await message.send('*...wait*');
+    const ai = await Bk9AI(['ai'], body)
+    return await msg.edit(ai || '*try later*');
   }
 );
 
@@ -142,7 +142,7 @@ bot(
     if (!body) return message.send(`Hello ${pushName}`);
     const msg = await message.send('*...wait*');
     const gemini = await Bk9AI(['gemini'], body)
-    return await msg.edit(gemini || '*Something went wrong*');
+    return await msg.edit(gemini || '*try later*');
   }
 );
 

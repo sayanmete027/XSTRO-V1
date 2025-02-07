@@ -8,3 +8,4 @@ session
 store
 *.tgz
 config.env
+config.json
