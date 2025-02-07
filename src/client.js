@@ -48,6 +48,8 @@ export const client = async () => {
     browser: Browsers.windows('chrome'),
     version,
     emitOwnEvents: true,
+    syncFullHistory: false,
+    shouldSyncHistoryMessage: false,
     generateHighQualityLinkPreview: true,
     linkPreviewImageThumbnailWidth: 1280,
     cachedGroupMetadata: async (jid) => groupCache.get(jid),

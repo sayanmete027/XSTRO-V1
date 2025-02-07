@@ -11,7 +11,7 @@ bot(
     type: 'warns',
     desc: 'Warn a user for violating rules',
   },
-  async (message, match) => {
+  async (message, match, {updateBlockStatus}) => {
     const jid = await message.getJid(match);
     if (!jid) return;
     const { success, warnings } = await addWarn(jid);
@@ -29,7 +29,7 @@ bot(
           mentions: [jid],
         });
       }
-      await message.Block(jid);
+      await updateBlockStatus(jid, 'block');
       await resetWarn(jid);
     } else {
       const remainingWarns = WARN_COUNT - warningCount;

@@ -1,7 +1,7 @@
 import { config } from '#config';
 import { LANG } from '#extension';
-import { bot, serialize } from '#src';
-import { editMessageProptery, toJid } from '#utils';
+import { bot } from '#src';
+import { toJid } from '#utils';
 import { isJidGroup } from '#libary';
 
 bot(
@@ -13,9 +13,8 @@ bot(
 	},
 	async (message, _, { user, quoted, reply_message }) => {
 		if (!reply_message || !reply_message.viewonce) return message.send(LANG.VIEWONCE);
-		const value = `message.${quoted.type}.viewOnce`;
-		const media = editMessageProptery(quoted, value, false);
-		return await message.forward(user.id, media, { quoted: quoted });
+		quoted.message[quoted.type].viewOnce = false;
+		return message.forward(user.id, quoted, { quoted: quoted });
 	}
 );
 
@@ -29,9 +28,8 @@ bot(
 	async (message, _, { jid, quoted, reply_message }) => {
 		if (!reply_message || (!reply_message.video && !reply_message.audio && !reply_message.image))
 			return message.send(LANG.MEDIA);
-		const value = `message.${quoted.type}.viewOnce`;
-		const viewonce = editMessageProptery(quoted, value, true);
-		return await message.forward(jid, viewonce);
+		quoted.message[quoted.type].viewOnce = true;
+		return message.forward(jid, quoted, { quoted: quoted });
 	}
 );
 
@@ -71,13 +69,13 @@ bot(
 		type: 'whatsapp',
 		desc: 'quoted message'
 	},
-	async (message, _, { jid, quoted,loadMessage }) => {
+	async (message, _, { jid, quoted, loadMessage }) => {
 		if (!quoted || !quoted?.message) return message.send('Reply A Message');
-    let msg
+		let msg;
 		msg = quoted;
-    msg = await loadMessage(msg.key.id);
-    if(!msg) return message.send('Message Not Found');
-    return await message.forward(jid, msg.quoted, { quoted: msg.quoted });
+		msg = await loadMessage(msg.key.id);
+		if (!msg) return message.send('Message Not Found');
+		return await message.forward(jid, msg.quoted, { quoted: msg.quoted });
 	}
 );
 

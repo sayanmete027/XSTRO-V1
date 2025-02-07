@@ -1,3 +1,4 @@
+import { Bk9AI } from '#extension';
 import { bot } from '#src';
 import { upload } from '#utils';
 import { getBuffer, getJson } from 'xstro-utils';
@@ -135,17 +136,13 @@ bot(
     desc: 'Chat with Gemini Flash',
     type: 'ai',
   },
-  async (message, match, { pushName }) => {
-    if (!match && !message.reply_message.text)
-      return message.send('_Hello there ' + pushName + '_');
-    const prompt = match || message.reply_message.text;
-    const msg = await message.send('_hmm_');
-    const res = (
-      await getJson(
-        `https://bk9.fun/ai/Gemini-Flash?q=${prompt}&userId=${message.sender.split('@')[0]}`
-      )
-    ).BK9;
-    return msg.edit(res);
+  async (message, _, { pushName, body, quoted }) => {
+    body = body || quoted?.body;
+    body = body.replace(/^[^A-Za-z0-9]*\s*gemini\s*/i, '');
+    if (!body) return message.send(`Hello ${pushName}`);
+    const msg = await message.send('*...wait*');
+    const gemini = await Bk9AI(['gemini'], body)
+    return await msg.edit(gemini || '*Something went wrong*');
   }
 );
 
