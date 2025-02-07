@@ -1,70 +1,47 @@
-import fs from 'fs';
-import path from 'path';
+import sqlite3 from 'sqlite3';
+import { open } from 'sqlite';
 
-const store = path.join('store', 'filters.json');
+const database = open({
+  filename: 'database.db',
+  driver: sqlite3.Database,
+});
 
-if (!fs.existsSync(store)) {
-  fs.writeFileSync(store, JSON.stringify([], null, 2));
-}
+const initDb = async () => {
+  const db = await database;
+  await db.exec(`
+    CREATE TABLE IF NOT EXISTS filters (
+      type TEXT NOT NULL,
+      text TEXT NOT NULL,
+      response TEXT NOT NULL,
+      PRIMARY KEY (type, text)
+    );
+  `);
+  return db;
+};
 
-const readFilters = () => JSON.parse(fs.readFileSync(store, 'utf8'));
-const writeFilters = (filters) => fs.writeFileSync(store, JSON.stringify(filters, null, 2));
-
-/**
- * Adds a DM or GC filter to the JSON-based database.
- * @param {string} type - The filter type ('dm' or 'gc')
- * @param {string} text - The trigger text for the filter.
- * @param {string} response - The response for the filter.
- * @returns {Promise<string>} - A success message.
- */
-export async function addFilter(type, text, response) {
-  const fullText = `${type}:${text}`;
-  const filters = readFilters();
-
-  // Check if the filter already exists
-  const existingFilter = filters.find((filter) => filter.text === fullText);
-  if (existingFilter) {
+export const addFilter = async (type, text, response) => {
+  const db = await initDb();
+  try {
+    await db.run(`INSERT INTO filters (type, text, response) VALUES (?, ?, ?)`, [
+      type,
+      text,
+      response,
+    ]);
+    return `${type.toUpperCase()} filter '${text}' added successfully.`;
+  } catch {
     return `${type.toUpperCase()} filter '${text}' already exists.`;
   }
+};
 
-  // Add new filter
-  filters.push({ text: fullText, response });
-  writeFilters(filters);
-  return `${type.toUpperCase()} filter '${text}' added successfully.`;
-}
+export const removeFilter = async (type, text) => {
+  const db = await initDb();
+  const result = await db.run(`DELETE FROM filters WHERE type = ? AND text = ?`, [type, text]);
+  return result.changes > 0
+    ? `${type.toUpperCase()} filter '${text}' removed successfully.`
+    : `${type.toUpperCase()} filter '${text}' does not exist.`;
+};
 
-/**
- * Removes a filter from the JSON-based database.
- * @param {string} type - The filter type ('dm' or 'gc')
- * @param {string} text - The trigger text of the filter to remove.
- * @returns {Promise<string>} - A success or failure message.
- */
-export async function removeFilter(type, text) {
-  const fullText = `${type}:${text}`;
-  const filters = readFilters();
-
-  // Find and remove the filter
-  const index = filters.findIndex((filter) => filter.text === fullText);
-  if (index === -1) {
-    return `${type.toUpperCase()} filter '${text}' does not exist.`;
-  }
-
-  filters.splice(index, 1); // Remove the filter
-  writeFilters(filters);
-  return `${type.toUpperCase()} filter '${text}' removed successfully.`;
-}
-
-/**
- * Retrieves filters by type from the JSON-based database.
- * @param {string} type - The filter type ('dm' or 'gc')
- * @returns {Promise<Array<{ word: string, response: string }>>} - An array of filters.
- */
-export async function getFilters(type) {
-  const filters = readFilters();
-  return filters
-    .filter((filter) => filter.text.startsWith(`${type}:`))
-    .map((filter) => ({
-      word: filter.text.replace(`${type}:`, ''),
-      response: filter.response,
-    }));
-}
+export const getFilters = async (type) => {
+  const db = await initDb();
+  return db.all(`SELECT text, response FROM filters WHERE type = ?`, [type]);
+};

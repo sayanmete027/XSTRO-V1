@@ -1,6 +1,6 @@
 import { bot } from '#src';
 import { devs, toJid } from '#utils';
-import { LANG } from '#theme';
+import { LANG } from '#extension';
 
 bot(
   {

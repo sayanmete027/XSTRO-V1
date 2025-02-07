@@ -1,9 +1,9 @@
 import { bot } from '#src';
 import { XSTRO, createSticker, randomizeArray } from '#utils';
 import { getBuffer, getJson } from 'xstro-utils';
-import { delay } from 'baileys';
+import { delay } from '#libary';
 import { font } from '#lib';
-import { LANG } from '#theme';
+import { LANG } from '#extension';
 
 bot(
   {

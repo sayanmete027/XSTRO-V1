@@ -1,65 +1,51 @@
-import fs from 'fs';
-import path from 'path';
+import sqlite3 from 'sqlite3';
+import { open } from 'sqlite';
 
-const store = path.join('store', 'bgm.json');
+const database = open({
+  filename: 'database.db',
+  driver: sqlite3.Database,
+});
 
-if (!fs.existsSync(store)) {
-  fs.writeFileSync(store, JSON.stringify([]));
-}
+const initDb = async () => {
+  const db = await database;
+  await db.exec(`
+    CREATE TABLE IF NOT EXISTS bgm (
+      word TEXT PRIMARY KEY,
+      response TEXT NOT NULL
+    );
+  `);
+  return db;
+};
 
-const readDB = () => JSON.parse(fs.readFileSync(store, 'utf8'));
-const writeDB = (data) => fs.writeFileSync(store, JSON.stringify(data, null, 2));
+export const addBgm = async (word, response) => {
+  if (!word || !response) throw new Error('Both word and response are required');
 
-async function addBgm(word, response) {
-  if (!word || !response) {
-    throw new Error('Both word and response are required');
-  }
-
-  const bgmList = readDB();
-  const existingEntry = bgmList.find((entry) => entry.word === word.toLowerCase());
-
-  if (existingEntry) {
+  const db = await initDb();
+  try {
+    await db.run(`INSERT INTO bgm (word, response) VALUES (?, ?)`, [word.toLowerCase(), response]);
+    return { word: word.toLowerCase(), response };
+  } catch {
     throw new Error(`BGM entry for word "${word}" already exists`);
   }
+};
 
-  const newEntry = { word: word.toLowerCase(), response };
-  bgmList.push(newEntry);
-  writeDB(bgmList);
+export const getBgmResponse = async (word) => {
+  if (!word) throw new Error('Word parameter is required');
 
-  return newEntry;
-}
+  const db = await initDb();
+  const result = await db.get(`SELECT response FROM bgm WHERE word = ?`, [word.toLowerCase()]);
+  return result ? result.response : null;
+};
 
-async function getBgmResponse(word) {
-  if (!word) {
-    throw new Error('Word parameter is required');
-  }
+export const deleteBgm = async (word) => {
+  if (!word) throw new Error('Word parameter is required');
 
-  const bgmList = readDB();
-  const entry = bgmList.find((item) => item.word === word.toLowerCase());
+  const db = await initDb();
+  const result = await db.run(`DELETE FROM bgm WHERE word = ?`, [word.toLowerCase()]);
+  return result.changes > 0;
+};
 
-  return entry ? entry.response : null;
-}
-
-async function deleteBgm(word) {
-  if (!word) {
-    throw new Error('Word parameter is required');
-  }
-
-  const bgmList = readDB();
-  const index = bgmList.findIndex((item) => item.word === word.toLowerCase());
-
-  if (index !== -1) {
-    bgmList.splice(index, 1);
-    writeDB(bgmList);
-    return true;
-  }
-
-  return false;
-}
-
-async function getBgmList() {
-  const bgmList = readDB();
-  return bgmList.sort((a, b) => a.word.localeCompare(b.word));
-}
-
-export { addBgm, getBgmResponse, deleteBgm, getBgmList };
+export const getBgmList = async () => {
+  const db = await initDb();
+  return db.all(`SELECT word, response FROM bgm ORDER BY word ASC`);
+};

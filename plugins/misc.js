@@ -1,6 +1,6 @@
 import { bot } from '#src';
 import { extractUrl } from '#utils';
-import { delay } from 'baileys';
+import { delay } from '#libary';
 
 bot(
   {

@@ -8,7 +8,7 @@ import {
   setAliveMsg,
 } from '#sql';
 
-import { LANG } from '#theme';
+import { LANG } from '#extension';
 
 bot(
   {

@@ -1,29 +1,41 @@
-import fs from 'fs';
-import path from 'path';
+import sqlite3 from 'sqlite3';
+import { open } from 'sqlite';
 
-const store = path.join('store', 'afk.json');
+const database = open({
+  filename: 'database.db',
+  driver: sqlite3.Database,
+});
+
+const initDb = async () => {
+  const db = await database;
+  await db.exec(`
+    CREATE TABLE IF NOT EXISTS afk_message (
+      id INTEGER PRIMARY KEY CHECK (id = 1),
+      message TEXT,
+      timestamp INTEGER
+    )
+  `);
+  return db;
+};
 
 export async function getAfkMessage() {
-  if (!fs.existsSync(store))
-    fs.writeFileSync(store, JSON.stringify({ message: null, timestamp: null }));
-  const data = JSON.parse(fs.readFileSync(store, 'utf8'));
-  if (data.message && data.timestamp) {
-    return { message: data.message, timestamp: data.timestamp };
-  }
-  return null;
+  const db = await initDb();
+  const row = await db.get('SELECT message, timestamp FROM afk_message WHERE id = 1');
+  return row ?? null;
 }
 
 export const setAfkMessage = async (afkMessage, timestamp) => {
-  if (!fs.existsSync(store))
-    fs.writeFileSync(store, JSON.stringify({ message: null, timestamp: null }));
-  const data = { message: afkMessage, timestamp };
-  fs.writeFileSync(store, JSON.stringify(data, null, 2));
-  return data;
+  const db = await initDb();
+  await db.run(
+    `INSERT INTO afk_message (id, message, timestamp) VALUES (1, ?, ?)
+     ON CONFLICT(id) DO UPDATE SET message = excluded.message, timestamp = excluded.timestamp`,
+    [afkMessage, timestamp]
+  );
+  return { message: afkMessage, timestamp };
 };
 
 export const delAfkMessage = async () => {
-  if (!fs.existsSync(store))
-    fs.writeFileSync(store, JSON.stringify({ message: null, timestamp: null }));
-  const data = { message: null, timestamp: null };
-  fs.writeFileSync(store, JSON.stringify(data, null, 2));
+  const db = await initDb();
+  await db.run('DELETE FROM afk_message WHERE id = 1');
+  return { message: null, timestamp: null };
 };

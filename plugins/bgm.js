@@ -1,5 +1,5 @@
 import { bot } from '#src';
-import { LANG } from '#theme';
+import { LANG } from '#extension';
 import { addBgm, getBgmResponse, deleteBgm, getBgmList, saveMessages } from '#sql';
 
 bot(

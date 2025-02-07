@@ -6,10 +6,10 @@ import {
   isJidNewsletter,
   normalizeMessageContent,
   WAProto,
-} from 'baileys';
+} from '#libary';
 import { toJid } from '#utils';
 import { getConfig, isBanned, isSudo } from '#sql';
-import { LANG } from '#theme';
+import { LANG } from '#extension';
 
 export async function serialize(messages, client) {
   /** Configurations from the database */
@@ -32,7 +32,7 @@ export async function serialize(messages, client) {
         : from;
 
   /** Is the sender of the Message a Sudo User? */
-  const sudo = isSudo(sender) ?? undefined;
+  const sudo = (await isSudo(sender)) ?? undefined;
   /** Is the sender of the Message a Banned User? */
   const isban = (await isBanned(sender)) ?? undefined;
   /** Was the received Message from a Group (True Yes | False No) */
@@ -99,7 +99,7 @@ export async function serialize(messages, client) {
         sender: remoteJid ? participant : participant, // Ensure participant is correct based on remoteJid
         message: qmessage,
         type: qmtype,
-        sudo: isSudo(participant),
+        sudo: await isSudo(participant),
         isban: await isBanned(participant),
         body: quotedBody,
         viewonce: qmessage?.[qmtype]?.viewOnce,

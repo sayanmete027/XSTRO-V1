@@ -1,6 +1,6 @@
 import { bot } from '#src';
 import { setAntiSpam, getAntiSpamMode } from '#sql';
-import { isJidGroup } from 'baileys';
+import { isJidGroup } from '#libary';
 
 bot(
   { pattern: 'antispam', public: false, desc: 'Simple Antispam Setup', type: 'user' },

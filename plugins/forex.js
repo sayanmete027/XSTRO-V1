@@ -1,4 +1,4 @@
-import { LANG } from '#theme';
+import { LANG } from '#extension';
 import { bot } from '#src';
 import { XSTRO } from '#utils';
 

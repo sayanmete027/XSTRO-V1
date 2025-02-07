@@ -1,27 +1,36 @@
-import fs from 'fs';
-import path from 'path';
+import sqlite3 from 'sqlite3';
+import { open } from 'sqlite';
 
-const dbPath = path.join('store', 'anticall.json');
+const database = open({
+  filename: 'database.db',
+  driver: sqlite3.Database,
+});
 
-if (!fs.existsSync(dbPath)) {
-  fs.writeFileSync(dbPath, JSON.stringify({ status: 'off', action: 'reject' }));
-}
-
-const readDB = () => JSON.parse(fs.readFileSync(dbPath, 'utf8'));
-const writeDB = (data) => fs.writeFileSync(dbPath, JSON.stringify(data, null, 2));
+const initDb = async () => {
+  const db = await database;
+  await db.exec(`
+    CREATE TABLE IF NOT EXISTS anticall (
+      id INTEGER PRIMARY KEY CHECK (id = 1),
+      status TEXT NOT NULL DEFAULT 'off',
+      action TEXT NOT NULL DEFAULT 'reject'
+    )
+  `);
+  await db.run(`INSERT OR IGNORE INTO anticall (id, status, action) VALUES (1, 'off', 'reject')`);
+  return db;
+};
 
 async function setAntiCall(status, action) {
-  const currentDB = readDB();
-  const updatedDB = {
-    status: status || currentDB.status,
-    action: action || currentDB.action,
-  };
-  writeDB(updatedDB);
+  const db = await initDb();
+  await db.run(
+    `UPDATE anticall SET status = COALESCE(?, status), action = COALESCE(?, action) WHERE id = 1`,
+    [status, action]
+  );
   return true;
 }
 
 async function getAntiCall() {
-  return readDB();
+  const db = await initDb();
+  return await db.get(`SELECT status, action FROM anticall WHERE id = 1`);
 }
 
 export { setAntiCall, getAntiCall };

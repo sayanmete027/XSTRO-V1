@@ -1,5 +1,6 @@
 import { bot } from '#src';
 import { getChatSummary, getGroupMembersMessageCount, getInactiveGroupMembers } from '#sql';
+import { toJid } from '#utils';
 
 bot(
   {
@@ -19,20 +20,18 @@ bot(
     );
 
     if (dmChats.length === 0) {
-      return message.send('No direct messages found.');
+      return message.reply('No messages avaliable.');
     }
 
-    const mentionJids = dmChats.map((chat) => chat.jid);
-    const PersonalMessages = dmChats.map(
+    const Jids = dmChats.map((chat) => chat.jid);
+    const pmMsg = dmChats.map(
       (chat, index) =>
-        `${index + 1}. FROM: @${chat.jid.split('@')[0]}
-Messages: ${chat.messageCount}
-Last Message: ${new Date(chat.lastMessageTimestamp).toLocaleString()}`
+        `${index + 1}. @${toJid(chat.jid).split('@')[0]}
+*Messages:* ${chat.messageCount}
+*Time:* ${new Date(chat.lastMessageTimestamp).toLocaleString()}`
     );
 
-    message.send(`*Direct Messages:*\n\n${PersonalMessages.join('\n\n')}`, {
-      mentions: mentionJids,
-    });
+    message.send(`*Personal Messages:*\n\n${pmMsg.join('\n\n')}`, { mentions: Jids });
   }
 );
 
@@ -55,9 +54,9 @@ bot(
       groupChats.map(async (chat, index) => {
         try {
           const groupMetadata = await message.client.groupMetadata(chat.jid);
-          return `GROUP: ${groupMetadata?.subject || 'Unknown Group'}
-Messages: ${chat.messageCount}
-Last Message: ${new Date(chat.lastMessageTimestamp).toLocaleString()}`;
+          return `GC: ${groupMetadata?.subject || 'Unknown Group'}
+MSGS: ${chat.messageCount}
+LAST MSG: ${new Date(chat.lastMessageTimestamp).toLocaleString()}`;
         } catch (error) {
           return `GROUP: Unknown Group
 Messages: ${chat.messageCount}
@@ -66,7 +65,7 @@ Last Message: ${new Date(chat.lastMessageTimestamp).toLocaleString()}`;
       })
     );
 
-    message.send(`Group Chats:\n\n${data.join('\n\n')}`);
+    message.reply(`Group Chats:\n\n${data.join('\n\n')}`);
   }
 );
 
@@ -81,13 +80,13 @@ bot(
   async (message) => {
     const groupData = await getGroupMembersMessageCount(message.jid);
     if (groupData.length === 0) return await message.send('_No active members found._');
-    let activeMembers = '*Active Group Members*\n\n';
+    let activeMembers = 'Active Group Members\n\n';
     groupData.forEach((member, index) => {
-      activeMembers += `*${index + 1}. ${member.name}*\n`;
-      activeMembers += `*   • Messages: ${member.messageCount}\n`;
+      activeMembers += `${index + 1}. ${member.name}\n`;
+      activeMembers += `• Messages: ${member.messageCount}\n`;
     });
 
-    await message.send(activeMembers);
+    await message.reply(activeMembers);
   }
 );
 
@@ -102,7 +101,7 @@ bot(
   async (message) => {
     const groupData = await getInactiveGroupMembers(message.jid, message.client);
     if (groupData.length === 0)
-      return await message.reply('*📊 Inactive Members:* No inactive members found.');
+      return await message.reply('📊 Inactive Members: No inactive members found.');
     let inactiveMembers = '📊 Inactive Members:\n\n';
     inactiveMembers += `Total Inactive: ${groupData.length}\n\n`;
     groupData.forEach((jid, index) => {

@@ -1,32 +1,32 @@
 {
   "name": "xstro",
-  "description": "Simple WhatsApp By AstroX11",
+  "description": "Node.js WhatsApp Bot",
   "logo": "https://avatars.githubusercontent.com/u/188756392?v=4",
-  "repository": "https://github.com/ASTRO-X10/xstro-md",
+  "repository": "https://github.com/AstroX11/Xstro",
   "stack": "container",
   "success_url": "/",
   "env": {
     "SESSION_ID": {
-      "description": "Session ID to Run Bot",
+      "description": "SESSION HERE",
       "required": true
     },
     "SUDO": {
-      "description": "Phone Number for Admin Users",
+      "description": "ADMIN USERS NUMBERS",
       "value": "",
       "required": false
     },
     "BOT_INFO": {
-      "description": "Bot Owner, Bot Name, URL LOGO",
+      "description": "BOT OWNER AND BOT NAME",
       "value": "αѕтяσχ11;χѕтяσ м∂",
       "required": false
     },
     "TIME_ZONE": {
-      "description": "Time Zone for Bot",
+      "description": "TIMEZONE",
       "value": "Asia/Kolkata",
       "required": false
     },
     "WARN_COUNT": {
-      "description": "Number of Warnings before Actions",
+      "description": "WARNINGS BEFORE ACTIONS",
       "value": "3",
       "required": false
     }

@@ -1,74 +1,43 @@
-import fs from 'fs';
-import path from 'path';
+import sqlite3 from 'sqlite3';
+import { open } from 'sqlite';
 
-const store = path.join('store', 'warnings.json');
+const database = open({
+  filename: 'database.db',
+  driver: sqlite3.Database,
+});
 
-if (!fs.existsSync(store)) {
-  fs.writeFileSync(store, JSON.stringify([], null, 2));
-}
-
-const readWarnings = () => JSON.parse(fs.readFileSync(store, 'utf8'));
-const writeWarnings = (warnings) => fs.writeFileSync(store, JSON.stringify(warnings, null, 2));
-
-/**
- * Adds a warning to a user or creates a new user with one warning.
- * @param {string} jid - The unique identifier of the user.
- * @returns {Promise<{success: boolean, warnings: number}>} Object containing success status and current warning count.
- */
-const addWarn = async (jid) => {
-  const warnings = readWarnings();
-  let user = warnings.find((u) => u.jid === jid);
-
-  if (!user) {
-    user = { jid, warnings: 0 };
-    warnings.push(user);
-  }
-
-  user.warnings += 1;
-  writeWarnings(warnings);
-
-  return { success: true, warnings: user.warnings };
+const initDb = async () => {
+  const db = await database;
+  await db.exec(
+    `CREATE TABLE IF NOT EXISTS warnings (jid TEXT PRIMARY KEY, warnings INTEGER DEFAULT 0)`
+  );
+  return db;
 };
 
-/**
- * Retrieves the number of warnings for a user.
- * @param {string} jid - The unique identifier of the user.
- * @returns {Promise<{success: boolean, warnings: number}>} Object containing success status and warning count.
- */
-const getWarn = async (jid) => {
-  const warnings = readWarnings();
-  const user = warnings.find((u) => u.jid === jid);
+export const addWarn = async (jid) => {
+  const db = await initDb();
+  await db.run(
+    `INSERT INTO warnings (jid, warnings) VALUES (?, 1) ON CONFLICT(jid) DO UPDATE SET warnings = warnings + 1`,
+    [jid]
+  );
+  const { warnings } = await db.get(`SELECT warnings FROM warnings WHERE jid = ?`, [jid]);
+  return { success: true, warnings };
+};
 
+export const getWarn = async (jid) => {
+  const db = await initDb();
+  const user = await db.get(`SELECT warnings FROM warnings WHERE jid = ?`, [jid]);
   return { success: true, warnings: user ? user.warnings : 0 };
 };
 
-/**
- * Resets the warning count for a user.
- * @param {string} jid - The unique identifier of the user.
- * @returns {Promise<{success: boolean}>} Object containing success status.
- */
-const resetWarn = async (jid) => {
-  const warnings = readWarnings();
-  const user = warnings.find((u) => u.jid === jid);
-
-  if (user) {
-    user.warnings = 0;
-    writeWarnings(warnings);
-  }
-
+export const resetWarn = async (jid) => {
+  const db = await initDb();
+  await db.run(`UPDATE warnings SET warnings = 0 WHERE jid = ?`, [jid]);
   return { success: true };
 };
 
-/**
- * Checks if a user has any warnings.
- * @param {string} jid - The unique identifier of the user.
- * @returns {Promise<boolean>} True if the user has warnings, false otherwise.
- */
-const isWarned = async (jid) => {
-  const warnings = readWarnings();
-  const user = warnings.find((u) => u.jid === jid);
-
+export const isWarned = async (jid) => {
+  const db = await initDb();
+  const user = await db.get(`SELECT warnings FROM warnings WHERE jid = ?`, [jid]);
   return user ? user.warnings > 0 : false;
 };
-
-export { addWarn, getWarn, resetWarn, isWarned };

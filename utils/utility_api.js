@@ -1,4 +1,4 @@
-import { LANG } from '#theme';
+import { LANG } from '#extension';
 import { getBuffer } from 'xstro-utils';
 
 const API_ID = LANG.API;

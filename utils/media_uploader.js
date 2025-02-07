@@ -1,4 +1,4 @@
-import { LANG } from '#theme';
+import { LANG } from '#extension';
 
 class ApiError extends Error {
   constructor(message, status, data) {

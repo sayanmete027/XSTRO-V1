@@ -1,39 +1,44 @@
-import fs from 'fs';
-import path from 'path';
+import sqlite3 from 'sqlite3';
+import { open } from 'sqlite';
 
-const antibotStore = path.join('store', 'antibot.json');
+const database = open({
+  filename: 'database.db',
+  driver: sqlite3.Database,
+});
 
-const readDB = () => JSON.parse(fs.readFileSync(antibotStore, 'utf8'));
-const writeDB = (data) => fs.writeFileSync(antibotStore, JSON.stringify(data, null, 2));
+const initDB = async () => {
+  const db = await database;
+  await db.exec(`
+    CREATE TABLE IF NOT EXISTS antibot (
+      jid TEXT PRIMARY KEY,
+      enabled INTEGER NOT NULL
+    )
+  `);
+};
 
 async function setAntibot(jid, enabled) {
-  if (!fs.existsSync(antibotStore)) fs.writeFileSync(antibotStore, JSON.stringify([]));
-  const data = readDB();
-  const existingRecord = data.find((record) => record.jid === jid);
-
-  if (existingRecord) {
-    existingRecord.enabled = enabled;
-  } else {
-    data.push({ jid, enabled });
-  }
-
-  writeDB(data);
+  await initDB();
+  const db = await database;
+  await db.run(
+    `INSERT INTO antibot (jid, enabled) VALUES (?, ?) 
+     ON CONFLICT(jid) DO UPDATE SET enabled = excluded.enabled`,
+    [jid, enabled ? 1 : 0]
+  );
   return { jid, enabled };
 }
 
 async function delAntibot(jid) {
-  if (!fs.existsSync(antibotStore)) fs.writeFileSync(antibotStore, JSON.stringify([]));
-  const data = readDB();
-  const filteredData = data.filter((record) => record.jid !== jid);
-  writeDB(filteredData);
-  return data.length !== filteredData.length;
+  await initDB();
+  const db = await database;
+  const { changes } = await db.run(`DELETE FROM antibot WHERE jid = ?`, [jid]);
+  return changes > 0;
 }
 
 async function getAntibot(jid) {
-  if (!fs.existsSync(antibotStore)) fs.writeFileSync(antibotStore, JSON.stringify([]));
-  const data = readDB();
-  const record = data.find((record) => record.jid === jid);
-  return record ? record.enabled : false;
+  await initDB();
+  const db = await database;
+  const record = await db.get(`SELECT enabled FROM antibot WHERE jid = ?`, [jid]);
+  return record ? !!record.enabled : false;
 }
 
 export { setAntibot, delAntibot, getAntibot };

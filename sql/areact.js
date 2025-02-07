@@ -1,28 +1,32 @@
-import fs from 'fs';
-import path from 'path';
+import sqlite3 from 'sqlite3';
+import { open } from 'sqlite';
 
-const store = path.join('store', 'areact.json');
+const database = open({
+  filename: 'database.db',
+  driver: sqlite3.Database,
+});
 
-if (!fs.existsSync(store)) {
-  fs.writeFileSync(store, JSON.stringify({ status: false }));
+const initDb = async () => {
+  const db = await database;
+  await db.exec(`
+    CREATE TABLE IF NOT EXISTS autoreact (
+      id INTEGER PRIMARY KEY CHECK (id = 1),
+      status INTEGER NOT NULL DEFAULT 0
+    );
+    INSERT INTO autoreact (id, status)
+    SELECT 1, 0 WHERE NOT EXISTS (SELECT 1 FROM autoreact WHERE id = 1);
+  `);
+  return db;
+};
+
+export async function setAutoReactStatus(status) {
+  const db = await initDb();
+  await db.run(`UPDATE autoreact SET status = ? WHERE id = 1`, [status ? 1 : 0]);
+  return true;
 }
 
-const readDB = () => JSON.parse(fs.readFileSync(store, 'utf8'));
-const writeDB = (data) => fs.writeFileSync(store, JSON.stringify(data, null, 2));
-
-async function setAutoReactStatus(status) {
-  const db = readDB();
-  db.status = status;
-  writeDB(db);
-  return {
-    success: true,
-    message: `Auto-react is now ${status ? 'enabled' : 'disabled'}`,
-  };
+export async function getAutoReactStatus() {
+  const db = await initDb();
+  const record = await db.get(`SELECT status FROM autoreact WHERE id = 1`);
+  return record ? !!record.status : false;
 }
-
-async function getAutoReactStatus() {
-  const db = readDB();
-  return db.status;
-}
-
-export { setAutoReactStatus, getAutoReactStatus };

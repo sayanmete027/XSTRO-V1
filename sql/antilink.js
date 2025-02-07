@@ -1,116 +1,72 @@
-import fs from 'fs';
-import path from 'path';
+import sqlite3 from 'sqlite3';
+import { open } from 'sqlite';
 
-const store = path.join('store', 'antilink.json');
+const database = open({
+  filename: 'database.db',
+  driver: sqlite3.Database,
+});
 
-if (!fs.existsSync(store)) fs.writeFileSync(store, JSON.stringify({}));
+const initDb = async () => {
+  const db = await database;
+  await db.exec(`
+    CREATE TABLE IF NOT EXISTS antilink (
+      jid TEXT PRIMARY KEY,
+      type TEXT NOT NULL,
+      action TEXT NOT NULL,
+      warningCount INTEGER DEFAULT 0
+    )
+  `);
+  return db;
+};
 
-const readDB = () => JSON.parse(fs.readFileSync(store, 'utf8'));
-const writeDB = (data) => fs.writeFileSync(store, JSON.stringify(data, null, 2));
+export async function setAntilink(jid, type, action) {
+  const db = await initDb();
+  const existing = await db.get(`SELECT * FROM antilink WHERE jid = ? AND type = ?`, [jid, type]);
 
-/**
- * Set or update the antilink configuration for a group.
- * @param {string} jid - The group ID.
- * @param {string} type - The configuration type ('on', 'off', 'action').
- * @param {string} action - The action to set ('delete', 'kick', 'warn', 'on', 'off').
- * @returns {Promise<boolean>} - Returns true if inserted/updated, false if already exists
- */
-async function setAntilink(jid, type, action) {
-  const db = readDB();
-  const groupConfig = db[jid] || {};
+  if (existing?.action === action) return false;
 
-  const existingConfig = groupConfig[type];
-  if (existingConfig && existingConfig.action === action) return false;
-
-  if (existingConfig) {
-    groupConfig[type] = { action, warningCount: existingConfig.warningCount || 0 };
+  if (existing) {
+    await db.run(`UPDATE antilink SET action = ? WHERE jid = ? AND type = ?`, [action, jid, type]);
   } else {
-    groupConfig[type] = { action, warningCount: 0 };
+    await db.run(`INSERT INTO antilink (jid, type, action) VALUES (?, ?, ?)`, [jid, type, action]);
   }
-
-  db[jid] = groupConfig;
-  writeDB(db);
   return true;
 }
 
-/**
- * Get the antilink configuration for a group.
- * @param {string} jid - The group ID.
- * @param {string} type - The configuration type ('on', 'off', 'action').
- * @returns {Promise<object|null>} - Returns the configuration object or null.
- */
-async function getAntilink(jid, type) {
-  const db = readDB();
-  const groupConfig = db[jid] || {};
-  return groupConfig[type] || null;
+export async function getAntilink(jid, type) {
+  const db = await initDb();
+  return await db.get(`SELECT action, warningCount FROM antilink WHERE jid = ? AND type = ?`, [
+    jid,
+    type,
+  ]);
 }
 
-/**
- * Remove antilink configuration for a specific type in a group.
- * @param {string} jid - The group ID.
- * @param {string} type - The configuration type to remove.
- * @returns {Promise<number>} - Number of rows destroyed
- */
-async function removeAntilink(jid, type) {
-  const db = readDB();
-  const groupConfig = db[jid] || {};
-
-  if (groupConfig[type]) {
-    delete groupConfig[type];
-    db[jid] = groupConfig;
-    writeDB(db);
-    return 1;
-  }
-
-  return 0;
+export async function removeAntilink(jid, type) {
+  const db = await initDb();
+  const { changes } = await db.run(`DELETE FROM antilink WHERE jid = ? AND type = ?`, [jid, type]);
+  return changes;
 }
 
-/**
- * Save the warning count for a user in a group.
- * @param {string} jid - The group ID.
- * @param {string} type - The configuration type.
- * @param {number} count - The warning count.
- * @returns {Promise<void>}
- */
-async function saveWarningCount(jid, type, count) {
-  const db = readDB();
-  const groupConfig = db[jid] || {};
-
-  if (groupConfig[type]) {
-    groupConfig[type].warningCount = count;
-    db[jid] = groupConfig;
-    writeDB(db);
-  }
+export async function saveWarningCount(jid, type, count) {
+  const db = await initDb();
+  await db.run(`UPDATE antilink SET warningCount = ? WHERE jid = ? AND type = ?`, [
+    count,
+    jid,
+    type,
+  ]);
 }
 
-/**
- * Increment the warning count for a group.
- * @param {string} jid - The group ID.
- * @param {string} type - The configuration type.
- * @returns {Promise<number>} - Returns the new warning count.
- */
-async function incrementWarningCount(jid, type) {
-  const groupConfig = (readDB()[jid] || {})[type];
-  const newCount = (groupConfig?.warningCount || 0) + 1;
+export async function incrementWarningCount(jid, type) {
+  const db = await initDb();
+  const existing = await db.get(`SELECT warningCount FROM antilink WHERE jid = ? AND type = ?`, [
+    jid,
+    type,
+  ]);
+  const newCount = (existing?.warningCount || 0) + 1;
   await saveWarningCount(jid, type, newCount);
   return newCount;
 }
 
-/**
- * Reset warning count for a group.
- * @param {string} jid - The group ID.
- * @param {string} type - The configuration type.
- * @returns {Promise<void>}
- */
-async function resetWarningCount(jid, type) {
+export async function resetWarningCount(jid, type) {
   await saveWarningCount(jid, type, 0);
 }
-
-export {
-  setAntilink,
-  removeAntilink,
-  getAntilink,
-  saveWarningCount,
-  incrementWarningCount,
-  resetWarningCount,
-};

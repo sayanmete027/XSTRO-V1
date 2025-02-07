@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 
-const store = path.join('store', 'config.json');
+const store = path.join('config.json');
 
 if (!fs.existsSync(store)) {
   fs.writeFileSync(

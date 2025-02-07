@@ -1,87 +1,67 @@
-import fs from 'fs';
-import path from 'path';
+import sqlite3 from 'sqlite3';
+import { open } from 'sqlite';
 
-const store = path.join('store', 'notes.json');
+const database = open({
+  filename: 'database.db',
+  driver: sqlite3.Database,
+});
 
-if (!fs.existsSync(store)) {
-  fs.writeFileSync(store, JSON.stringify([], null, 2));
-}
+const initDb = async () => {
+  const db = await database;
+  await db.exec(`
+    CREATE TABLE IF NOT EXISTS notes (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      title TEXT NOT NULL,
+      content TEXT NOT NULL,
+      createdAt TEXT NOT NULL
+    );
+  `);
+  return db;
+};
 
-const readNotes = () => JSON.parse(fs.readFileSync(store, 'utf8'));
-const writeNotes = (notes) => fs.writeFileSync(store, JSON.stringify(notes, null, 2));
-
-/**
- * Adds a new note to the database.
- * @param {string} title - The title of the note.
- * @param {string} content - The content of the note.
- * @returns {Promise<Object>} - The created note.
- */
-export async function addNote(title, content) {
-  const notes = readNotes();
-  const newNote = {
-    id: notes.length + 1, // Auto-increment id based on the current notes length
+export const addNote = async (title, content) => {
+  const db = await initDb();
+  const result = await db.run(`INSERT INTO notes (title, content, createdAt) VALUES (?, ?, ?)`, [
     title,
     content,
-    createdAt: new Date(),
+    new Date().toISOString(),
+  ]);
+  return { id: result.lastID, title, content, createdAt: new Date().toISOString() };
+};
+
+export const updateNote = async (id, updates) => {
+  const db = await initDb();
+  const existingNote = await db.get(`SELECT * FROM notes WHERE id = ?`, [id]);
+
+  if (!existingNote) throw new Error('Note not found');
+
+  const updatedNote = {
+    title: updates.title || existingNote.title,
+    content: updates.content || existingNote.content,
+    createdAt: existingNote.createdAt,
   };
 
-  notes.push(newNote);
-  writeNotes(notes);
-  return newNote;
-}
+  await db.run(`UPDATE notes SET title = ?, content = ? WHERE id = ?`, [
+    updatedNote.title,
+    updatedNote.content,
+    id,
+  ]);
 
-/**
- * Updates an existing note by its ID.
- * @param {number} id - The ID of the note to update.
- * @param {Object} updates - The updates to apply to the note.
- * @returns {Promise<Object>} - The updated note.
- */
-export async function updateNote(id, updates) {
-  const notes = readNotes();
-  const noteIndex = notes.findIndex((note) => note.id === id);
+  return { id, ...updatedNote };
+};
 
-  if (noteIndex === -1) {
-    throw new Error('Note not found');
-  }
+export const removeNote = async (id) => {
+  const db = await initDb();
+  const result = await db.run(`DELETE FROM notes WHERE id = ?`, [id]);
+  return result.changes > 0;
+};
 
-  const updatedNote = { ...notes[noteIndex], ...updates, createdAt: notes[noteIndex].createdAt };
-  notes[noteIndex] = updatedNote;
-  writeNotes(notes);
-  return updatedNote;
-}
+export const getNotes = async () => {
+  const db = await initDb();
+  return db.all(`SELECT * FROM notes`);
+};
 
-/**
- * Removes a note by its ID.
- * @param {number} id - The ID of the note to delete.
- * @returns {Promise<boolean>} - Returns true if deletion was successful, false otherwise.
- */
-export async function removeNote(id) {
-  const notes = readNotes();
-  const noteIndex = notes.findIndex((note) => note.id === id);
-
-  if (noteIndex === -1) {
-    return false;
-  }
-
-  notes.splice(noteIndex, 1);
-  writeNotes(notes);
-  return true;
-}
-
-/**
- * Retrieves all notes.
- * @returns {Promise<Array>} - An array of all notes.
- */
-export async function getNotes() {
-  return readNotes();
-}
-
-/**
- * Retrieves a single note by its ID.
- * @param {number} id - The ID of the note to retrieve.
- * @returns {Promise<Object|null>} - The note object if found, or null.
- */
-export async function getNote(id) {
-  const notes = readNotes();
-  return notes.find((note) => note.id === id) || null;
-}
+export const getNote = async (id) => {
+  const db = await initDb();
+  return db.get(`SELECT * FROM notes WHERE id = ?`, [id]);
+};

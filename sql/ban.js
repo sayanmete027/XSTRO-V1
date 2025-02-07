@@ -1,52 +1,52 @@
-import fs from 'fs';
-import path from 'path';
+import sqlite3 from 'sqlite3';
+import { open } from 'sqlite';
 
-const store = path.join('store', 'ban.json');
+const database = open({
+  filename: 'database.db',
+  driver: sqlite3.Database,
+});
 
-if (!fs.existsSync(store)) {
-  fs.writeFileSync(store, JSON.stringify([]));
-}
-
-const readDB = () => JSON.parse(fs.readFileSync(store, 'utf8'));
-const writeDB = (data) => fs.writeFileSync(store, JSON.stringify(data, null, 2));
+const initDb = async () => {
+  const db = await database;
+  await db.exec(`
+    CREATE TABLE IF NOT EXISTS banned_users (
+      jid TEXT PRIMARY KEY
+    );
+  `);
+  return db;
+};
 
 export const addBan = async (jid) => {
   if (!jid) throw new Error('JID is required.');
 
-  const bannedUsers = readDB();
-  if (!bannedUsers.includes(jid)) {
-    bannedUsers.push(jid);
-    writeDB(bannedUsers);
+  const db = await initDb();
+  try {
+    await db.run(`INSERT INTO banned_users (jid) VALUES (?)`, [jid]);
     return `_@${jid.split('@')[0]} has been banned from using commands._`;
+  } catch {
+    return `_@${jid.split('@')[0]} is already banned._`;
   }
-  return `_@${jid.split('@')[0]} is already banned._`;
 };
 
 export const removeBan = async (jid) => {
   if (!jid) throw new Error('JID is required.');
 
-  const bannedUsers = readDB();
-  const index = bannedUsers.indexOf(jid);
-  if (index !== -1) {
-    bannedUsers.splice(index, 1);
-    writeDB(bannedUsers);
-    return `_@${jid.split('@')[0]} unbanned, and can now use commands._`;
-  }
-  return `_@${jid.split('@')[0]} wasn't banned._`;
+  const db = await initDb();
+  const result = await db.run(`DELETE FROM banned_users WHERE jid = ?`, [jid]);
+  return result.changes
+    ? `_@${jid.split('@')[0]} unbanned, and can now use commands._`
+    : `_@${jid.split('@')[0]} wasn't banned._`;
 };
 
 export const getBanned = async () => {
-  return readDB();
+  const db = await initDb();
+  const bannedUsers = await db.all(`SELECT jid FROM banned_users`);
+  return bannedUsers.map((row) => row.jid);
 };
 
-/**
- * Checks if a given JID (Jabber ID) is banned
- * @async
- * @param {string} jid - The Jabber ID to check. If not provided, defaults to empty string
- * @returns {Promise<boolean>} - Returns true if the JID is banned, false otherwise
- */
 export const isBanned = async (jid) => {
-  if (!jid) jid = '';
-  const bannedUsers = await getBanned();
-  return bannedUsers.includes(jid);
+  if (!jid) return false;
+  const db = await initDb();
+  const result = await db.get(`SELECT jid FROM banned_users WHERE jid = ?`, [jid]);
+  return !!result;
 };

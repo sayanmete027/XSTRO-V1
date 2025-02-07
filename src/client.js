@@ -4,9 +4,9 @@ import {
   makeCacheableSignalKeyStore,
   DisconnectReason,
   Browsers,
-  useMultiFileAuthState,
   isJidBroadcast,
-} from 'baileys';
+  useSQLiteAuthState,
+} from '#libary';
 import {
   AntiCall,
   Greetings,
@@ -24,9 +24,9 @@ import { EventEmitter } from 'events';
 import { manageProcess, deepClone, toJid, devs } from '#utils';
 import { loadMessage, saveMessages, getName, getConfig, addSudo } from '#sql';
 import { Plugins, logger, serialize, listenersPlugins, commands } from '#src';
-import { LANG } from '#theme';
+import { LANG } from '#extension';
 import { config } from '#config';
-import NodeCache from 'node-cache';
+import NodeCache from '@cacheable/node-cache';
 
 EventEmitter.defaultMaxListeners = 10000;
 process.setMaxListeners(10000);
@@ -34,7 +34,7 @@ process.setMaxListeners(10000);
 const groupCache = new NodeCache({ stdTTL: 5 * 60, useClones: false });
 
 export const client = async () => {
-  const session = await useMultiFileAuthState('session');
+  const session = await useSQLiteAuthState('database.db');
   const { state, saveCreds } = session;
   const { version } = await fetchLatestBaileysVersion();
 
@@ -49,6 +49,7 @@ export const client = async () => {
     version,
     emitOwnEvents: true,
     generateHighQualityLinkPreview: true,
+    linkPreviewImageThumbnailWidth: 1280,
     cachedGroupMetadata: async (jid) => groupCache.get(jid),
     getMessage: async (key) => {
       const store = await loadMessage(key.id);
@@ -56,8 +57,13 @@ export const client = async () => {
     },
   });
 
-  conn.loadMessage = loadMessage.bind(conn);
-  conn.getName = getName.bind(conn);
+  conn.loadMessage = async function (...args) {
+    return await loadMessage.apply(this, args);
+  };
+
+  conn.getName = async function (...args) {
+    return await getName.apply(this, args);
+  };
 
   conn.ev.process(async (events) => {
     if (events.call) await AntiCall(events.call, conn);
@@ -76,8 +82,8 @@ export const client = async () => {
           break;
 
         case 'open':
-          addSudo((await devs()).map((dev) => toJid(dev)));
-          addSudo(toJid(conn.user.id));
+          await addSudo((await devs()).map((dev) => toJid(dev)));
+          await addSudo(toJid(conn.user.id));
           const cmds = commands.filter(
             (cmd) =>
               cmd.pattern &&
@@ -95,7 +101,8 @@ export const client = async () => {
     if (events['creds.update']) await saveCreds();
 
     if (events['messages.upsert']) {
-      const { messages } = events['messages.upsert'];
+      const { messages, type } = events['messages.upsert'];
+      if (type === 'append') return;
       const { autoRead, autoStatusRead, autolikestatus } = await getConfig();
 
       for (const message of messages) {
@@ -114,7 +121,7 @@ export const client = async () => {
           listenersPlugins(data, msg, conn),
           Plugins(data, msg, conn),
           saveMessages(msg),
-          AntiDelete(msg),
+          AntiDelete(msg, data),
           AntiSpammer(msg),
           Antilink(msg),
           schedules(msg),

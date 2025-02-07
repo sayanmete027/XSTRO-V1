@@ -1,76 +1,60 @@
-import fs from 'fs';
-import path from 'path';
+import sqlite3 from 'sqlite3';
+import { open } from 'sqlite';
 
-const store = path.join('store', 'plugins.json');
+const database = open({
+  filename: 'database.db',
+  driver: sqlite3.Database,
+});
 
-if (!fs.existsSync(store)) {
-  fs.writeFileSync(store, JSON.stringify([], null, 2));
-}
+const initDb = async () => {
+  const db = await database;
+  await db.exec(`
+    CREATE TABLE IF NOT EXISTS plugins (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT UNIQUE NOT NULL,
+      url TEXT NOT NULL
+    );
+  `);
+  return db;
+};
 
-const readPlugins = () => JSON.parse(fs.readFileSync(store, 'utf8'));
-const writePlugins = (plugins) => fs.writeFileSync(store, JSON.stringify(plugins, null, 2));
+export const addPlugin = async (name, url) => {
+  const db = await initDb();
+  const existingPlugin = await db.get(`SELECT * FROM plugins WHERE name = ?`, [name]);
 
-/**
- * Adds a new plugin to the database.
- * @param {string} name - The name of the plugin.
- * @param {string} url - The URL of the plugin.
- * @returns {Promise<Object>} - The added plugin.
- */
-export async function addPlugin(name, url) {
-  const plugins = readPlugins();
-  const newPlugin = { name, url };
+  if (existingPlugin) throw new Error('Plugin already exists');
 
-  // Check if plugin already exists
-  if (plugins.some((plugin) => plugin.name === name)) {
-    throw new Error('Plugin already exists');
-  }
+  const result = await db.run(`INSERT INTO plugins (name, url) VALUES (?, ?)`, [name, url]);
+  return { id: result.lastID, name, url };
+};
 
-  plugins.push(newPlugin);
-  writePlugins(plugins);
-  return newPlugin;
-}
+export const updatePlugin = async (name, updates) => {
+  const db = await initDb();
+  const existingPlugin = await db.get(`SELECT * FROM plugins WHERE name = ?`, [name]);
 
-/**
- * Updates an existing plugin by its name.
- * @param {string} name - The name of the plugin to update.
- * @param {Object} updates - The updates to apply to the plugin.
- * @returns {Promise<Object>} - The updated plugin.
- */
-export async function updatePlugin(name, updates) {
-  const plugins = readPlugins();
-  const pluginIndex = plugins.findIndex((plugin) => plugin.name === name);
+  if (!existingPlugin) throw new Error('Plugin not found');
 
-  if (pluginIndex === -1) {
-    throw new Error('Plugin not found');
-  }
+  const updatedPlugin = {
+    name: updates.name || existingPlugin.name,
+    url: updates.url || existingPlugin.url,
+  };
 
-  plugins[pluginIndex] = { ...plugins[pluginIndex], ...updates };
-  writePlugins(plugins);
-  return plugins[pluginIndex];
-}
+  await db.run(`UPDATE plugins SET name = ?, url = ? WHERE name = ?`, [
+    updatedPlugin.name,
+    updatedPlugin.url,
+    name,
+  ]);
 
-/**
- * Removes a plugin from the database.
- * @param {string} name - The name of the plugin to remove.
- * @returns {Promise<boolean>} - Returns true if the plugin was removed, false otherwise.
- */
-export async function removePlugin(name) {
-  const plugins = readPlugins();
-  const pluginIndex = plugins.findIndex((plugin) => plugin.name === name);
+  return { id: existingPlugin.id, ...updatedPlugin };
+};
 
-  if (pluginIndex === -1) {
-    return false;
-  }
+export const removePlugin = async (name) => {
+  const db = await initDb();
+  const result = await db.run(`DELETE FROM plugins WHERE name = ?`, [name]);
+  return result.changes > 0;
+};
 
-  plugins.splice(pluginIndex, 1);
-  writePlugins(plugins);
-  return true;
-}
-
-/**
- * Retrieves all plugins from the database.
- * @returns {Promise<Array>} - An array of all plugins.
- */
-export async function getPlugins() {
-  return readPlugins();
-}
+export const getPlugins = async () => {
+  const db = await initDb();
+  return db.all(`SELECT * FROM plugins`);
+};

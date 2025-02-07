@@ -1,9 +1,10 @@
 node_modules
 database.db
+database.db-shm
+database.db-wal
 .env
 test.js
 session
 store
 *.tgz
 config.env
-XSTRO_23_40_60

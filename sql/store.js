@@ -1,164 +1,132 @@
-import fs from 'fs/promises';
-import path from 'path';
-import { isJidBroadcast, isJidGroup, isJidNewsletter } from 'baileys';
+import sqlite3 from 'sqlite3';
+import { open } from 'sqlite';
+import { isJidBroadcast, isJidGroup, isJidNewsletter } from '#libary';
 
-const storeDir = path.join(process.cwd(), 'store');
+const database = open({
+  filename: 'database.db',
+  driver: sqlite3.Database,
+});
 
-const readJSON = async (file) => {
-  try {
-    const filePath = path.join(storeDir, file);
-    const data = await fs.readFile(filePath, 'utf8');
-    return JSON.parse(data);
-  } catch {
-    return [];
-  }
+const initDb = async () => {
+  const db = await database;
+  await db.exec(`
+    CREATE TABLE IF NOT EXISTS contacts (
+      jid TEXT PRIMARY KEY,
+      name TEXT NOT NULL
+    );
+    
+    CREATE TABLE IF NOT EXISTS messages (
+      id TEXT PRIMARY KEY,
+      jid TEXT NOT NULL,
+      message TEXT NOT NULL,
+      timestamp INTEGER NOT NULL,
+      FOREIGN KEY (jid) REFERENCES contacts(jid) ON DELETE CASCADE
+    );
+
+    CREATE TABLE IF NOT EXISTS message_counts (
+      jid TEXT NOT NULL,
+      sender TEXT NOT NULL,
+      count INTEGER DEFAULT 1,
+      PRIMARY KEY (jid, sender)
+    );
+  `);
+  return db;
 };
 
-const writeJSON = async (file, data) => {
-  const filePath = path.join(storeDir, file);
-  await fs.mkdir(storeDir, { recursive: true });
-  await fs.writeFile(filePath, JSON.stringify(data, null, 2));
-};
-
-const saveContact = async (jid, name) => {
+export const saveContact = async (jid, name) => {
   if (!jid || !name || isJidGroup(jid) || isJidBroadcast(jid) || isJidNewsletter(jid)) return;
-  const contacts = await readJSON('contact.json');
-  const index = contacts.findIndex((contact) => contact.jid === jid);
-  if (index > -1) {
-    contacts[index].name = name;
-  } else {
-    contacts.push({ jid, name });
-  }
-  await writeJSON('contact.json', contacts);
+  const db = await initDb();
+  await db.run(
+    `INSERT INTO contacts (jid, name) VALUES (?, ?) ON CONFLICT(jid) DO UPDATE SET name = excluded.name`,
+    [jid, name]
+  );
 };
 
-const getContacts = async () => {
-  try {
-    const contacts = await readJSON('contact.json');
-    return contacts;
-  } catch (error) {
-    return [];
-  }
+export const getContacts = async () => {
+  const db = await initDb();
+  return db.all(`SELECT * FROM contacts`);
 };
 
-const saveMessage = async (message) => {
-  const jid = message.key.remoteJid;
-  const id = message.key.id;
+export const saveMessage = async (message) => {
+  const { remoteJid: jid, id } = message.key;
   if (!id || !jid || !message) return;
   await saveContact(message.sender, message.pushName);
-  const messages = await readJSON('message.json');
-  const index = messages.findIndex((msg) => msg.id === id && msg.jid === jid);
+  const db = await initDb();
   const timestamp = message.messageTimestamp ? message.messageTimestamp * 1000 : Date.now();
-  if (index > -1) {
-    messages[index].message = message;
-    messages[index].timestamp = timestamp;
-  } else {
-    messages.push({ id, jid, message, timestamp });
-  }
-  await writeJSON('message.json', messages);
+  await db.run(
+    `INSERT INTO messages (id, jid, message, timestamp) VALUES (?, ?, ?, ?) ON CONFLICT(id) DO UPDATE SET message = excluded.message, timestamp = excluded.timestamp`,
+    [id, jid, JSON.stringify(message), timestamp]
+  );
 };
 
-const loadMessage = async (id) => {
+export const loadMessage = async (id) => {
   if (!id) return null;
-  const messages = await readJSON('message.json');
-  const message = messages.find((msg) => msg.id === id);
-  return message ? message.message : null;
+  const db = await initDb();
+  const result = await db.get(`SELECT message FROM messages WHERE id = ?`, [id]);
+  return result ? JSON.parse(result.message) : null;
 };
 
-const getName = async (jid) => {
-  const contacts = await readJSON('contact.json');
-  const contact = contacts.find((contact) => contact.jid === jid);
-  return contact ? contact.name : jid.split('@')[0].replace(/_/g, ' ');
+export const getName = async (jid) => {
+  const db = await initDb();
+  const result = await db.get(`SELECT name FROM contacts WHERE jid = ?`, [jid]);
+  return result ? result.name : jid.split('@')[0].replace(/_/g, ' ');
 };
 
-const saveMessageCount = async (message) => {
+export const saveMessageCount = async (message) => {
   if (!message) return;
-  const jid = message.key.remoteJid;
+  const { remoteJid: jid } = message.key;
   const sender = message.sender;
   if (!jid || !sender || !isJidGroup(jid)) return;
-
-  const messageCounts = await readJSON('message_count.json');
-  const index = messageCounts.findIndex((record) => record.jid === jid && record.sender === sender);
-
-  if (index > -1) {
-    messageCounts[index].count += 1;
-  } else {
-    messageCounts.push({ jid, sender, count: 1 });
-  }
-
-  await writeJSON('message_count.json', messageCounts);
+  const db = await initDb();
+  await db.run(
+    `INSERT INTO message_counts (jid, sender, count) VALUES (?, ?, 1) ON CONFLICT(jid, sender) DO UPDATE SET count = count + 1`,
+    [jid, sender]
+  );
 };
 
-const getInactiveGroupMembers = async (jid, client) => {
+export const getInactiveGroupMembers = async (jid, client) => {
   if (!isJidGroup(jid)) return [];
   const groupMetadata = await client.groupMetadata(jid);
   if (!groupMetadata) return [];
-
-  const messageCounts = await readJSON('message_count.json');
-  const inactiveMembers = groupMetadata.participants.filter((participant) => {
-    const record = messageCounts.find((msg) => msg.jid === jid && msg.sender === participant.id);
-    return !record || record.count === 0;
-  });
-
-  return inactiveMembers.map((member) => member.id);
+  const db = await initDb();
+  const messageCounts = await db.all(`SELECT sender FROM message_counts WHERE jid = ?`, [jid]);
+  const inactiveMembers = groupMetadata.participants.filter(
+    (p) => !messageCounts.some((m) => m.sender === p.id)
+  );
+  return inactiveMembers.map((m) => m.id);
 };
 
-const getGroupMembersMessageCount = async (jid) => {
+export const getGroupMembersMessageCount = async (jid) => {
   if (!isJidGroup(jid)) return [];
-  const messageCounts = await readJSON('message_count.json');
-  const groupCounts = messageCounts
-    .filter((record) => record.jid === jid && record.count > 0)
-    .sort((a, b) => b.count - a.count);
-
+  const db = await initDb();
+  const groupCounts = await db.all(
+    `SELECT sender, count FROM message_counts WHERE jid = ? ORDER BY count DESC`,
+    [jid]
+  );
   return Promise.all(
-    groupCounts.map(async (record) => ({
-      sender: record.sender,
-      name: await getName(record.sender),
-      messageCount: record.count,
+    groupCounts.map(async (r) => ({
+      sender: r.sender,
+      name: await getName(r.sender),
+      messageCount: r.count,
     }))
   );
 };
 
-const getChatSummary = async () => {
-  const messages = await readJSON('message.json');
-  const distinctJids = [...new Set(messages.map((msg) => msg.jid))];
-
-  const summaries = await Promise.all(
-    distinctJids.map(async (jid) => {
-      const chatMessages = messages.filter((msg) => msg.jid === jid);
-      const messageCount = chatMessages.length;
-      const lastMessage = chatMessages.sort(
-        (a, b) => new Date(b.timestamp) - new Date(a.timestamp)
-      )[0];
-      const chatName = isJidGroup(jid) ? jid : await getName(jid);
-
-      return {
-        jid,
-        name: chatName,
-        messageCount,
-        lastMessageTimestamp: lastMessage ? lastMessage.timestamp : null,
-      };
-    })
+export const getChatSummary = async () => {
+  const db = await initDb();
+  const messages = await db.all(
+    `SELECT jid, COUNT(*) as messageCount, MAX(timestamp) as lastMessageTimestamp FROM messages GROUP BY jid ORDER BY lastMessageTimestamp DESC`
   );
-
-  return summaries.sort(
-    (a, b) => new Date(b.lastMessageTimestamp) - new Date(a.lastMessageTimestamp)
+  return Promise.all(
+    messages.map(async (m) => ({
+      jid: m.jid,
+      name: isJidGroup(m.jid) ? m.jid : await getName(m.jid),
+      messageCount: m.messageCount,
+      lastMessageTimestamp: m.lastMessageTimestamp,
+    }))
   );
 };
 
-const saveMessageV1 = saveMessage;
-const saveMessageV2 = (message) => {
-  return Promise.all([saveMessageV1(message), saveMessageCount(message)]);
-};
-
-export {
-  saveContact,
-  getContacts,
-  loadMessage,
-  getName,
-  getChatSummary,
-  saveMessageCount,
-  getInactiveGroupMembers,
-  getGroupMembersMessageCount,
-  saveMessageV2 as saveMessages,
+export const saveMessages = async (message) => {
+  return Promise.all([saveMessage(message), saveMessageCount(message)]);
 };

@@ -1,82 +1,64 @@
-import fs from 'fs';
-import path from 'path';
+import sqlite3 from 'sqlite3';
+import { open } from 'sqlite';
 
-const store = path.join('store', 'schedules.json');
+const database = open({
+  filename: 'database.db',
+  driver: sqlite3.Database,
+});
 
-if (!fs.existsSync(store)) {
-  fs.writeFileSync(store, JSON.stringify([], null, 2));
-}
+const initDb = async () => {
+  const db = await database;
+  await db.exec(`
+    CREATE TABLE IF NOT EXISTS schedules (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      groupId TEXT UNIQUE NOT NULL,
+      muteTime TEXT NOT NULL,
+      unmuteTime TEXT NOT NULL,
+      isMuted BOOLEAN NOT NULL,
+      isScheduled BOOLEAN NOT NULL
+    );
+  `);
+  return db;
+};
 
-const readSchedules = () => JSON.parse(fs.readFileSync(store, 'utf8'));
-const writeSchedules = (schedules) => fs.writeFileSync(store, JSON.stringify(schedules, null, 2));
-
-/**
- * Adds or updates a schedule for a group.
- * @param {string} groupId - The ID of the group.
- * @param {string} muteTime - The mute time for the group.
- * @param {string} unmuteTime - The unmute time for the group.
- * @param {boolean} isMuted - Whether the group is muted.
- * @param {boolean} isScheduled - Whether the schedule is active.
- * @returns {Promise<Object>} - The added or updated schedule.
- */
-export async function addOrUpdateSchedule(
+export const addOrUpdateSchedule = async (
   groupId,
   muteTime,
   unmuteTime,
   isMuted = false,
   isScheduled = false
-) {
-  const schedules = readSchedules();
-  let schedule = schedules.find((schedule) => schedule.groupId === groupId);
+) => {
+  const db = await initDb();
+  const existingSchedule = await db.get(`SELECT * FROM schedules WHERE groupId = ?`, [groupId]);
 
-  if (schedule) {
-    // Update existing schedule
-    schedule.muteTime = muteTime;
-    schedule.unmuteTime = unmuteTime;
-    schedule.isMuted = isMuted;
-    schedule.isScheduled = isScheduled;
-  } else {
-    // Add new schedule
-    schedule = { groupId, muteTime, unmuteTime, isMuted, isScheduled };
-    schedules.push(schedule);
+  if (existingSchedule) {
+    await db.run(
+      `UPDATE schedules SET muteTime = ?, unmuteTime = ?, isMuted = ?, isScheduled = ? WHERE groupId = ?`,
+      [muteTime, unmuteTime, isMuted, isScheduled, groupId]
+    );
+    return { id: existingSchedule.id, groupId, muteTime, unmuteTime, isMuted, isScheduled };
   }
 
-  writeSchedules(schedules);
-  return schedule;
-}
+  const result = await db.run(
+    `INSERT INTO schedules (groupId, muteTime, unmuteTime, isMuted, isScheduled) VALUES (?, ?, ?, ?, ?)`,
+    [groupId, muteTime, unmuteTime, isMuted, isScheduled]
+  );
 
-/**
- * Retrieves a schedule by groupId.
- * @param {string} groupId - The ID of the group.
- * @returns {Promise<Object|null>} - The schedule for the group or null if not found.
- */
-export async function getSchedule(groupId) {
-  const schedules = readSchedules();
-  return schedules.find((schedule) => schedule.groupId === groupId) || null;
-}
+  return { id: result.lastID, groupId, muteTime, unmuteTime, isMuted, isScheduled };
+};
 
-/**
- * Removes a schedule by groupId.
- * @param {string} groupId - The ID of the group.
- * @returns {Promise<boolean>} - Returns true if the schedule was removed, false otherwise.
- */
-export async function removeSchedule(groupId) {
-  const schedules = readSchedules();
-  const index = schedules.findIndex((schedule) => schedule.groupId === groupId);
+export const getSchedule = async (groupId) => {
+  const db = await initDb();
+  return db.get(`SELECT * FROM schedules WHERE groupId = ?`, [groupId]);
+};
 
-  if (index === -1) {
-    return false;
-  }
+export const removeSchedule = async (groupId) => {
+  const db = await initDb();
+  const result = await db.run(`DELETE FROM schedules WHERE groupId = ?`, [groupId]);
+  return result.changes > 0;
+};
 
-  schedules.splice(index, 1);
-  writeSchedules(schedules);
-  return true;
-}
-
-/**
- * Retrieves all schedules.
- * @returns {Promise<Array>} - An array of all schedules.
- */
-export async function getAllSchedules() {
-  return readSchedules();
-}
+export const getAllSchedules = async () => {
+  const db = await initDb();
+  return db.all(`SELECT * FROM schedules`);
+};

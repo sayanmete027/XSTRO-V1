@@ -1,6 +1,6 @@
 import { detectType, getBuffer, getMimeType } from 'xstro-utils';
 import { downloadMessage, isUrl, toJid } from '#utils';
-import { LANG } from '#theme';
+import { LANG } from '#extension';
 
 class Message {
   constructor(client, data) {
@@ -136,11 +136,22 @@ class Message {
     const jid = opts.jid || this.jid;
     const type = opts.type || (await detectType(content));
     const mentions = opts.mentions || this.mention;
-    const msg = await this.client.sendMessage(jid, {
-      [type]: content,
-      contextInfo: { mentionedJid: mentions, ...opts },
-      ...opts,
-    });
+    const quoted =
+      opts?.quoted?.key?.id !== undefined
+        ? opts.quoted
+        : this?.quoted?.key?.id !== undefined
+          ? this.quoted
+          : this.data;
+    console.log(quoted);
+    const msg = await this.client.sendMessage(
+      jid,
+      {
+        [type]: content,
+        contextInfo: { mentionedJid: mentions, ...opts },
+        ...opts,
+      },
+      { quoted: quoted }
+    );
     return new Message(this.client, msg);
   }
 

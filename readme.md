@@ -1,21 +1,21 @@
-# `xstro-md`: A Simple WhatsApp Bot
+# `xstro-md`: Simple WhatsApp Bot
 
-xstro-md is an open-source WhatsApp bot developed by [AstroX11](https://github.com/AstroX11) to help you manage WhatsApp with ease. Originally a personal project to improve JavaScript skills, it has grown with community support. (I hope someone sponsors me one day!)
+xstro-md is an open-source WhatsApp bot designed and developed by [AstroX11](https://github.com/AstroX11) to simplify WhatsApp management. Initially a private endeavor for honing JavaScript, it grew with community contributions over time. (Here's to a sponsor one day!)
 
 > [!Important]  
-> You can modify the source code under the provided license. However, I am not responsible for any unethical use of this software. It was built for educational purposes, so please use it responsibly.
+> You can adapt the source under the terms of the included license, but I disclaim any and all liability for any misuse of this software. It is for educational purposes only—please use it responsibly.
 
 [![npm](https://img.shields.io/npm/dm/xstro-utils?style=for-the-badge)](https://www.npmjs.com/package/xstro-utils)  
 [![Forks](https://img.shields.io/github/forks/AstroX11/Xstro?style=for-the-badge)](https://github.com/AstroX11/Xstro/network/members)  
 [![Stars](https://img.shields.io/github/stars/AstroX11/Xstro?style=for-the-badge)](https://github.com/AstroX11/Xstro/stargazers)
 
-[![Fork Repository](https://img.shields.io/badge/Fork_Repo-blue?style=for-the-badge&logo=github)](https://github.com/AstroX11/Xstro/fork)
-[![Get Session](https://img.shields.io/badge/Get_Session-black?style=for-the-badge&logo=react)](https://bit.ly/41mQBbY)
+[![Fork Repository](https://img.shields.io/badge/Fork_Repo-blue?style=for-the-badge&logo=github)](https://github.com/AstroX11/Xstro/fork)  
+[![Get Session](https://img.shields.io/badge/Get_Session-black?style=for-the-badge&logo=react)](https://bit.ly/41mQBbY)  
 [![Join WhatsApp Support Group](https://img.shields.io/badge/Support_Group-black?style=for-the-badge&logo=whatsapp)](https://chat.whatsapp.com/HIvICIvQ8hL4PmqBu7a2C6)
 
 ## Table of Contents
 
-- [Custom Session Setup](#custom-session-setup)
+- [Wiki](https://github.com/AstroX11/Xstro/wiki)
 - [Deployments](#deployments)
   - [Heroku Deploy](#heroku-deploy)
   - [Koyeb Deploy](#koyeb-deploy)
@@ -27,21 +27,20 @@ xstro-md is an open-source WhatsApp bot developed by [AstroX11](https://github.c
     - [Install Yarn](#install-yarn)
     - [Install Git](#install-git)
     - [Setup and Run](#setup-and-run)
-- [Guides and Support](#guides-and-support)
 - [Contributing](#contributing)
 - [Disclaimer](#disclaimer)
 
-## Custom Session Setup
+## Custom Session Configuration
 
-1. [Install Node.js](https://nodejs.org/en)
+1. [Install Node.js](https://nodejs.org/)
 2. [Install Git](https://git-scm.com/)
-3. Check your Node.js installation:
+3. Verify your Node.js installation:
 
    ```bash
    node -v
    ```
 
-4. Create a folder, open your terminal in that folder, and follow these steps:
+4. Create a new directory, navigate to it in your terminal, and follow these steps:
    - [Session Source](https://github.com/AstroX11/XstroSession)
    - [Session Crypto](https://github.com/AstroX11/session-maker-crypto)
 
@@ -50,15 +49,15 @@ xstro-md is an open-source WhatsApp bot developed by [AstroX11](https://github.c
 ### Heroku Deploy
 
 1. Click [Deploy Now](https://www.heroku.com/deploy?template=https://github.com/AstroX11/Xstro).
-2. Fill in the variables: `SESSION_ID`, `BOT_INFO`, `SUDO`, `STICKER_PACK`, `WARN_COUNT`, and `TIME_ZONE`.
-3. Click **Deploy** to set up the bot.
+2. Enter the required variables: `SESSION_ID`, `BOT_INFO`, `SUDO`, `STICKER_PACK`, `WARN_COUNT`, and `TIME_ZONE`.
+3. Click **Deploy** to begin deploying the bot.
 4. [Watch Video Tutorial](https://tinyurl.com/2yrycr7h)
 
 ### Koyeb Deploy
 
 1. Click [Deploy Now](https://app.koyeb.com/services/deploy?type=git&builder=dockerfile&repository=https://github.com/AstroX11/Xstro&branch=master&name=xstro&env%5BSESSION_ID%5D=null&env%5BSUDO%5D=null&env%5BBOT_INFO%5D=αѕтяσχ11;χѕтяσ%20м∂&env%5BSTICKER_PACK%5D=мα∂є%20бу;χѕтяσ%20мυℓтι%20∂єνι¢є%20вσт&env%5BWARN_COUNT%5D=3&env%5BTIME_ZONE%5D=Africa/Lagos).
-2. Fill in the required variables.
-3. Click **Deploy** (avoid altering default settings).
+2. Provide the necessary variables.
+3. Click **Deploy** (leave default settings in place).
 4. [Watch Video Tutorial](https://tinyurl.com/2yrycr7h)
 
 ### Render Deploy
@@ -67,10 +66,10 @@ xstro-md is an open-source WhatsApp bot developed by [AstroX11](https://github.c
 2. Enter the required variables: `SESSION_ID`, `BOT_INFO`, `SUDO`, `STICKER_PACK`, `WARN_COUNT`, and `TIME_ZONE`.
 3. Click **Deploy Blueprint** and wait for the bot to start.
 4. Copy the deployed URL.
-5. To keep the bot alive, create a monitor by signing up or logging in to Better Stack:
-   - [Create an Account](https://betterstack.com/users/sign-up)
+5. To ensure uptime, set up a monitor using Better Stack:
+   - [Sign Up](https://betterstack.com/users/sign-up)
    - [Log In](https://betterstack.com/users/sign-in#magic)
-6. In Better Stack, create a monitor by pasting the deployed URL (it pings every 5 minutes).
+6. In Better Stack, create a monitor with your deployed URL (pings every 5 minutes).
 7. [Watch Video Tutorial](https://tinyurl.com/2yrycr7h)
 
 ### Panel Deploy
@@ -82,7 +81,7 @@ Refer to the [Panel Deployment documentation](https://github.com/AstroX11/Xstro/
 #### Install Node.js
 
 - **Windows:**  
-  [Download Node.js](https://nodejs.org/) and install it. Verify with:
+  [Download Node.js](https://nodejs.org/) and install it. Verify installation:
 
   ```bash
   node -v
@@ -109,7 +108,7 @@ Refer to the [Panel Deployment documentation](https://github.com/AstroX11/Xstro/
 #### Install FFmpeg
 
 - **Windows:**  
-  [Download FFmpeg](https://ffmpeg.org/download.html), extract it, and add the `bin` folder to your PATH. Verify with:
+  [Download FFmpeg](https://ffmpeg.org/download.html), extract it, and add the `bin` folder to your PATH. Verify installation:
 
   ```bash
   ffmpeg -version
@@ -131,7 +130,7 @@ Refer to the [Panel Deployment documentation](https://github.com/AstroX11/Xstro/
 
 #### Install Yarn
 
-Install Yarn globally:
+Install globally:
 
 ```bash
 npm install -g yarn
@@ -141,7 +140,7 @@ yarn -v
 #### Install Git
 
 - **Windows:**  
-  [Download Git](https://git-scm.com/) and install it. Verify with:
+  [Download Git](https://git-scm.com/) and install it. Verify installation:
 
   ```bash
   git --version
@@ -172,15 +171,6 @@ yarn -v
    yarn install
    npm start
    ```
-
-## Guides and Support
-
-- [External Plugins](https://github.com/AstroX11/Xstro/wiki/External-Plugins)
-- [Render Support](https://github.com/AstroX11/Xstro/wiki/Render-Support)
-- [Heroku Support](https://github.com/AstroX11/Xstro/wiki/Heroku-Support)
-- [Windows Setup](https://github.com/AstroX11/Xstro/wiki/Windows-Setup)
-- [Plugin Creation](https://github.com/AstroX11/Xstro/wiki/Plugin-Creation)
-- [Create Custom Listener](https://github.com/AstroX11/Xstro/wiki/Create-Custom-Listener)
 
 ## Contributing
 

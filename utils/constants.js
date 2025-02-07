@@ -1,6 +1,6 @@
 import { promises as fs, readdirSync, statSync } from 'fs';
 import { join } from 'path';
-import { jidNormalizedUser } from 'baileys';
+import { jidNormalizedUser } from '#libary';
 import { getBuffer } from 'xstro-utils';
 
 export function manageProcess(type) {

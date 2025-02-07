@@ -1,4 +1,4 @@
-import { LANG } from '#theme';
+import { LANG } from '#extension';
 import { bot } from '#src';
 import { remini, XSTRO, removeBg, UploadFileUgu, createSticker, extractUrl } from '#utils';
 import { getBuffer, getJson } from 'xstro-utils';

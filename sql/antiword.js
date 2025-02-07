@@ -1,47 +1,46 @@
-import fs from 'fs';
-import path from 'path';
+import sqlite3 from 'sqlite3';
+import { open } from 'sqlite';
 
-const store = path.join('store', 'antiword.json');
+const database = open({
+  filename: 'database.db',
+  driver: sqlite3.Database,
+});
 
-if (!fs.existsSync(store)) fs.writeFileSync(store, JSON.stringify([]));
+const initDb = async () => {
+  const db = await database;
+  await db.exec(`
+    CREATE TABLE IF NOT EXISTS antiword (
+      jid TEXT PRIMARY KEY,
+      status INTEGER NOT NULL DEFAULT 0
+    );
+    CREATE TABLE IF NOT EXISTS antiwords (
+      jid TEXT NOT NULL,
+      word TEXT NOT NULL,
+      PRIMARY KEY (jid, word),
+      FOREIGN KEY (jid) REFERENCES antiword(jid) ON DELETE CASCADE
+    );
+  `);
+  return db;
+};
 
-const readDB = () => JSON.parse(fs.readFileSync(store, 'utf8'));
-const writeDB = (data) => fs.writeFileSync(store, JSON.stringify(data, null, 2));
-
-async function setAntiWordStatus(jid, action) {
-  if (!jid) return;
-  const db = readDB();
-  let record = db.find((item) => item.jid === jid);
-
-  if (!record) {
-    record = { jid, status: action, words: [] };
-    db.push(record);
-  } else {
-    record.status = action;
-  }
-
-  writeDB(db);
-
-  return {
-    success: true,
-    message: `Antiword ${action ? 'enabled' : 'disabled'} for group ${jid}`,
-  };
+export async function setAntiWordStatus(jid, action) {
+  const db = await initDb();
+  await db.run(
+    `INSERT INTO antiword (jid, status) VALUES (?, ?) 
+    ON CONFLICT(jid) DO UPDATE SET status = excluded.status`,
+    [jid, action ? 1 : 0]
+  );
+  return { success: true, message: `Antiword ${action ? 'enabled' : 'disabled'} for group ${jid}` };
 }
 
-async function addAntiWords(jid, words) {
-  if (!jid || !words) return;
-  const db = readDB();
-  let record = db.find((item) => item.jid === jid);
+export async function addAntiWords(jid, words) {
+  const db = await initDb();
+  const insertStmt = await db.prepare(`INSERT OR IGNORE INTO antiwords (jid, word) VALUES (?, ?)`);
 
-  if (!record) {
-    record = { jid, status: false, words: words };
-    db.push(record);
-  } else {
-    const uniqueWords = [...new Set([...record.words, ...words])];
-    record.words = uniqueWords;
+  for (const word of words) {
+    await insertStmt.run(jid, word);
   }
-
-  writeDB(db);
+  await insertStmt.finalize();
 
   return {
     success: true,
@@ -50,20 +49,14 @@ async function addAntiWords(jid, words) {
   };
 }
 
-async function removeAntiWords(jid, words) {
-  if (!jid) return;
-  const db = readDB();
-  const record = db.find((item) => item.jid === jid);
+export async function removeAntiWords(jid, words) {
+  const db = await initDb();
+  const deleteStmt = await db.prepare(`DELETE FROM antiwords WHERE jid = ? AND word = ?`);
 
-  if (!record) {
-    return {
-      success: false,
-      message: `No antiwords found for group ${jid}`,
-    };
+  for (const word of words) {
+    await deleteStmt.run(jid, word);
   }
-
-  record.words = record.words.filter((word) => !words.includes(word));
-  writeDB(db);
+  await deleteStmt.finalize();
 
   return {
     success: true,
@@ -72,31 +65,20 @@ async function removeAntiWords(jid, words) {
   };
 }
 
-async function getAntiWords(jid) {
-  if (!jid) return;
-  const db = readDB();
-  const record = db.find((item) => item.jid === jid);
-
-  if (!record) {
-    return {
-      success: true,
-      status: false,
-      words: [],
-    };
-  }
+export async function getAntiWords(jid) {
+  const db = await initDb();
+  const record = await db.get(`SELECT status FROM antiword WHERE jid = ?`, [jid]);
+  const words = await db.all(`SELECT word FROM antiwords WHERE jid = ?`, [jid]);
 
   return {
     success: true,
-    status: record.status,
-    words: record.words,
+    status: record ? !!record.status : false,
+    words: words.map((row) => row.word),
   };
 }
 
-async function isAntiWordEnabled(jid) {
-  if (!jid) return;
-  const db = readDB();
-  const record = db.find((item) => item.jid === jid);
-  return record ? record.status : false;
+export async function isAntiWordEnabled(jid) {
+  const db = await initDb();
+  const record = await db.get(`SELECT status FROM antiword WHERE jid = ?`, [jid]);
+  return record ? !!record.status : false;
 }
-
-export { setAntiWordStatus, addAntiWords, removeAntiWords, getAntiWords, isAntiWordEnabled };

@@ -1,61 +1,44 @@
-import fs from 'fs';
-import path from 'path';
+import sqlite3 from 'sqlite3';
+import { open } from 'sqlite';
 
-const store = path.join('store', 'group_events.json');
+const database = open({
+  filename: 'database.db',
+  driver: sqlite3.Database,
+});
 
-if (!fs.existsSync(store)) {
-  fs.writeFileSync(store, JSON.stringify([], null, 2));
-}
+const initDb = async () => {
+  const db = await database;
+  await db.exec(`
+    CREATE TABLE IF NOT EXISTS group_events (
+      jid TEXT PRIMARY KEY,
+      enabled INTEGER NOT NULL CHECK (enabled IN (0, 1))
+    );
+  `);
+  return db;
+};
 
-const readGroupEvents = () => JSON.parse(fs.readFileSync(store, 'utf8'));
-const writeGroupEvents = (groupEvents) =>
-  fs.writeFileSync(store, JSON.stringify(groupEvents, null, 2));
-
-/**
- * Enables group events for a given JID.
- * @param {string} jid - The unique identifier (chat ID or JID).
- * @returns {Promise<boolean>} - Always returns true upon success.
- */
 export const enableGroupEvents = async (jid) => {
-  const groupEvents = readGroupEvents();
-  const existingEvent = groupEvents.find((event) => event.jid === jid);
-
-  if (existingEvent) {
-    existingEvent.enabled = true;
-  } else {
-    groupEvents.push({ jid, enabled: true });
-  }
-
-  writeGroupEvents(groupEvents);
+  const db = await initDb();
+  await db.run(
+    `INSERT INTO group_events (jid, enabled) VALUES (?, ?) 
+     ON CONFLICT(jid) DO UPDATE SET enabled = excluded.enabled`,
+    [jid, 1]
+  );
   return true;
 };
 
-/**
- * Disables group events for a given JID.
- * @param {string} jid - The unique identifier (chat ID or JID).
- * @returns {Promise<boolean>} - Always returns true upon success.
- */
 export const disableGroupEvents = async (jid) => {
-  const groupEvents = readGroupEvents();
-  const existingEvent = groupEvents.find((event) => event.jid === jid);
-
-  if (existingEvent) {
-    existingEvent.enabled = false;
-  } else {
-    groupEvents.push({ jid, enabled: false });
-  }
-
-  writeGroupEvents(groupEvents);
+  const db = await initDb();
+  await db.run(
+    `INSERT INTO group_events (jid, enabled) VALUES (?, ?) 
+     ON CONFLICT(jid) DO UPDATE SET enabled = excluded.enabled`,
+    [jid, 0]
+  );
   return true;
 };
 
-/**
- * Checks if group events are enabled for a given JID.
- * @param {string} jid - The unique identifier (chat ID or JID).
- * @returns {Promise<boolean>} - Returns true if group events are enabled, false otherwise.
- */
 export const isGroupEventEnabled = async (jid) => {
-  const groupEvents = readGroupEvents();
-  const event = groupEvents.find((event) => event.jid === jid);
-  return event ? event.enabled : false;
+  const db = await initDb();
+  const data = await db.get(`SELECT enabled FROM group_events WHERE jid = ?`, [jid]);
+  return data ? !!data.enabled : false;
 };

@@ -1,69 +1,46 @@
-import fs from 'fs';
-import path from 'path';
+import sqlite3 from 'sqlite3';
+import { open } from 'sqlite';
 
-const store = path.join('store', 'mentions.json');
+const database = open({
+  filename: 'database.db',
+  driver: sqlite3.Database,
+});
 
-if (!fs.existsSync(store)) {
-  fs.writeFileSync(store, JSON.stringify([], null, 2));
-}
+const initDb = async () => {
+  const db = await database;
+  await db.exec(`
+    CREATE TABLE IF NOT EXISTS mentions (
+      jid TEXT PRIMARY KEY,
+      message TEXT NOT NULL
+    );
+  `);
+  return db;
+};
 
-const readMentions = () => JSON.parse(fs.readFileSync(store, 'utf8'));
-const writeMentions = (mentions) => fs.writeFileSync(store, JSON.stringify(mentions, null, 2));
-
-/**
- * Sets a mention message for a specific JID.
- * @param {string} jid - The unique identifier (chat ID or JID).
- * @param {Object} message - The message data to associate with the JID.
- * @returns {Promise<boolean>} - Always returns true upon success.
- */
-export async function setMention(jid, message) {
-  const mentions = readMentions();
-  const existingMention = mentions.find((mention) => mention.jid === jid);
-
-  if (existingMention) {
-    existingMention.message = message;
-  } else {
-    mentions.push({ jid, message });
-  }
-
-  writeMentions(mentions);
+export const setMention = async (jid, message) => {
+  const db = await initDb();
+  await db.run(
+    `INSERT INTO mentions (jid, message) VALUES (?, ?) 
+     ON CONFLICT(jid) DO UPDATE SET message = excluded.message`,
+    [jid, JSON.stringify(message)]
+  );
   return true;
-}
+};
 
-/**
- * Deletes a mention for a specific JID.
- * @param {string} jid - The unique identifier (chat ID or JID).
- * @returns {Promise<boolean>} - Returns true if deletion was successful, false otherwise.
- */
-export async function delMention(jid) {
-  const mentions = readMentions();
-  const updatedMentions = mentions.filter((mention) => mention.jid !== jid);
+export const delMention = async (jid) => {
+  const db = await initDb();
+  const result = await db.run(`DELETE FROM mentions WHERE jid = ?`, [jid]);
+  return result.changes > 0;
+};
 
-  if (mentions.length !== updatedMentions.length) {
-    writeMentions(updatedMentions);
-    return true;
-  }
+export const isMention = async (jid) => {
+  const db = await initDb();
+  const data = await db.get(`SELECT 1 FROM mentions WHERE jid = ?`, [jid]);
+  return !!data;
+};
 
-  return false;
-}
-
-/**
- * Checks if a mention exists for a specific JID.
- * @param {string} jid - The unique identifier (chat ID or JID).
- * @returns {Promise<boolean>} - Returns true if a mention exists, false otherwise.
- */
-export async function isMention(jid) {
-  const mentions = readMentions();
-  return mentions.some((mention) => mention.jid === jid);
-}
-
-/**
- * Retrieves the mention message for a specific JID.
- * @param {string} jid - The unique identifier (chat ID or JID).
- * @returns {Promise<Object|null>} - The message data if it exists, otherwise null.
- */
-export async function getMention(jid) {
-  const mentions = readMentions();
-  const mention = mentions.find((mention) => mention.jid === jid);
-  return mention ? mention.message : null;
-}
+export const getMention = async (jid) => {
+  const db = await initDb();
+  const data = await db.get(`SELECT message FROM mentions WHERE jid = ?`, [jid]);
+  return data ? JSON.parse(data.message) : null;
+};

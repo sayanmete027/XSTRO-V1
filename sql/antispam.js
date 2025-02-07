@@ -1,27 +1,39 @@
-import fs from 'fs';
-import path from 'path';
-import { isJidGroup } from 'baileys';
+import sqlite3 from 'sqlite3';
+import { open } from 'sqlite';
+import { isJidGroup } from '#libary';
 
-const store = path.join('store', 'antispam.json');
+const database = open({
+  filename: 'database.db',
+  driver: sqlite3.Database,
+});
 
-if (!fs.existsSync(store)) fs.writeFileSync(store, JSON.stringify({}));
+const initDb = async () => {
+  const db = await database;
+  await db.exec(`
+    CREATE TABLE IF NOT EXISTS antispam (
+      jid TEXT PRIMARY KEY,
+      mode TEXT NOT NULL
+    )
+  `);
+  return db;
+};
 
-const readDB = () => JSON.parse(fs.readFileSync(store, 'utf8'));
-const writeDB = (data) => fs.writeFileSync(store, JSON.stringify(data, null, 2));
-
-async function setAntiSpam(jid, mode) {
+export async function setAntiSpam(jid, mode) {
+  const db = await initDb();
   const normalizedJid = isJidGroup(jid) ? jid : 'global';
-  const db = readDB();
-  db[normalizedJid] = { mode };
-  writeDB(db);
+  const existing = await db.get(`SELECT * FROM antispam WHERE jid = ?`, [normalizedJid]);
+
+  if (existing) {
+    await db.run(`UPDATE antispam SET mode = ? WHERE jid = ?`, [mode, normalizedJid]);
+  } else {
+    await db.run(`INSERT INTO antispam (jid, mode) VALUES (?, ?)`, [normalizedJid, mode]);
+  }
   return true;
 }
 
-async function getAntiSpamMode(jid) {
+export async function getAntiSpamMode(jid) {
+  const db = await initDb();
   const normalizedJid = isJidGroup(jid) ? jid : 'global';
-  const db = readDB();
-  const setting = db[normalizedJid];
-  return setting ? setting.mode : 'off';
+  const result = await db.get(`SELECT mode FROM antispam WHERE jid = ?`, [normalizedJid]);
+  return result ? result.mode : 'off';
 }
-
-export { setAntiSpam, getAntiSpamMode };

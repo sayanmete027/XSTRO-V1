@@ -1,4 +1,4 @@
-import { LANG } from '#theme';
+import { LANG } from '#extension';
 import { getConfig } from '#sql';
 
 const commands = [];

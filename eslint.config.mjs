@@ -31,7 +31,7 @@ const eslintConfig = {
     ]
   },
   files: ['**/*.js'],
-  ignores: ['node_modules/**', 'dist/**']
+  ignores: ['node_modules/**', 'resources/**', 'resources/lib/*']
 };
 
 export default eslintConfig;

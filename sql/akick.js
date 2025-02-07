@@ -1,36 +1,49 @@
-import fs from 'fs';
-import path from 'path';
+import sqlite3 from 'sqlite3';
+import { open } from 'sqlite';
 
-const store = path.join('store', 'autokick.json');
+const database = open({
+  filename: 'database.db',
+  driver: sqlite3.Database,
+});
 
-const readDB = () => JSON.parse(fs.readFileSync(store, 'utf8'));
-const writeDB = (data) => fs.writeFileSync(store, JSON.stringify(data, null, 2));
+const initDB = async () => {
+  const db = await database;
+  await db.exec(`
+    CREATE TABLE IF NOT EXISTS autokick (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      groupJid TEXT NOT NULL,
+      userJid TEXT NOT NULL,
+      UNIQUE(groupJid, userJid)
+    )
+  `);
+};
 
 export const addAKick = async (groupJid, userJid) => {
-  if (!fs.existsSync(store)) fs.writeFileSync(store, JSON.stringify([]));
-  const data = readDB();
-  if (data.some((record) => record.groupJid === groupJid && record.userJid === userJid)) {
+  await initDB();
+  const db = await database;
+  try {
+    await db.run(`INSERT INTO autokick (groupJid, userJid) VALUES (?, ?)`, [groupJid, userJid]);
+    return true;
+  } catch {
     return false;
   }
-  data.push({ groupJid, userJid });
-  writeDB(data);
-  return true;
 };
 
 export const delKick = async (groupJid, userJid) => {
-  if (!fs.existsSync(store)) fs.writeFileSync(store, JSON.stringify([]));
-  const data = readDB();
-  const filteredData = data.filter(
-    (record) => !(record.groupJid === groupJid && record.userJid === userJid)
-  );
-  writeDB(filteredData);
-  return data.length !== filteredData.length;
+  await initDB();
+  const db = await database;
+  const { changes } = await db.run(`DELETE FROM autokick WHERE groupJid = ? AND userJid = ?`, [
+    groupJid,
+    userJid,
+  ]);
+  return changes > 0;
 };
 
 export const getKicks = async (groupJid, userJid = null) => {
-  if (!fs.existsSync(store)) fs.writeFileSync(store, JSON.stringify([]));
-  const data = readDB();
-  return data.filter(
-    (record) => record.groupJid === groupJid && (!userJid || record.userJid === userJid)
+  await initDB();
+  const db = await database;
+  return await db.all(
+    `SELECT * FROM autokick WHERE groupJid = ? ${userJid ? 'AND userJid = ?' : ''}`,
+    userJid ? [groupJid, userJid] : [groupJid]
   );
 };
