@@ -15,7 +15,7 @@ bot(
   },
   async (message) => {
     const start = performance.now();
-    const msg = await message.reply('Testing Speed...');
+    const msg = await message.send('Pong!');
     const end = performance.now();
     await msg.edit(`\`\`\`Pong! ${(end - start).toFixed(1)} ms\`\`\``);
   }
