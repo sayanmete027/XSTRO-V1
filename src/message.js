@@ -101,7 +101,7 @@ class Message {
             title: this.pushName,
             body: LANG.BOT_NAME,
             mediaType: 1,
-            thumbnailUrl: LANG.THUMBNAIL,
+            thumbnail: await getBuffer(LANG.THUMBNAIL),
             sourceUrl: LANG.REPO_URL,
             showAdAttribution: true,
           },
