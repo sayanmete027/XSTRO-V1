@@ -1,10 +1,8 @@
 import http from 'http';
+import cluster from 'cluster';
 import { config } from 'dotenv';
 import { client, eventlogger, initSession, loadPlugins } from '#src';
-import cluster from 'cluster';
-import { mkdir } from 'fs/promises';
-import { fetchPlugins } from '#utils';
-import { SessionMigrator } from '#extension';
+import { fetchPlugins, SessionMigrator } from '#extension';
 
 config();
 
@@ -46,7 +44,6 @@ if (cluster.isPrimary) {
 } else {
   const startServer = async () => {
     console.log('Starting...');
-    await mkdir('store', { recursive: true });
     eventlogger();
     await initSession();
     await SessionMigrator('session', 'database.db');

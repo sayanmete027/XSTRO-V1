@@ -21,9 +21,9 @@ import {
 } from '#lib';
 import Message from './message.js';
 import { EventEmitter } from 'events';
-import { manageProcess, deepClone, toJid, devs } from '#utils';
+import { manageProcess, toJid, devs } from '#utils';
 import { loadMessage, saveMessages, getName, getConfig, addSudo } from '#sql';
-import { Plugins, logger, serialize, listenersPlugins, commands } from '#src';
+import { logger, serialize, commands, ExecuteCommands, CommandEvents } from '#src';
 import { LANG } from '#extension';
 import { config } from '#config';
 import NodeCache from '@cacheable/node-cache';
@@ -108,7 +108,7 @@ export const client = async () => {
       const { autoRead, autoStatusRead, autolikestatus } = await getConfig();
 
       for (const message of messages) {
-        const msg = await serialize(deepClone(JSON.parse(JSON.stringify(message))), conn);
+        const msg = await serialize(structuredClone(message), conn);
         const data = new Message(conn, msg);
         if (autoRead) await conn.readMessages([msg.key]);
         if (autoStatusRead && isJidBroadcast(msg.from)) await conn.readMessages([msg.key]);
@@ -120,8 +120,8 @@ export const client = async () => {
           );
         }
         await Promise.all([
-          listenersPlugins(data, msg, conn),
-          Plugins(data, msg, conn),
+          CommandEvents(data, msg, conn),
+          ExecuteCommands(data, msg, conn),
           saveMessages(msg),
           AntiDelete(msg, data),
           AntiSpammer(msg),

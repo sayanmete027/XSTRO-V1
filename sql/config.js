@@ -1,118 +1,98 @@
-import fs from 'fs';
-import path from 'path';
+import sqlite3 from 'sqlite3';
+import { open } from 'sqlite';
 
-const store = path.join('config.json');
+const database = open({
+  filename: 'database.db',
+  driver: sqlite3.Database,
+});
 
-if (!fs.existsSync(store)) {
-  fs.writeFileSync(
-    store,
-    JSON.stringify(
-      {
-        autoRead: false,
-        autoStatusRead: false,
-        cmdReact: true,
-        cmdRead: false,
-        mode: false,
-        PREFIX: '.',
-        disabledCmds: [],
-        autolikestatus: false,
-        disablegc: false,
-        disabledm: false,
-      },
-      null,
-      2
-    )
-  );
-}
+// Initialize database - should be called once at startup
+async function initDb() {
+  const db = await database;
 
-const readConfig = () => JSON.parse(fs.readFileSync(store, 'utf8'));
-const writeConfig = (config) => fs.writeFileSync(store, JSON.stringify(config, null, 2));
+  await db.exec(`
+    CREATE TABLE IF NOT EXISTS config (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      prefix TEXT DEFAULT '.',
+      mode INTEGER DEFAULT 1,
+      autoRead INTEGER DEFAULT 0,
+      autoStatusRead INTEGER DEFAULT 0,
+      autolikestatus INTEGER DEFAULT 0,
+      disablegc INTEGER DEFAULT 0,
+      disabledm INTEGER DEFAULT 0,
+      cmdReact INTEGER DEFAULT 0,
+      cmdRead INTEGER DEFAULT 0,
+      disabledCmds TEXT DEFAULT '[]'
+    );
+  `);
 
-async function ensureConfigExists() {
-  let config = readConfig();
-  if (!config) {
-    config = {
-      autoRead: false,
-      autoStatusRead: false,
-      cmdReact: true,
-      cmdRead: false,
-      mode: false,
-      PREFIX: '.',
-      disabledCmds: [],
-      autolikestatus: false,
-      disablegc: false,
-      disabledm: false,
-    };
-    writeConfig(config);
-  }
-  return config;
-}
-
-async function updateConfig(field, value) {
-  let config = await ensureConfigExists();
-
-  if (field === 'disabledCmds' && Array.isArray(value)) {
-    const currentCmds = config.disabledCmds || [];
-    const newCmds = [...new Set([...currentCmds, ...value])];
-    config.disabledCmds = newCmds;
-    writeConfig(config);
-  } else {
-    const updatedValue = field === 'PREFIX' ? value : !!value;
-    config[field] = updatedValue;
-    writeConfig(config);
+  // Only insert default if no data exists
+  const exists = await db.get('SELECT id FROM config LIMIT 1');
+  if (!exists) {
+    await db.run(`
+      INSERT INTO config 
+        (prefix, mode, autoRead, autoStatusRead, autolikestatus, disablegc, disabledm, cmdReact, cmdRead, disabledCmds)
+      VALUES 
+        ('.', 1, 0, 0, 0, 0, 0, 0, 0, '[]')
+    `);
   }
 
-  return config;
+  return db;
 }
 
-async function getConfig() {
-  const config = await ensureConfigExists();
+// Simply get config from database
+export async function getConfig() {
+  await initDb();
+  const db = await database;
+  const row = await db.get('SELECT * FROM config LIMIT 1');
+  if (!row) return null;
+
   return {
-    autoRead: config.autoRead,
-    autoStatusRead: config.autoStatusRead,
-    cmdReact: config.cmdReact,
-    cmdRead: config.cmdRead,
-    mode: config.mode,
-    PREFIX: config.PREFIX,
-    disabledCmds: config.disabledCmds || [],
-    autolikestatus: config.autolikestatus,
-    disablegc: config.disablegc,
-    disabledm: config.disabledm,
+    prefix: !Array.isArray(row.prefix) ? Array.from(row.prefix) : row.prefix,
+    mode: Boolean(row.mode),
+    autoRead: Boolean(row.autoRead),
+    autoStatusRead: Boolean(row.autoStatusRead),
+    autolikestatus: Boolean(row.autolikestatus),
+    disablegc: Boolean(row.disablegc),
+    disabledm: Boolean(row.disabledm),
+    cmdReact: Boolean(row.cmdReact),
+    cmdRead: Boolean(row.cmdRead),
+    disabledCmds: JSON.parse(row.disabledCmds),
   };
 }
 
-async function addDisabledCmd(cmd) {
-  let config = await ensureConfigExists();
-  const currentCmds = config.disabledCmds || [];
+// Edit specific config values
+export async function editConfig(updates) {
+  await initDb();
+  const allowedKeys = [
+    'prefix',
+    'mode',
+    'autoRead',
+    'autoStatusRead',
+    'autolikestatus',
+    'disablegc',
+    'disabledm',
+    'cmdReact',
+    'cmdRead',
+    'disabledCmds',
+  ];
 
-  if (currentCmds.includes(cmd)) {
-    return { success: false, message: '_Command already disabled._' };
-  }
+  const keys = Object.keys(updates).filter((key) => allowedKeys.includes(key));
+  if (!keys.length) return;
 
-  currentCmds.push(cmd);
-  config.disabledCmds = currentCmds;
-  writeConfig(config);
-  return { success: true, message: `_${cmd} command disabled_` };
+  const db = await database;
+  const setClause = keys.map((key) => `${key} = ?`).join(', ');
+  const values = keys.map((key) => {
+    const val = updates[key];
+    if (key === 'prefix') return val;
+    if (Array.isArray(val)) return JSON.stringify(val);
+    if (typeof val === 'boolean') return val ? 1 : 0;
+    return val;
+  });
+
+  await db.run(
+    `UPDATE config SET ${setClause} WHERE id = (SELECT id FROM config LIMIT 1)`,
+    ...values
+  );
+  return getConfig();
 }
-
-async function removeDisabledCmd(cmd) {
-  let config = await ensureConfigExists();
-  const currentCmds = config.disabledCmds || [];
-
-  if (!currentCmds.includes(cmd)) {
-    return { success: false, message: '_Command is not disabled._' };
-  }
-
-  const updatedCmds = currentCmds.filter((disabledCmd) => disabledCmd !== cmd);
-  config.disabledCmds = updatedCmds;
-  writeConfig(config);
-  return { success: true, message: `_${cmd} command enabled_` };
-}
-
-async function isCmdDisabled(cmd) {
-  const config = await ensureConfigExists();
-  const currentCmds = config.disabledCmds || [];
-  return currentCmds.includes(cmd);
-}
-
-export { updateConfig, getConfig, addDisabledCmd, removeDisabledCmd, isCmdDisabled };

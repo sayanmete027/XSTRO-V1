@@ -1,5 +1,6 @@
 import { bot } from '#src';
 import { getAfkMessage, setAfkMessage, delAfkMessage } from '#sql';
+import { formatDuration } from '#utils';
 
 const afkTrack = {};
 
@@ -55,7 +56,7 @@ bot(
 
     if (message.isGroup) {
       if (message.mention?.includes(message.user)) {
-        return message.send(
+        return message.reply(
           `${afkData.message}\n\nLast Seen: ${formatDuration(Date.now() - afkData.timestamp)}`
         );
       }
@@ -64,16 +65,9 @@ bot(
       const now = Date.now();
       if (now - (afkTrack[message.sender] || 0) < 30000) return;
       afkTrack[message.sender] = now;
-      return message.send(
+      return message.reply(
         `${afkData.message}\n\nLast Seen: ${formatDuration(now - afkData.timestamp)}`
       );
     }
   }
 );
-
-function formatDuration(ms) {
-  const hours = Math.floor(ms / (1000 * 60 * 60));
-  const minutes = Math.floor((ms / (1000 * 60)) % 60);
-  const seconds = Math.floor((ms / 1000) % 60);
-  return `${hours}hr ${minutes}mins ${seconds}sec`;
-}

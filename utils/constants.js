@@ -20,6 +20,21 @@ export function formatBytes(bytes, decimals = 2) {
   return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
 }
 
+export function formatDuration(ms) {
+  const hours = Math.floor(ms / (1000 * 60 * 60));
+  const minutes = Math.floor((ms / (1000 * 60)) % 60);
+  const seconds = Math.floor((ms / 1000) % 60);
+  return `${hours}hr ${minutes}mins ${seconds}sec`;
+}
+
+export function randomizeArray(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
 export function runtime(seconds) {
   seconds = Number(seconds);
   var d = Math.floor(seconds / (3600 * 24));
@@ -132,32 +147,6 @@ export const formatTime = (timestamp) => {
   const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes;
   return `${hours}:${formattedMinutes}${ampm}`;
 };
-
-export function randomizeArray(arr) {
-  for (let i = arr.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
-  }
-  return arr;
-}
-
-export function deepClone(data) {
-  function traverse(value, depth = 0) {
-    if (Array.isArray(value)) {
-      return value.map((item) => traverse(item, depth + 1));
-    } else if (value && typeof value === 'object' && value !== null) {
-      const result = {};
-      Object.entries(value).forEach(([key, val]) => {
-        result[key] = traverse(val, depth + 1);
-      });
-      return result;
-    } else {
-      return value;
-    }
-  }
-
-  return traverse(data);
-}
 
 export const devs = async () =>
   (

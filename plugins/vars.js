@@ -1,5 +1,5 @@
 import { bot } from '#src';
-import { manageVar } from '#utils';
+import { manageVar } from '#extension';
 
 bot(
   {

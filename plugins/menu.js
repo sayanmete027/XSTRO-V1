@@ -12,15 +12,14 @@ bot(
     desc: 'Show All Commands',
     dontAddCommandList: true,
   },
-  async (message) => {
-    const { mode, PREFIX } = await getConfig();
+  async (message, { mode, prefix }) => {
     const cmds = commands.filter(
       (cmd) =>
         cmd.pattern && !cmd.dontAddCommandList && !cmd.pattern.toString().includes('undefined')
     ).length;
     let menuInfo = `\`\`\`
 ╭─── ${config.BOT_INFO.split(';')[1]} ────
-│ Prefix: ${PREFIX}
+│ Prefix: ${prefix}
 │ Owner: ${config.BOT_INFO.split(';')[0]}		
 │ Plugins: ${cmds}
 │ Mode: ${mode ? 'Private' : 'Public'}

@@ -1,48 +1,55 @@
 import { bot } from '#src';
 import { setAntiSpam, getAntiSpamMode } from '#sql';
-import { isJidGroup } from '#libary';
 
 bot(
-  { pattern: 'antispam', public: false, desc: 'Simple Antispam Setup', type: 'user' },
-  async (message, match, { jid, prefix }) => {
-    const isGroup = isJidGroup(jid);
+  {
+    pattern: 'antispam',
+    public: false,
+    desc: 'Simple Antispam Setup',
+    type: 'user',
+  },
+  async (msg, match, { jid, prefix, isGroup }) => {
     if (!match)
-      return message.send(
+      return msg.reply(
         `Usage:\n${prefix}antispam on\n${isGroup ? `${prefix}antispam set [kick|delete]\n` : ''}${prefix}antispam off`
       );
-    const [command, action] = match.toLowerCase().split(' ');
-    if (command === 'on') {
-      if ((await getAntiSpamMode(jid)) !== 'off')
-        return message.send(
+
+    const [cmd, opt] = match.toLowerCase().split(' ');
+    const mode = await getAntiSpamMode(jid);
+
+    if (cmd === 'on') {
+      if (mode !== 'off')
+        return msg.reply(
           isGroup
-            ? '_Antispam is already enabled for this group._'
-            : '_Dm antispam is already enabled._'
+            ? 'Antispam is already enabled for this group.'
+            : 'Antispam is already enabled for dm.'
         );
       await setAntiSpam(jid, isGroup ? 'off' : 'block');
-      return message.send(
-        isGroup ? '_Antispam enabled. Use `antispam set` to configure._' : '_Dm antispam enabled._'
+      return msg.reply(
+        isGroup ? 'Antispam enabled. Use `antispam set` to configure.' : 'Dm antispam enabled.'
       );
     }
-    if (command === 'set') {
-      if (!isGroup) return message.send('_This command is only for groups._');
-      if (!['kick', 'delete'].includes(action))
-        return message.send('_Use `antispam set kick` or `antispam set delete`._');
-      await setAntiSpam(jid, action);
-      return message.send(`_Antispam set to: ${action}_`);
+
+    if (cmd === 'set') {
+      if (!isGroup) return msg.reply('For Groups Only!');
+      if (!['kick', 'delete'].includes(opt))
+        return msg.reply(`Use ${prefix}antispam set kick or ${prefix}antispam set delete.`);
+      await setAntiSpam(jid, opt);
+      return msg.reply(`Antispam set to: ${opt}`);
     }
-    if (command === 'off') {
-      if ((await getAntiSpamMode(jid)) === 'off')
-        return message.send(
+
+    if (cmd === 'off') {
+      if (mode === 'off')
+        return msg.reply(
           isGroup
-            ? '_Antispam is already disabled for this group._'
-            : '_Dm antispam is already disabled._'
+            ? 'Antispam is already disabled for this group.'
+            : 'Dm antispam is already disabled.'
         );
       await setAntiSpam(jid, 'off');
-      return message.send(
-        isGroup ? '_Antispam disabled for this group._' : '_Dm antispam disabled._'
-      );
+      return msg.send(isGroup ? '_Antispam disabled for this group._' : '_Dm antispam disabled._');
     }
-    message.send(
+
+    msg.send(
       `Usage:\n${prefix}antispam on\n${isGroup ? `${prefix}antispam set [kick|delete]\n` : ''}${prefix}antispam off`
     );
   }

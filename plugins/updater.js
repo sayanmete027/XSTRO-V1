@@ -56,7 +56,7 @@ bot(
         const dependencyChanged = await updatedDependencies();
         if (dependencyChanged) {
           await message.send('*Dependencies changed. Installing new dependencies...*');
-          await execAsync('npm install');
+          await execAsync('yarn install');
         }
         process.exit(0);
       }

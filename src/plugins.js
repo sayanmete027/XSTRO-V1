@@ -13,15 +13,15 @@ const bot = function (cmd, func) {
   return cmd;
 };
 
-const Plugins = async (data, msg, client) => {
+async function ExecuteCommands(data, msg, client) {
   if (!msg.body) return;
-  const { PREFIX, disablegc, disabledm, cmdReact, cmdRead, disabledCmds } = await getConfig();
+  const { disablegc, disabledm, cmdReact, cmdRead, disabledCmds } = await getConfig();
 
   for (const cmd of commands) {
-    const prefix = Array.from(PREFIX).find((p) => msg.body.startsWith(p));
-    const match = msg.body.slice(prefix.length).match(cmd.pattern);
-    if (prefix && match) {
-      if (msg.isGroup && disablegc && `${prefix}${match[2]}` !== `${prefix}enablegc`) return;
+    const handler = msg.prefix.find((p) => msg.body.startsWith(p));
+    const match = msg.body.slice(handler.length).match(cmd.pattern);
+    if (handler && match) {
+      if (msg.isGroup && disablegc && `${handler}${match[2]}` !== `${handler}enablegc`) return;
       if (!msg.isGroup && disabledm && msg.from !== msg.user) return;
       if (disabledCmds.includes(match[1])) return await msg.send(LANG.DISABLED_CMD);
 
@@ -42,14 +42,14 @@ const Plugins = async (data, msg, client) => {
       }
     }
   }
-};
+}
 
-const listenersPlugins = async (data, msg, client) => {
-  const freeflow = commands.filter((cmd) => cmd.on);
+const CommandEvents = async (data, msg, client) => {
+  const listeners = commands.filter((cmd) => cmd.on);
 
-  for (const command of freeflow) {
+  for (const command of listeners) {
     await command.function(data, { ...msg, ...data, ...client });
   }
 };
 
-export { commands, bot, Plugins, listenersPlugins };
+export { commands, bot, ExecuteCommands, CommandEvents };

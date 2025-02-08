@@ -1,6 +1,6 @@
-import { LANG } from '#extension';
 import { bot } from '#src';
-import { remini, XSTRO, removeBg, UploadFileUgu, createSticker, extractUrl } from '#utils';
+import { LANG, createSticker } from '#extension';
+import { remini, XSTRO, removeBg, UploadFileUgu, extractUrl } from '#utils';
 import { getBuffer, getJson } from 'xstro-utils';
 
 bot(

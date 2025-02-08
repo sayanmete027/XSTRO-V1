@@ -1,9 +1,9 @@
 import { bot } from '#src';
-import { XSTRO, createSticker, randomizeArray } from '#utils';
-import { getBuffer, getJson } from 'xstro-utils';
 import { delay } from '#libary';
 import { font } from '#lib';
-import { LANG } from '#extension';
+import { XSTRO, randomizeArray } from '#utils';
+import { getBuffer, getJson } from 'xstro-utils';
+import { LANG, createSticker } from '#extension';
 
 bot(
   {

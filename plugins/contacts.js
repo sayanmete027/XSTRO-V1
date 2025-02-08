@@ -1,5 +1,5 @@
 import { bot } from '#src';
-import { getContacts, saveContact } from '#sql';
+import { getContacts } from '#sql';
 import { createVCard, toJid } from '#utils';
 
 bot(

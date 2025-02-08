@@ -1,5 +1,5 @@
 import { bot } from '#src';
-import { installPlugin, removePluginByName, listPlugins } from '#utils';
+import { installPlugin, removePluginByName, listPlugins } from '#extension';
 
 bot(
   {

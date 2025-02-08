@@ -1,5 +1,6 @@
 import { LANG } from '#extension';
 import { bot } from '#src';
+import { XSTRO } from '#utils';
 import {
   audioToBlackVideo,
   convertToMp3,
@@ -12,8 +13,7 @@ import {
   toPTT,
   toVideo,
   webpToImage,
-  XSTRO,
-} from '#utils';
+} from '#extension';
 
 bot(
   {
