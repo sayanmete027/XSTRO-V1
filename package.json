@@ -15,8 +15,7 @@
   },
  "scripts": {
   "start": "node index",
-  "postinstall": "yarn --cwd resources install",
-  "build": "yarn --cwd resources build",
+  "build": "yarn --cwd resources install",
   "lint": "eslint .",
   "lint:fix": "eslint . --fix"
   },
