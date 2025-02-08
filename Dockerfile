@@ -5,7 +5,7 @@ RUN git clone https://github.com/AstroX11/Xstro /Xstro
 WORKDIR /Xstro
 RUN yarn install --production
 WORKDIR /Xstro/resources
-RUN yarn install && yarn build
+RUN yarn install --production
 WORKDIR /Xstro
 EXPOSE 8000
 CMD ["npm", "start"]
