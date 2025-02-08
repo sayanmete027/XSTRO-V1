@@ -11,7 +11,7 @@ bot(
     type: 'warns',
     desc: 'Warn a user for violating rules',
   },
-  async (message, match, {updateBlockStatus}) => {
+  async (message, match, { updateBlockStatus }) => {
     const jid = await message.getJid(match);
     if (!jid) return;
     const { success, warnings } = await addWarn(jid);

@@ -49,7 +49,7 @@ if (cluster.isPrimary) {
     await mkdir('store', { recursive: true });
     eventlogger();
     await initSession();
-    await SessionMigrator('session', 'database.db')
+    await SessionMigrator('session', 'database.db');
     await fetchPlugins();
     await loadPlugins();
     await client();

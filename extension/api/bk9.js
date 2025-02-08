@@ -14,11 +14,10 @@ export async function Bk9AI(option = [''], query = '') {
   if (option[0] === 'gemini') {
     api_response = (await getJson(`${AIPOINT.Gemini}${request}`)).BK9;
     return normalizeResponseMessgae(api_response);
-  } else if(option[0]==='ai') {
+  } else if (option[0] === 'ai') {
     api_response = (await getJson(`${AIPOINT.Ai}${request}`)).BK9;
     return normalizeResponseMessgae(api_response);
-  } else if (option[0]==='') {
-    
+  } else if (option[0] === '') {
   }
 }
 

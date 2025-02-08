@@ -15,7 +15,7 @@ bot(
     body = body.replace(/^[^A-Za-z0-9]*\s*ai\s*/i, '');
     if (!body) return message.send(`Hello ${pushName}`);
     const msg = await message.send('*...wait*');
-    const ai = await Bk9AI(['ai'], body)
+    const ai = await Bk9AI(['ai'], body);
     return await msg.edit(ai || '*try later*');
   }
 );
@@ -141,7 +141,7 @@ bot(
     body = body.replace(/^[^A-Za-z0-9]*\s*gemini\s*/i, '');
     if (!body) return message.send(`Hello ${pushName}`);
     const msg = await message.send('*...wait*');
-    const gemini = await Bk9AI(['gemini'], body)
+    const gemini = await Bk9AI(['gemini'], body);
     return await msg.edit(gemini || '*try later*');
   }
 );
