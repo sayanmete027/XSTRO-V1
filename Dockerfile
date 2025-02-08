@@ -1,4 +1,4 @@
-FROM node:23.7.0
+FROM node:alpine3.19
 ENV NODE_ENV=production
 RUN apk add --no-cache git ffmpeg
 RUN git clone https://github.com/AstroX11/Xstro /Xstro
