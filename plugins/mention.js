@@ -51,7 +51,7 @@ bot(
     type: 'mentions',
   },
   async (message) => {
-    if (!(await isMention(message.jid))) return message.send('_Mention Alreay off_');
+    if (!(await isMention(message.jid))) return message.send('_Mention Already off_');
     await delMention(message.jid);
     return message.send('_Mention Deleted for this Group_');
   }
