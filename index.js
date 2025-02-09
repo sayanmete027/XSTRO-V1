@@ -1,10 +1,8 @@
 import http from 'http';
 import cluster from 'cluster';
-import { config } from 'dotenv';
 import { client, eventlogger, initSession, loadPlugins } from '#src';
 import { fetchPlugins, SessionMigrator } from '#extension';
-
-config();
+import config from '#config';
 
 if (cluster.isPrimary) {
   let isRestarting = false;
@@ -46,7 +44,7 @@ if (cluster.isPrimary) {
     console.log('Starting...');
     eventlogger();
     await initSession();
-    await SessionMigrator('session', 'database.db');
+    await SessionMigrator(`session/${config.SESSION_ID}`, 'database.db');
     await fetchPlugins();
     await loadPlugins();
     await client();

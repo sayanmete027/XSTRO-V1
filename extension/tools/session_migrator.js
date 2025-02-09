@@ -1,22 +1,17 @@
 import sqlite3 from 'sqlite3';
+import { getSessionId, setSessionId } from '#sql';
 import fs from 'fs/promises';
 import path from 'path';
-import { config } from '#config';
-import { getSessionId, setSessionId } from '#sql';
+import config from '#config';
 
 export async function SessionMigrator(Sessionfolder, SessionDataBasePath) {
   try {
-    if (!Sessionfolder || !SessionDataBasePath) {
+    const sId = await getSessionId();
+    if (!Sessionfolder || !SessionDataBasePath || sId === config.SESSION_ID) {
       console.log('No Migration');
       return;
     }
-    const existingSession = await getSessionId();
-    if (existingSession) {
-      if (existingSession === config.SESSION) {
-        console.log('Session is up to date. Skipping migration.');
-        return;
-      }
-    }
+
     async function readSessionFiles() {
       const files = await fs.readdir(Sessionfolder);
       const result = {};
