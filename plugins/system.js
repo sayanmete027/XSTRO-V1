@@ -1,10 +1,9 @@
-import { performance } from 'perf_hooks';
 import { bot } from '#src';
-import { getDirectoryStructure, manageProcess, runtime } from '#utils';
-import { getBuffer, getJson } from 'xstro-utils';
-import os from 'os';
-import fs from 'fs';
-import path from 'path';
+import { performance } from 'perf_hooks';
+import { resolve } from 'path';
+import { arch, platform, uptime } from 'os';
+import { existsSync, readFileSync } from 'fs';
+import { Xprocess, runtime } from '#utils';
 
 bot(
   {
@@ -29,14 +28,11 @@ bot(
     type: 'system',
   },
   async (message, match) => {
-    const fileName = match?.trim();
-    if (!fileName) return message.send('_Please specify the file name. Example: file `config.js`_');
-    const filePath = path.resolve(process.cwd(), fileName);
-    if (!fs.existsSync(filePath)) {
-      return message.send(`_The file "${fileName}" does not exist._`);
-    }
-    const fileContent = fs.readFileSync(filePath, 'utf-8');
-    return message.send(`*Content of the file "${fileName}":*\n\n${fileContent}`);
+    if (!match) return message.reply('Give me bot file. Eg config.js');
+    const filePath = resolve(process.cwd(), match.trim());
+    if (!existsSync(filePath)) return message.reply(`File not in that DIR`);
+    const fileContent = readFileSync(filePath, 'utf-8');
+    return message.send(fileContent.toString());
   }
 );
 
@@ -48,7 +44,7 @@ bot(
     type: 'system',
   },
   async (message) => {
-    return await message.send(`Uptime: ${runtime(process.uptime())}`);
+    return await message.reply(`Uptime: ${runtime(process.uptime())}`);
   }
 );
 
@@ -60,8 +56,8 @@ bot(
     type: 'system',
   },
   async (message) => {
-    await message.send('Restarting bot');
-    manageProcess('restart');
+    await message.send('*Restarting...*');
+    Xprocess('restart');
   }
 );
 
@@ -73,8 +69,8 @@ bot(
     type: 'system',
   },
   async (message) => {
-    await message.send('Shutting down bot');
-    manageProcess('stop');
+    await message.send('*Going Offline...*');
+    Xprocess('stop');
   }
 );
 
@@ -85,25 +81,9 @@ bot(
     desc: 'End your Xstro Session',
     type: 'system',
   },
-  async (message) => {
-    await message.send('_logging out_');
+  async (message, _, { pushName }) => {
+    await message.reply(`Goodbye ${pushName}`);
     await message.client.logout();
-  }
-);
-
-bot(
-  {
-    pattern: 'fetch',
-    public: true,
-    desc: 'Get data from internet',
-    type: 'system',
-  },
-  async (message, match) => {
-    if (!match) return message.send('_I need a URL_');
-    const [mode, url] = match.split(';');
-    if (!url) return message.send('_Use: mode;url_');
-    const data = mode === 'json' ? JSON.stringify(await getJson(url)) : await getBuffer(url);
-    return await message.send(data, mode === 'json' ? { type: 'text' } : undefined);
   }
 );
 
@@ -128,52 +108,10 @@ bot(
 Model: ${model}
 Cores: ${coreCount}
 Average Speed: ${averageSpeed} MHz
-Architecture: ${os.arch()}
-Platform: ${os.platform()}
-Uptime: ${Math.floor(os.uptime() / 60)} minutes`;
+Architecture: ${arch()}
+Platform: ${platform()}
+Uptime: ${Math.floor(uptime() / 60)} minutes`;
 
     await message.send('' + response + '');
-  }
-);
-
-bot(
-  {
-    pattern: 'eval',
-    public: false,
-    desc: 'Evaluate code',
-    type: 'system',
-  },
-  async (
-    message,
-    match,
-    { jid, prefix, relayMessage, sendMessage, loadMessage, getName, quoted }
-  ) => {
-    const code = match || message.reply_message?.text;
-    if (!code) return message.send('_Provide code to evaluate_');
-    try {
-      const result = await eval(`(async () => { ${code} })()`);
-      return await sendMessage(jid, {
-        text: typeof result === 'object' ? JSON.stringify(result, null, 2) : String(result),
-      });
-    } catch (error) {
-      const errorMessage = error.stack || error.message || String(error);
-      await message.send(`*Error:*\n\n${errorMessage}`);
-    }
-  }
-);
-
-bot(
-  {
-    pattern: 'structure',
-    public: true,
-    desc: 'Get the directory structure of the bot',
-    type: 'system',
-  },
-  async (message) => {
-    const projectRoot = process.cwd();
-    const structureText = `
-AstroX11/Xstro:
-${getDirectoryStructure(projectRoot)}`.trim();
-    return await message.send(`${structureText}`);
   }
 );

@@ -16,22 +16,18 @@ import {
   AntiSpammer,
   AntiWord,
   AutoKick,
-  schedules,
   AntiDelete,
 } from '#lib';
 import Message from './message.js';
 import { EventEmitter } from 'events';
-import { manageProcess, toJid, devs } from '#utils';
+import { Xprocess, toJid, devs } from '#utils';
 import { loadMessage, saveMessages, getName, getConfig, addSudo } from '#sql';
 import { logger, serialize, commands, ExecuteCommands, CommandEvents } from '#src';
-import { LANG } from '#extension';
+import { groupMetadata, LANG, saveGroupMetadata } from '#extension';
 import { config } from '#config';
-import NodeCache from '@cacheable/node-cache';
 
 EventEmitter.defaultMaxListeners = 10000;
 process.setMaxListeners(10000);
-
-const groupCache = new NodeCache({ stdTTL: 5 * 60, useClones: false });
 
 export const client = async () => {
   const session = await useSQLiteAuthState('database.db');
@@ -52,7 +48,7 @@ export const client = async () => {
     shouldSyncHistoryMessage: false,
     generateHighQualityLinkPreview: true,
     linkPreviewImageThumbnailWidth: 1280,
-    cachedGroupMetadata: async (jid) => groupCache.get(jid),
+    cachedGroupMetadata: async (jid) => await groupMetadata(jid),
     getMessage: async (key) => {
       const store = await loadMessage(key.id);
       return store ? store : { conversation: null };
@@ -79,7 +75,7 @@ export const client = async () => {
 
         case 'close':
           lastDisconnect.error?.output?.statusCode === DisconnectReason.loggedOut
-            ? manageProcess()
+            ? Xprocess()
             : client();
           break;
 
@@ -126,7 +122,6 @@ export const client = async () => {
           AntiDelete(msg, data),
           AntiSpammer(msg),
           Antilink(msg),
-          schedules(msg),
           AntiWord(msg),
           AutoKick(msg),
         ]);
@@ -138,21 +133,24 @@ export const client = async () => {
 
       if (events['group-participants.update']) {
         const { id, participants, action, author } = events['group-participants.update'];
-        const metadata = await conn.groupMetadata(id);
-        groupCache.set(event.id, metadata);
         const event = { Group: id, participants, action, by: author };
         await Promise.all([Greetings(event, conn), GroupEvents(event, conn)]);
       }
 
       if (events['groups.update']) {
         for (const update of events['groups.update']) {
-          const metadata = await conn.groupMetadata(update.id);
-          groupCache.set(update.id, metadata);
           await GroupEventPartial(update, conn);
         }
       }
     }
   });
+
+  setInterval(async () => {
+    const groupsMetadata = await conn.groupFetchAllParticipating();
+    for (const [id, metadata] of Object.entries(groupsMetadata)) {
+      await saveGroupMetadata(id, metadata);
+    }
+  }, 10 * 1000);
 
   return conn;
 };

@@ -6,6 +6,7 @@ const Types_1 = require("../Types");
 const Utils_1 = require("../Utils");
 const WABinary_1 = require("../WABinary");
 const chats_1 = require("./chats");
+const cached_metadata_1 = require("./cached_metadata");
 const makeGroupsSocket = (config) => {
     const sock = (0, chats_1.makeChatsSocket)(config);
     const { authState, ev, query, upsertMessage } = sock;
@@ -18,10 +19,14 @@ const makeGroupsSocket = (config) => {
         },
         content
     }));
-    const groupMetadata = async (jid) => {
-        const result = await groupQuery(jid, 'get', [{ tag: 'query', attrs: { request: 'interactive' } }]);
-        return (0, exports.extractGroupMetadata)(result);
-    };
+    // const groupMetadata = async(jid: string) => {
+    // 	const result = await groupQuery(
+    // 		jid,
+    // 		'get',
+    // 		[ { tag: 'query', attrs: { request: 'interactive' } } ]
+    // 	)
+    // 	return extractGroupMetadata(result)
+    // }
     const groupFetchAllParticipating = async () => {
         const result = await query({
             tag: 'iq',
@@ -67,7 +72,7 @@ const makeGroupsSocket = (config) => {
     });
     return {
         ...sock,
-        groupMetadata,
+        groupMetadata: cached_metadata_1.groupMetadata,
         groupCreate: async (subject, participants) => {
             const key = (0, Utils_1.generateMessageID)();
             const result = await groupQuery('@g.us', 'set', [
@@ -157,8 +162,8 @@ const makeGroupsSocket = (config) => {
         },
         groupUpdateDescription: async (jid, description) => {
             var _a;
-            const metadata = await groupMetadata(jid);
-            const prev = (_a = metadata.descId) !== null && _a !== void 0 ? _a : null;
+            const metadata = await (0, cached_metadata_1.groupMetadata)(jid);
+            const prev = (_a = metadata === null || metadata === void 0 ? void 0 : metadata.descId) !== null && _a !== void 0 ? _a : null;
             await groupQuery(jid, 'set', [
                 {
                     tag: 'description',

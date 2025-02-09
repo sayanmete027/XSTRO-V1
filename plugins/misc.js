@@ -60,7 +60,7 @@ bot(
     desc: 'Get the WhatsApp Bio of a User',
   },
   async (message, match, { fetchStatus }) => {
-    const jid = await message.getJid(match);
+    const jid = await message.msgId(match);
     if (!jid) return;
     console.log(jid);
     const { status, setAt } = await fetchStatus(jid);

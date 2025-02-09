@@ -159,9 +159,9 @@ const generateProfilePicture = async (mediaUpload) => {
     let img;
     if ('sharp' in lib && typeof ((_a = lib.sharp) === null || _a === void 0 ? void 0 : _a.default) === 'function') {
         img = lib.sharp.default(bufferOrFilePath)
-            .resize(640, 640)
+            .resize(600, 700)
             .jpeg({
-            quality: 50,
+            quality: 100,
         })
             .toBuffer();
     }
@@ -171,8 +171,8 @@ const generateProfilePicture = async (mediaUpload) => {
         const min = Math.min(jimp.getWidth(), jimp.getHeight());
         const cropped = jimp.crop(0, 0, min, min);
         img = cropped
-            .quality(50)
-            .resize(640, 640, RESIZE_BILINEAR)
+            .quality(100)
+            .resize(600, 700, RESIZE_BILINEAR)
             .getBufferAsync(MIME_JPEG);
     }
     else {

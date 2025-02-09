@@ -73,7 +73,7 @@ class Message {
     return true;
   }
 
-  async getJid(match) {
+  async msgId(match) {
     return this.isGroup
       ? match
         ? toJid(match)

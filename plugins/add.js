@@ -16,7 +16,7 @@ bot(
     { jid, profilePictureUrl, groupInviteCode, sendMessage, groupMetadata }
   ) => {
     if (!(await message.getAdmin())) return;
-    const user = await message.getJid(match);
+    const user = await message.msgId(match);
     const inviteLink = await groupInviteCode(jid);
     const data = await groupMetadata(jid);
     const pp = await profilePictureUrl(jid).catch(() => null);
@@ -51,7 +51,7 @@ bot(
   },
   async (message, match, { jid, groupMetadata, profilePictureUrl, query, relayMessage }) => {
     if (!(await message.getAdmin())) return;
-    const user = await message.getJid(match);
+    const user = await message.msgId(match);
     const pp = await profilePictureUrl(jid).catch(() => null);
     const jpegThumbnail = pp ? Buffer.from(await (await fetch(pp)).arrayBuffer()) : Buffer.alloc(0);
 

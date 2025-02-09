@@ -12,7 +12,7 @@ bot(
     desc: 'Warn a user for violating rules',
   },
   async (message, match, { updateBlockStatus }) => {
-    const jid = await message.getJid(match);
+    const jid = await message.msgId(match);
     if (!jid) return;
     const { success, warnings } = await addWarn(jid);
     if (!success) return await message.send('Failed to add warning');
@@ -49,7 +49,7 @@ bot(
     desc: 'Check warnings of a user',
   },
   async (message, match) => {
-    const jid = await message.getJid(match);
+    const jid = await message.msgId(match);
     if (!jid) return;
     const { warnings } = await getWarn(jid);
     await message.send(`@${jid.split('@')[0]} has ${warnings} warnings.`, {
@@ -66,7 +66,7 @@ bot(
     desc: 'Reset warnings of a user',
   },
   async (message, match) => {
-    const jid = await message.getJid(match);
+    const jid = await message.msgId(match);
     if (!jid) return;
     const { success } = await resetWarn(jid);
     if (success) {

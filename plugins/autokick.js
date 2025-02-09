@@ -11,7 +11,7 @@ bot(
   },
   async (message, match, { jid }) => {
     if (!(await message.getAdmin())) return;
-    const user = await message.getJid(match);
+    const user = await message.msgId(match);
 
     const added = await addAKick(jid, user);
     return message.send(
@@ -33,7 +33,7 @@ bot(
   },
   async (message, match, { jid }) => {
     if (!(await message.getAdmin())) return;
-    const user = await message.getJid(match);
+    const user = await message.msgId(match);
 
     const deleted = await delKick(jid, user);
     return message.send(

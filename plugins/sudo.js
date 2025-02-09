@@ -1,6 +1,5 @@
 import { bot } from '#src';
 import { getSudo, delSudo, addSudo, isSudo } from '#sql';
-import { toJid } from '#utils';
 
 bot(
   {
@@ -10,11 +9,10 @@ bot(
     type: 'sudo',
   },
   async (message, _, { prefix }) => {
-    return message.send(`sᴜᴅᴏ sᴇᴛᴜᴘ\n
-_${prefix}addsudo 12345567,22445,356 or @user1,@user2,@user3_
-_${prefix}setsudo number | @user_
-_${prefix}getsudo_
-_${prefix}delsudo number | @user_
+    return message.reply(`How to Use Sudo\n
+${prefix}setsudo @user
+${prefix}getsudo
+${prefix}delsudo @user
 `);
   }
 );
@@ -27,29 +25,11 @@ bot(
     type: 'sudo',
   },
   async (message, match) => {
-    const jid = await message.getJid(match);
+    const jid = await message.msgId(match);
     if (!jid) return;
-    if (isSudo(jid)) return message.send('_Already A Sudo User_');
+    if (await isSudo(jid)) return message.reply('Already a Sudo');
     await addSudo(jid);
     return message.send('@' + jid.split('@')[0] + ' is now a Sudo', { mentions: [jid] });
-  }
-);
-
-bot(
-  {
-    pattern: 'addsudo',
-    public: false,
-    desc: 'Adds Set of Users as Sudo Users',
-    type: 'sudo',
-  },
-  async (message, match) => {
-    if (!match && !message.mention)
-      return message.send('_Usage: 12345567,22445,356 or @user1,@user2,@user3_');
-    match = match.replace(/@/g, '').split(/,\s*|\s+/g);
-    match = match.map((id) => toJid(id));
-    if (!Array.isArray(match)) match = Array.from(match);
-    addSudo(match);
-    return message.send(`Added ${match.length} new Sudo Users`);
   }
 );
 
@@ -61,18 +41,11 @@ bot(
     type: 'sudo',
   },
   async (message, match) => {
-    const jid = await message.getJid(match);
+    const jid = await message.msgId(match);
     if (!jid) return;
-    if (!isSudo(jid)) return message.send('_User was not a sudo user_');
-    if (delSudo(jid)) {
-      return message.send(`@${jid.split('@')[0]} removed from sudo users`, {
-        mentions: [jid],
-      });
-    } else {
-      return message.send(`@${jid.split('@')[0]} is not a sudo user`, {
-        mentions: [jid],
-      });
-    }
+    if (!(await isSudo(jid))) return message.reply(`Wasn't a Sudo user`);
+    await delSudo(jid);
+    return await message.send(`@${jid.split('@')[0]} removed from sudo users`, { mentions: [jid] });
   }
 );
 
@@ -87,6 +60,6 @@ bot(
     const users = getSudo();
     if (!users || users.length === 0) return message.send('ɴᴏ sᴜᴅᴏ ғᴏᴜɴᴅ');
     const list = users.map((jid) => `@${jid.split('@')[0]}`).join('\n');
-    return message.send(`*sᴜᴅᴏ ᴜsᴇʀs:*\n\n${list}`, { mentions: users });
+    return message.send(`*Sudo Users:*\n\n${list}`, { mentions: users });
   }
 );

@@ -1,6 +1,6 @@
 {
   "name": "xstro",
-  "version": "1.6.15",
+  "version": "1.7.0",
   "description": "A simple WhatsApp bot built by AstroX11.",
   "main": "index.js",
   "type": "module",
@@ -47,11 +47,9 @@
     "prettier": "^3.1.0"
   },
   "dependencies": {
-    "@cacheable/node-cache": "^1.5.2",
     "axios": "^1.7.9",
     "dotenv": "^16.4.7",
     "node-webpmux": "^3.2.0",
-    "qrcode-terminal": "^0.12.0",
     "sharp": "^0.33.5",
     "sqlite": "^5.1.1",
     "sqlite3": "^5.1.7",

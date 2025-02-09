@@ -1,8 +1,7 @@
 import { font } from '#lib';
 import { config } from '#config';
 import { bot, commands } from '#src';
-import { getConfig } from '#sql';
-import { formatBytes, runtime } from '#utils';
+import { formatBytes, getRandom, runtime } from '#utils';
 import { platform, totalmem, freemem } from 'os';
 
 bot(
@@ -12,14 +11,14 @@ bot(
     desc: 'Show All Commands',
     dontAddCommandList: true,
   },
-  async (message, { mode, prefix }) => {
+  async (message, _, { mode, prefix }) => {
     const cmds = commands.filter(
       (cmd) =>
         cmd.pattern && !cmd.dontAddCommandList && !cmd.pattern.toString().includes('undefined')
     ).length;
     let menuInfo = `\`\`\`
 ╭─── ${config.BOT_INFO.split(';')[1]} ────
-│ Prefix: ${prefix}
+│ Prefix: ${getRandom(prefix)}
 │ Owner: ${config.BOT_INFO.split(';')[0]}		
 │ Plugins: ${cmds}
 │ Mode: ${mode ? 'Private' : 'Public'}

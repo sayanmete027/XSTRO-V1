@@ -25,7 +25,7 @@ async function ExecuteCommands(data, msg, client) {
       if (!msg.isGroup && disabledm && msg.from !== msg.user) return;
       if (disabledCmds.includes(match[1])) return await msg.send(LANG.DISABLED_CMD);
 
-      const args = match[2] ?? '';
+      const args = match[2] ?? undefined;
 
       if (msg.mode && !msg.sudo) return;
       if (msg.isban) return await msg.send(LANG.BANNED);

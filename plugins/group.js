@@ -140,7 +140,7 @@ bot(
   },
   async (message, match, { jid, groupMetadata, groupParticipantsUpdate }) => {
     if (!(await message.getAdmin())) return;
-    const user = await message.getJid(match);
+    const user = await message.msgId(match);
     if (!user) return;
     const { participants } = await groupMetadata(jid);
     const memebers = participants.find((p) => p.id === user);
@@ -161,7 +161,7 @@ bot(
   },
   async (message, match, { jid, groupMetadata, groupParticipantsUpdate }) => {
     if (!(await message.getAdmin())) return;
-    const user = await message.getJid(match);
+    const user = await message.msgId(match);
     if (!user) return;
     const { participants } = await groupMetadata(jid);
     const participant = participants.find((p) => p.id === user);
@@ -182,7 +182,7 @@ bot(
   },
   async (message, match, { groupParticipantsUpdate }) => {
     if (!(await message.getAdmin())) return;
-    const jid = await message.getJid(match);
+    const jid = await message.msgId(match);
     if (!jid) return;
     await groupParticipantsUpdate(message.jid, [jid], 'remove');
     return message.send(`@${jid.split('@')[0]} removed from Group.`, { mentions: [jid] });

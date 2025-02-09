@@ -24,10 +24,16 @@ export async function initSession() {
   let decrypted = decipher.update(Source.data, 'hex', 'utf8');
   decrypted += decipher.final('utf8');
   const data = JSON.parse(decrypted);
-  mkdirSync('session', { recursive: true });
-  writeFileSync(join('session', 'creds.json'), JSON.stringify(data.creds, null, 2));
+  mkdirSync(`session/${config.SESSION_ID}`, { recursive: true });
+  writeFileSync(
+    join(`session/${config.SESSION_ID}`, 'creds.json'),
+    JSON.stringify(data.creds, null, 2)
+  );
   for (const [filename, syncKeyData] of Object.entries(data.syncKeys)) {
-    writeFileSync(join('session', filename), JSON.stringify(syncKeyData, null, 2));
+    writeFileSync(
+      join(`session/${config.SESSION_ID}`, filename),
+      JSON.stringify(syncKeyData, null, 2)
+    );
   }
   console.log(LANG.CONNECTED_SESSION);
   return data;

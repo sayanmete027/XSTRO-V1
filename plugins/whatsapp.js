@@ -280,7 +280,7 @@ bot(
   },
   async (message, match, { reply_message, quoted }) => {
     if (!reply_message) return message.send('_Reply A Message!_');
-    const jid = await message.getJid(match);
+    const jid = await message.msgId(match);
     if (!jid) return message.send('Reply someone or mention or provide a number');
     await message.forward(jid, quoted, { quoted: quoted });
     return await message.send(`Forwarded to @${jid.split('@')[0]}`, { mentions: [jid] });
@@ -295,7 +295,7 @@ bot(
     desc: 'Blocks A Person',
   },
   async (message, match, { updateBlockStatus }) => {
-    const jid = await message.getJid(match);
+    const jid = await message.msgId(match);
     if (!jid) return;
     await updateBlockStatus(jid, 'block');
   }
@@ -309,7 +309,7 @@ bot(
     desc: 'Unblocks A Person',
   },
   async (message, match, { updateBlockStatus }) => {
-    const jid = await message.getJid(match);
+    const jid = await message.msgId(match);
     if (!jid) return;
     await updateBlockStatus(jid, 'unblock');
   }

@@ -3,6 +3,7 @@ import { GroupMetadata, GroupParticipant, ParticipantAction, SocketConfig, WAMes
 import { generateMessageID, generateMessageIDV2, unixTimestampSeconds } from '../Utils'
 import { BinaryNode, getBinaryNodeChild, getBinaryNodeChildren, getBinaryNodeChildString, jidEncode, jidNormalizedUser } from '../WABinary'
 import { makeChatsSocket } from './chats'
+import {groupMetadata} from './cached_metadata'
 
 export const makeGroupsSocket = (config: SocketConfig) => {
 	const sock = makeChatsSocket(config)
@@ -20,14 +21,14 @@ export const makeGroupsSocket = (config: SocketConfig) => {
 		})
 	)
 
-	const groupMetadata = async(jid: string) => {
-		const result = await groupQuery(
-			jid,
-			'get',
-			[ { tag: 'query', attrs: { request: 'interactive' } } ]
-		)
-		return extractGroupMetadata(result)
-	}
+	// const groupMetadata = async(jid: string) => {
+	// 	const result = await groupQuery(
+	// 		jid,
+	// 		'get',
+	// 		[ { tag: 'query', attrs: { request: 'interactive' } } ]
+	// 	)
+	// 	return extractGroupMetadata(result)
+	// }
 
 
 	const groupFetchAllParticipating = async() => {
@@ -198,7 +199,7 @@ export const makeGroupsSocket = (config: SocketConfig) => {
 		},
 		groupUpdateDescription: async(jid: string, description?: string) => {
 			const metadata = await groupMetadata(jid)
-			const prev = metadata.descId ?? null
+			const prev = metadata?.descId ?? null
 
 			await groupQuery(
 				jid,

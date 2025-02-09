@@ -374,14 +374,14 @@ export const makeMessagesSocket = (config: SocketConfig) => {
 						(async() => {
 							let groupData = useCachedGroupMetadata && cachedGroupMetadata ? await cachedGroupMetadata(jid) : undefined
 							if(groupData && Array.isArray(groupData?.participants)) {
-								logger.trace({ jid, participants: groupData.participants.length }, 'using cached group metadata')
+								console.log({ jid, participants: groupData.participants.length }, 'using cached group metadata')
 							} else if(!isStatus) {
-								groupData = await groupMetadata(jid)
+								groupData = await groupMetadata(jid) || undefined
 							}
 
 							return groupData
-						})(),
-						(async() => {
+
+						})(),						(async() => {
 							if(!participant && !isStatus) {
 								const result = await authState.keys.get('sender-key-memory', [jid])
 								return result[jid] || { }

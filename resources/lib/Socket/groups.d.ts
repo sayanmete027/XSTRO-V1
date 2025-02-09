@@ -4,7 +4,7 @@ import { proto } from '../../WAProto';
 import { GroupMetadata, ParticipantAction, SocketConfig } from '../Types';
 import { BinaryNode } from '../WABinary';
 export declare const makeGroupsSocket: (config: SocketConfig) => {
-    groupMetadata: (jid: string) => Promise<GroupMetadata>;
+    groupMetadata: (jid: string) => Promise<GroupMetadata | null>;
     groupCreate: (subject: string, participants: string[]) => Promise<GroupMetadata>;
     groupLeave: (id: string) => Promise<void>;
     groupUpdateSubject: (jid: string, subject: string) => Promise<void>;

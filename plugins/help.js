@@ -27,7 +27,7 @@ bot(
     type: 'help',
   },
   async (message) => {
-    return await message.reply(LANG.ABOUT)
+    return await message.reply(LANG.ABOUT);
   }
 );
 
@@ -39,7 +39,7 @@ bot(
     type: 'help',
   },
   async (message, match) => {
-    const jid = await message.getJid(match);
+    const jid = await message.msgId(match);
     if (!jid) return;
     if (!jid) return message.send('Provide A Number To Pair');
     const msg = await message.send('Getting Pairing Code');

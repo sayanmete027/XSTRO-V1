@@ -155,9 +155,9 @@ export const generateProfilePicture = async(mediaUpload: WAMediaUpload) => {
 	let img: Promise<Buffer>
 	if('sharp' in lib && typeof lib.sharp?.default === 'function') {
 		img = lib.sharp.default(bufferOrFilePath)
-			.resize(720, 640)
+			.resize(600, 700)
 			.jpeg({
-				quality: 80,
+				quality: 100,
 			})
 			.toBuffer()
 	} else if('jimp' in lib && typeof lib.jimp?.read === 'function') {
@@ -167,8 +167,8 @@ export const generateProfilePicture = async(mediaUpload: WAMediaUpload) => {
 		const cropped = jimp.crop(0, 0, min, min)
 
 		img = cropped
-			.quality(50)
-			.resize(640, 640, RESIZE_BILINEAR)
+			.quality(100)
+			.resize(600, 700, RESIZE_BILINEAR)
 			.getBufferAsync(MIME_JPEG)
 	} else {
 		throw new Boom('No image processing library available')
