@@ -26,20 +26,8 @@ bot(
     desc: 'Github Repository Link',
     type: 'help',
   },
-  async (message, _, { jid, sendMessage }) => {
-    return await sendMessage(jid, {
-      text: LANG.ABOUT,
-      contextInfo: {
-        externalAdReply: {
-          title: LANG.BOT_NAME,
-          body: 'ᴛᴀᴘ ʜᴇʀᴇ sᴏᴜʀᴄᴇ ᴄᴏᴅᴇ',
-          mediaType: 1,
-          thumbnailUrl: LANG.THUMBNAIL,
-          sourceUrl: LANG.REPO_URL,
-          showAdAttribution: true,
-        },
-      },
-    });
+  async (message) => {
+    return await message.reply(LANG.ABOUT)
   }
 );
 

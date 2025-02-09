@@ -100,8 +100,7 @@ class Message {
           externalAdReply: {
             title: this.pushName,
             body: LANG.BOT_NAME,
-            mediaType: 1,
-            thumbnailUrl: LANG.THUMBNAIL,
+            mediaType: null,
             sourceUrl: LANG.REPO_URL,
             showAdAttribution: true,
           },
