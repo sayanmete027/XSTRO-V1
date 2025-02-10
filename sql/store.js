@@ -67,9 +67,10 @@ export const loadMessage = async (id) => {
 };
 
 export const getName = async (jid) => {
+  if (isJidGroup(jid) || isJidBroadcast(jid) || isJidNewsletter(jid)) return null;
   const db = await initDb();
   const result = await db.get(`SELECT name FROM contacts WHERE jid = ?`, [jid]);
-  return result ? result.name : jid.split('@')[0].replace(/_/g, ' ');
+  return result ? result.name : null;
 };
 
 export const saveMessageCount = async (message) => {
@@ -120,7 +121,7 @@ export const getChatSummary = async () => {
   return Promise.all(
     messages.map(async (m) => ({
       jid: m.jid,
-      name: isJidGroup(m.jid) ? m.jid : await getName(m.jid),
+      name: await getName(m.jid),
       messageCount: m.messageCount,
       lastMessageTimestamp: m.lastMessageTimestamp,
     }))

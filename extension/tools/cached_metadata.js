@@ -30,13 +30,10 @@ export const saveGroupMetadata = async (jid, metadata) => {
 
 export const groupMetadata = async (jid) => {
   const db = await initDb();
-  const query = `
-    SELECT metadata
-    FROM group_metadata
-    WHERE jid = ?;
-  `;
+  const query = `SELECT metadata FROM group_metadata WHERE jid = ?;`;
   const result = await db.get(query, [jid]);
-  return result ? result.metadata : null;
+
+  return result && result.metadata ? JSON.parse(result.metadata) : null;
 };
 
 export const deleteGroupMetadata = async (jid) => {

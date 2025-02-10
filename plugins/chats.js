@@ -1,6 +1,7 @@
 import { bot } from '#src';
 import { getChatSummary, getGroupMembersMessageCount, getInactiveGroupMembers } from '#sql';
 import { toJid } from '#utils';
+import { isJidGroup } from '#libary';
 
 bot(
   {
@@ -11,27 +12,16 @@ bot(
   },
   async (message) => {
     const allChats = await getChatSummary();
-    const dmChats = allChats.filter(
-      (chat) =>
-        !chat.jid.endsWith('@g.us') &&
-        !chat.jid.endsWith('@newsletter') &&
-        chat.jid !== 'status@broadcast' &&
-        chat.jid !== message.user
-    );
-
-    if (dmChats.length === 0) {
-      return message.reply('No messages avaliable.');
+    const directChats = allChats.filter((chat) => chat.name);
+    if (directChats.length === 0) {
+      return message.reply('No direct chats found.');
     }
-
-    const Jids = dmChats.map((chat) => chat.jid);
-    const pmMsg = dmChats.map(
-      (chat, index) =>
-        `${index + 1}. @${toJid(chat.jid).split('@')[0]}
-*Messages:* ${chat.messageCount}
-*Time:* ${new Date(chat.lastMessageTimestamp).toLocaleString()}`
-    );
-
-    message.send(`*Personal Messages:*\n\n${pmMsg.join('\n\n')}`, { mentions: Jids });
+    const data = directChats.map((chat, index) => {
+      return `PERSONAL CHATS: ${chat.name}
+MSGS: ${chat.messageCount}
+LAST MSG: ${new Date(chat.lastMessageTimestamp).toLocaleString()}`;
+    });
+    return await message.reply(data.join('\n\n'));
   }
 );
 
@@ -44,28 +34,26 @@ bot(
   },
   async (message) => {
     const allChats = await getChatSummary();
-    const groupChats = allChats.filter((chat) => chat.jid.endsWith('@g.us'));
-
-    if (groupChats.length === 0) {
-      return message.send('No group chats found.');
+    const groupChats = allChats.filter((chat) => isJidGroup(chat.jid));
+    if (!groupChats) {
+      return message.reply('No Groups found yet!');
     }
-
     const data = await Promise.all(
       groupChats.map(async (chat, index) => {
         try {
-          const groupMetadata = await message.client.groupMetadata(chat.jid);
-          return `GC: ${groupMetadata?.subject || 'Unknown Group'}
-MSGS: ${chat.messageCount}
-LAST MSG: ${new Date(chat.lastMessageTimestamp).toLocaleString()}`;
+          const groupdata = await groupMetadata(chat.jid);
+          return `GC: ${groupdata?.subject}
+    MSGS: ${chat.messageCount}
+    LAST MSG: ${new Date(chat.lastMessageTimestamp).toLocaleString()}`;
         } catch (error) {
-          return `GROUP: Unknown Group
-Messages: ${chat.messageCount}
-Last Message: ${new Date(chat.lastMessageTimestamp).toLocaleString()}`;
+          console.error(error);
+          return `GC: Unknown Group
+    MSGS: ${chat.messageCount}
+    LAST MSG: ${new Date(chat.lastMessageTimestamp).toLocaleString()}`;
         }
       })
     );
-
-    message.reply(`Group Chats:\n\n${data.join('\n\n')}`);
+    return await message.reply(data.join('\n'));
   }
 );
 

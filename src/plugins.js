@@ -30,7 +30,8 @@ async function ExecuteCommands(WaInstance, Message, Socket) {
       if (Message.mode && !Message.sudo) return;
       if (Message.isban) return await Message.send(LANG.BANNED);
       if (cmd.isGroup && !Message.isGroup) return Message.send(LANG.GROUP_ONLY);
-      if (!Message.mode && !cmd.public && !Message.sudo) return await Message.send(LANG.PRIVATE_ONLY);
+      if (!Message.mode && !cmd.public && !Message.sudo)
+        return await Message.send(LANG.PRIVATE_ONLY);
       if (cmdReact) await WaInstance.react('⏳');
       if (cmdRead) await Socket.readMessages([Message.key]);
 

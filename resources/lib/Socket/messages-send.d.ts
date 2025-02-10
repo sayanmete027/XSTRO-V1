@@ -65,6 +65,7 @@ export declare const makeMessagesSocket: (config: SocketConfig) => {
     profilePictureUrl: (jid: string, type?: "image" | "preview", timeoutMs?: number | undefined) => Promise<string | undefined>;
     onWhatsApp: (...jids: string[]) => Promise<{
         jid: string;
+        /** Fetch all the devices we've to send a message to */
         exists: unknown;
     }[] | undefined>;
     fetchBlocklist: () => Promise<string[]>;
