@@ -19,14 +19,15 @@ const makeGroupsSocket = (config) => {
         },
         content
     }));
-    // const groupMetadata = async(jid: string) => {
-    // 	const result = await groupQuery(
-    // 		jid,
-    // 		'get',
-    // 		[ { tag: 'query', attrs: { request: 'interactive' } } ]
-    // 	)
-    // 	return extractGroupMetadata(result)
-    // }
+    const groupMetadata = async (jid) => {
+        try {
+            const result = await groupQuery(jid, 'get', [{ tag: 'query', attrs: { request: 'interactive' } }]);
+            return (0, exports.extractGroupMetadata)(result);
+        }
+        catch (error) {
+            return await (0, cached_metadata_1.groupMetadata2)(jid);
+        }
+    };
     const groupFetchAllParticipating = async () => {
         const result = await query({
             tag: 'iq',
@@ -72,7 +73,7 @@ const makeGroupsSocket = (config) => {
     });
     return {
         ...sock,
-        groupMetadata: cached_metadata_1.groupMetadata,
+        groupMetadata,
         groupCreate: async (subject, participants) => {
             const key = (0, Utils_1.generateMessageID)();
             const result = await groupQuery('@g.us', 'set', [
@@ -162,7 +163,7 @@ const makeGroupsSocket = (config) => {
         },
         groupUpdateDescription: async (jid, description) => {
             var _a;
-            const metadata = await (0, cached_metadata_1.groupMetadata)(jid);
+            const metadata = await groupMetadata(jid);
             const prev = (_a = metadata === null || metadata === void 0 ? void 0 : metadata.descId) !== null && _a !== void 0 ? _a : null;
             await groupQuery(jid, 'set', [
                 {

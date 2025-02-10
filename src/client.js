@@ -99,8 +99,7 @@ export const client = async () => {
     if (events['creds.update']) await saveCreds();
 
     if (events['messages.upsert']) {
-      const { messages, type } = events['messages.upsert'];
-      if (type === 'append') return;
+      const { messages } = events['messages.upsert'];
       const { autoRead, autoStatusRead, autolikestatus } = await getConfig();
 
       for (const message of messages) {

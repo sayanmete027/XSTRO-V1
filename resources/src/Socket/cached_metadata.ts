@@ -34,7 +34,7 @@ export const saveGroupMetadata = async (jid: string, metadata: GroupMetadata): P
   await db.run(query, [jid, jsonMetadata]);
 };
 
-export const groupMetadata = async (jid: string): Promise<GroupMetadata | null> => {
+export const groupMetadata2 = async (jid: string): Promise<GroupMetadata | null> => {
   const db = await initDb();
   const query = `
     SELECT metadata

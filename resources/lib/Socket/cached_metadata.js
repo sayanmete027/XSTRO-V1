@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteGroupMetadata = exports.groupMetadata = exports.saveGroupMetadata = void 0;
+exports.deleteGroupMetadata = exports.groupMetadata2 = exports.saveGroupMetadata = void 0;
 const sqlite3_1 = __importDefault(require("sqlite3"));
 const sqlite_1 = require("sqlite");
 const database = (0, sqlite_1.open)({
@@ -31,7 +31,7 @@ const saveGroupMetadata = async (jid, metadata) => {
     await db.run(query, [jid, jsonMetadata]);
 };
 exports.saveGroupMetadata = saveGroupMetadata;
-const groupMetadata = async (jid) => {
+const groupMetadata2 = async (jid) => {
     const db = await initDb();
     const query = `
     SELECT metadata
@@ -41,7 +41,7 @@ const groupMetadata = async (jid) => {
     const result = await db.get(query, [jid]);
     return result ? JSON.parse(result.metadata) : null;
 };
-exports.groupMetadata = groupMetadata;
+exports.groupMetadata2 = groupMetadata2;
 const deleteGroupMetadata = async (jid) => {
     const db = await initDb();
     const query = `

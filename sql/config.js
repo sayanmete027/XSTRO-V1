@@ -20,7 +20,7 @@ async function initDb() {
       autolikestatus INTEGER DEFAULT 0,
       disablegc INTEGER DEFAULT 0,
       disabledm INTEGER DEFAULT 0,
-      cmdReact INTEGER DEFAULT 0,
+      cmdReact INTEGER DEFAULT 1,
       cmdRead INTEGER DEFAULT 0,
       disabledCmds TEXT DEFAULT '[]'
     );
@@ -33,7 +33,7 @@ async function initDb() {
       INSERT INTO config 
         (prefix, mode, autoRead, autoStatusRead, autolikestatus, disablegc, disabledm, cmdReact, cmdRead, disabledCmds)
       VALUES 
-        ('.', 1, 0, 0, 0, 0, 0, 0, 0, '[]')
+        ('.', 1, 0, 0, 0, 0, 0, 1, 0, '[]')
     `);
   }
 

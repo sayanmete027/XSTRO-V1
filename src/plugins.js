@@ -13,32 +13,32 @@ const bot = function (cmd, func) {
   return cmd;
 };
 
-async function ExecuteCommands(data, msg, client) {
-  if (!msg.body) return;
+async function ExecuteCommands(WaInstance, Message, Socket) {
+  if (!Message.body) return;
   const { disablegc, disabledm, cmdReact, cmdRead, disabledCmds } = await getConfig();
 
   for (const cmd of commands) {
-    const handler = msg.prefix.find((p) => msg.body.startsWith(p));
-    const match = msg.body.slice(handler.length).match(cmd.pattern);
+    const handler = Message.prefix.find((p) => Message.body.startsWith(p));
+    const match = Message.body.slice(handler.length).match(cmd.pattern);
     if (handler && match) {
-      if (msg.isGroup && disablegc && `${handler}${match[2]}` !== `${handler}enablegc`) return;
-      if (!msg.isGroup && disabledm && msg.from !== msg.user) return;
-      if (disabledCmds.includes(match[1])) return await msg.send(LANG.DISABLED_CMD);
+      if (Message.isGroup && disablegc && `${handler}${match[2]}` !== `${handler}enablegc`) return;
+      if (!Message.isGroup && disabledm && Message.from !== Message.user) return;
+      if (disabledCmds.includes(match[1])) return await Message.send(LANG.DISABLED_CMD);
 
-      const args = match[2] ?? undefined;
+      const args = match[2] ?? '';
 
-      if (msg.mode && !msg.sudo) return;
-      if (msg.isban) return await msg.send(LANG.BANNED);
-      if (cmd.isGroup && !msg.isGroup) return msg.send(LANG.GROUP_ONLY);
-      if (!msg.mode && !cmd.public && !msg.sudo) return await msg.send(LANG.PRIVATE_ONLY);
-      if (cmdReact) await data.react('⏳');
-      if (cmdRead) await client.readMessages([msg.key]);
+      if (Message.mode && !Message.sudo) return;
+      if (Message.isban) return await Message.send(LANG.BANNED);
+      if (cmd.isGroup && !Message.isGroup) return Message.send(LANG.GROUP_ONLY);
+      if (!Message.mode && !cmd.public && !Message.sudo) return await Message.send(LANG.PRIVATE_ONLY);
+      if (cmdReact) await WaInstance.react('⏳');
+      if (cmdRead) await Socket.readMessages([Message.key]);
 
       try {
-        await cmd.function(data, args, { ...data, ...msg, ...client });
-        return await data.react('');
+        await cmd.function(WaInstance, args, { ...WaInstance, ...Message, ...Socket });
+        return await WaInstance.react('');
       } catch (err) {
-        return msg.error(cmd, err);
+        return Message.error(cmd, err);
       }
     }
   }
