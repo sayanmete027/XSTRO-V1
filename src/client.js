@@ -150,7 +150,7 @@ export const client = async () => {
     for (const [id, metadata] of Object.entries(groupsMetadata)) {
       await saveGroupMetadata(id, metadata);
     }
-  }, 30 * 1000);
+  }, 180 * 1000);
 
   return conn;
 };
