@@ -1,7 +1,7 @@
 import { bot } from '#src';
 import { performance } from 'perf_hooks';
 import { resolve } from 'path';
-import { arch, platform, uptime } from 'os';
+import { arch, cpus, platform, uptime } from 'os';
 import { existsSync, readFileSync } from 'fs';
 import { Xprocess, runtime } from '#utils';
 
@@ -95,14 +95,14 @@ bot(
     type: 'system',
   },
   async (message) => {
-    const cpus = os.cpus();
-    const coreCount = cpus.length;
-    const model = cpus[0].model
+    const cpu = cpus();
+    const coreCount = cpu.length;
+    const model = cpu[0].model
       .replace(/\s+\(.*\)/g, '')
       .replace(/CPU|Processor/gi, '')
       .trim();
 
-    const averageSpeed = Math.round(cpus.reduce((sum, cpu) => sum + cpu.speed, 0) / coreCount);
+    const averageSpeed = Math.round(cpu.reduce((sum, cpu) => sum + cpu.speed, 0) / coreCount);
 
     const response = `CPU Information:
 Model: ${model}
