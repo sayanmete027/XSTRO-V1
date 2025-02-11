@@ -21,7 +21,7 @@ import {
 import Message from './message.js';
 import { EventEmitter } from 'events';
 import { Xprocess, toJid, devs } from '#utils';
-import { loadMessage, saveMessages, getName, getConfig, addSudo } from '#sql';
+import { getMessage, saveMessages, getName, getConfig, addSudo } from '#sql';
 import { logger, serialize, commands, ExecuteCommands, CommandEvents } from '#src';
 import { groupMetadata, LANG, saveGroupMetadata } from '#extension';
 import { config } from '#config';
@@ -50,13 +50,13 @@ export const client = async () => {
     linkPreviewImageThumbnailWidth: 1280,
     cachedGroupMetadata: async (jid) => await groupMetadata(jid),
     getMessage: async (key) => {
-      const store = await loadMessage(key.id);
+      const store = await getMessage(key.id);
       return store ? store : { conversation: null };
     },
   });
 
-  conn.loadMessage = async function (...args) {
-    return await loadMessage.apply(this, args);
+  conn.getMessage = async function (...args) {
+    return await getMessage.apply(this, args);
   };
 
   conn.getName = async function (...args) {

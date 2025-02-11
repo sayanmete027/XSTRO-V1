@@ -193,11 +193,11 @@ const generateMessageIDV2 = (userId) => {
     const random = (0, crypto_1.randomBytes)(16);
     random.copy(data, 28);
     const hash = (0, crypto_1.createHash)('sha256').update(data).digest();
-    return 'XSTROBOT' + hash.toString('hex').toUpperCase().substring(0, 18);
+    return hash.toString('hex').toUpperCase().substring(0, 18);
 };
 exports.generateMessageIDV2 = generateMessageIDV2;
 // generate a random ID to attach to a message
-const generateMessageID = () => 'XSTROBOT' + (0, crypto_1.randomBytes)(18).toString('hex').toUpperCase();
+const generateMessageID = () => (0, crypto_1.randomBytes)(18).toString('hex').toUpperCase();
 exports.generateMessageID = generateMessageID;
 function bindWaitForEvent(ev, event) {
     return async (check, timeoutMs) => {

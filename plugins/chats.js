@@ -1,6 +1,5 @@
 import { bot } from '#src';
 import { getChatSummary, getGroupMembersMessageCount, getInactiveGroupMembers } from '#sql';
-import { toJid } from '#utils';
 import { isJidGroup } from '#libary';
 
 bot(

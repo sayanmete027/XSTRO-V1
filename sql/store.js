@@ -1,6 +1,6 @@
 import sqlite3 from 'sqlite3';
 import { open } from 'sqlite';
-import { isJidBroadcast, isJidGroup, isJidNewsletter } from '#libary';
+import { isJidBroadcast, isJidGroup, isJidNewsletter, WAProto } from '#libary';
 
 const database = open({
   filename: 'database.db',
@@ -64,6 +64,17 @@ export const loadMessage = async (id) => {
   const db = await initDb();
   const result = await db.get(`SELECT message FROM messages WHERE id = ?`, [id]);
   return result ? JSON.parse(result.message) : null;
+};
+
+export const getMessage = async (id) => {
+  if (!id) return null;
+  const db = await initDb();
+  const result = await db.get(`SELECT message FROM messages WHERE id = ?`, [id]);
+  const message = result ? JSON.parse(result.message) : null;
+  if (!message) return null;
+  WAProto.Message.fromObject(message.message);
+  const msg = WAProto.WebMessageInfo.fromObject(message);
+  return msg;
 };
 
 export const getName = async (jid) => {

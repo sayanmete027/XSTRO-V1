@@ -142,7 +142,7 @@ const addTransactionCapability = (state, logger, { maxCommitRetries, delayBetwee
                         let tries = maxCommitRetries;
                         while (tries) {
                             tries -= 1;
-                            //eslint-disable-next-line max-depth
+                             
                             try {
                                 await state.set(mutations);
                                 logger.trace({ dbQueriesInTransaction }, 'committed transaction');
