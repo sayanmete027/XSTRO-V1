@@ -1,7 +1,5 @@
-import { config } from '#config';
-import { LANG } from '#extension';
-import { bot } from '#src';
-import { toJid } from '#utils';
+import config from '#config';
+import { bot, LANG, toJid } from '#src';
 import { isJidGroup } from '#libary';
 
 bot(
@@ -41,9 +39,9 @@ bot(
     desc: 'Changes your WhatsApp Name',
   },
   async (message, match, { updateProfileName }) => {
-    if (!match) return message.send('_Provide A New Name_');
+    if (!match) return message.reply('Provide A New Name');
     await updateProfileName(match);
-    return message.send('_WhatsApp Name Updated!_');
+    return message.reply('WhatsApp Name Updated!');
   }
 );
 
@@ -58,7 +56,7 @@ bot(
     if (!message.reply_message?.image) return message.send(LANG.IMAGE);
     const img = await message.download();
     await updateProfilePicture(user.id, img);
-    return await message.send('_Profile Picture Updated_');
+    return await message.send('Profile Picture Updated');
   }
 );
 
@@ -177,7 +175,7 @@ bot(
     if (!match) return message.send('Provide their numbers, e.g. 121232343,131312424');
     match = match.split(',').map((id) => toJid(id.trim()));
     const res = await onWhatsApp(...match);
-    if (!res.length) return message.send('_None of the numbers exist on WhatsApp._');
+    if (!res.length) return message.send('None of the numbers exist on WhatsApp.');
     const existingNumbers = res.filter((user) => user.exists).map((user) => user.jid.split('@')[0]);
     const nonExistingNumbers = match
       .filter((id) => !res.some((user) => user.jid === id && user.exists))
@@ -228,7 +226,7 @@ bot(
       },
       jid
     );
-    await message.send('_Cleared_');
+    await message.send('Cleared');
   }
 );
 
@@ -241,7 +239,7 @@ bot(
   },
   async (message, _, { user, removeProfilePicture }) => {
     await removeProfilePicture(user.id);
-    return message.send('_Profile Picture Removed!_');
+    return message.send('Profile Picture Removed!');
   }
 );
 
@@ -279,7 +277,7 @@ bot(
     desc: 'Forwards A Replied Message',
   },
   async (message, match, { reply_message, quoted }) => {
-    if (!reply_message) return message.send('_Reply A Message!_');
+    if (!reply_message) return message.send('Reply A Message!');
     const jid = await message.msgId(match);
     if (!jid) return message.send('Reply someone or mention or provide a number');
     await message.forward(jid, quoted, { quoted: quoted });
@@ -360,7 +358,7 @@ bot(
     desc: 'Change your whatsapp bio',
   },
   async (message, match, { prefix, updateProfileStatus }) => {
-    if (!match) return message.send(`_Usage:_\n_${prefix}bio Hello World_`);
+    if (!match) return message.send(`Usage:_\n_${prefix}bio Hello World`);
     await updateProfileStatus(match);
     return await message.send('WhatsApp bio Updated to "' + match + '"');
   }
@@ -374,7 +372,7 @@ bot(
     desc: 'React to A Message',
   },
   async (message, match, { jid, sendMessage, reply_message }) => {
-    if (!reply_message) return message.send('_Reply Message_');
+    if (!reply_message) return message.send('Reply Message');
     if (!match) return message.send('react 😊');
     return await sendMessage(jid, {
       react: { text: match, key: reply_message.key },

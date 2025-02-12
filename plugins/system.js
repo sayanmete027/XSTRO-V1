@@ -1,9 +1,7 @@
-import { bot } from '#src';
-import { performance } from 'perf_hooks';
+import { bot, Xprocess, runtime } from '#src';
 import { resolve } from 'path';
 import { arch, cpus, platform, uptime } from 'os';
 import { existsSync, readFileSync } from 'fs';
-import { Xprocess, runtime } from '#utils';
 
 bot(
   {
@@ -13,10 +11,10 @@ bot(
     type: 'system',
   },
   async (message) => {
-    const start = performance.now();
+    const start = Date.now();
     const msg = await message.send('Pong!');
-    const end = performance.now();
-    await msg.edit(`\`\`\`Pong! ${(end - start).toFixed(1)} ms\`\`\``);
+    const end = Date.now();
+    await msg.edit(`\`\`\`Pong! ${end - start} ms\`\`\``);
   }
 );
 

@@ -1,5 +1,4 @@
-import { bot } from '#src';
-import { XSTRO } from '#utils';
+import { bot, XSTRO } from '#src';
 
 bot(
   {
@@ -11,10 +10,10 @@ bot(
   async (message) => {
     const res = await XSTRO.news();
     let data = '';
-    for (const items of res)
-      data += `Title: ${items.title}\n\nDescription: ${items.description}\n\nlink: ${items.url}\n\n`;
-
-    return await message.send(data);
+    for (const item of res) {
+      data += `Title: ${item.title}\n\nDescription: ${item.description}\n\nLink: ${item.url}\n\n`;
+    }
+    return await message.reply(data);
   }
 );
 
@@ -28,10 +27,10 @@ bot(
   async (message) => {
     const res = await XSTRO.footballnews();
     let data = '';
-    for (const items of res) {
-      data += `Title: ${items.title}\nlink: ${items.url}\n\n`;
+    for (const item of res) {
+      data += `Title: ${item.title}\nLink: ${item.url}\n\n`;
     }
-    return await message.send(data);
+    return await message.reply(data);
   }
 );
 
@@ -45,10 +44,10 @@ bot(
   async (message) => {
     const res = await XSTRO.animenews();
     let data = '';
-    for (const items of res) {
-      data += `Title: ${items.title}\nDescription: ${items.description}\nlink: ${items.link}\n\n`;
+    for (const item of res) {
+      data += `Title: ${item.title}\nDescription: ${item.description}\nLink: ${item.link}\n\n`;
     }
-    return await message.send(data);
+    return await message.reply(data);
   }
 );
 
@@ -59,16 +58,15 @@ bot(
     desc: 'Get Tech latest news',
     type: 'news',
   },
-  async (message, match) => {
+  async (message) => {
     const news = await XSTRO.technews();
-    if (!news?.length) return message.send('No news found');
-    const formattedNews = news
+    const data = news
       .map(
         (article, index) =>
-          `*${index + 1}. ${article.title}*\n${article.description || ''}\n${article.link}`
+          `${index + 1}. ${article.title}\n${article.description || ''}\n${article.link}`
       )
       .join('\n\n');
-    return message.send(`*Latest Tech News:*\n\n${formattedNews}`);
+    return message.reply(data);
   }
 );
 
@@ -81,17 +79,13 @@ bot(
   },
   async (message) => {
     const res = await XSTRO.wabeta();
-    if (!res || res.length === 0) {
-      return message.send('No updates available at the moment.');
-    }
     const news = res
       .map(
         (item, index) =>
-          `*${index + 1}. ${item.title}*\n${item.description}\n[Read more](${item.url})\n`
+          `${index + 1}. ${item.title}\n${item.description}\n[Read more](${item.url})\n`
       )
       .join('\n');
-
-    return message.send(news);
+    return message.reply(news);
   }
 );
 
@@ -104,11 +98,10 @@ bot(
   },
   async (message) => {
     const res = await XSTRO.voxnews();
-    if (!res) return message.send('_No News_');
+    if (!res) return message.reply('No News');
     const data = res.map(
-      (article) =>
-        `*Title:* ${article.title}\n*Author:* ${article.author}\n*Url:* ${article.url}\n\n`
+      (article) => `Title: ${article.title}\nAuthor: ${article.author}\nUrl: ${article.url}\n\n`
     );
-    return await message.send(data.join('\n'));
+    return await message.reply(data.join('\n'));
   }
 );

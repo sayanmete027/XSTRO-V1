@@ -10,11 +10,6 @@
       "description": "SESSION HERE",
       "required": true
     },
-    "SUDO": {
-      "description": "ADMIN USERS NUMBERS",
-      "value": "",
-      "required": false
-    },
     "BOT_INFO": {
       "description": "BOT OWNER AND BOT NAME",
       "value": "αѕтяσχ11;χѕтяσ м∂",

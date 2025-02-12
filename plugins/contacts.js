@@ -1,6 +1,4 @@
-import { bot } from '#src';
-import { getContacts } from '#sql';
-import { createVCard, toJid } from '#utils';
+import { bot, getContacts } from '#src';
 
 bot(
   {
@@ -11,30 +9,9 @@ bot(
   },
   async (message) => {
     const contacts = await getContacts();
-    if (!contacts.length) return await message.send('_No contacts saved yet_');
-    const contactList = contacts.map((c) => `*${c.name}:* _${c.jid.split('@')[0]}_`).join('\n');
-    return await message.send(`*ᴄᴏɴᴛᴀᴄᴛs sᴀᴠᴇᴅ ʙʏ ʙᴏᴛ*\n\n${contactList}`);
-  }
-);
-
-bot(
-  {
-    pattern: 'savecontact',
-    public: false,
-    desc: 'Save A Contact to the bot',
-    type: 'contacts',
-  },
-  async (message, match, { jid, prefix, onWhatsApp, sendMessage }) => {
-    if (!match) return message.send(prefix + 'savecontact Astro|12345678901 To Save a contact');
-    match = match.split('|');
-    if (!(await onWhatsApp(toJid(match[1]))))
-      return message.send('That Number does npt exist on WhatsApp');
-    const contact = createVCard(match[0], [match[1]]);
-    return await sendMessage(jid, {
-      document: contact,
-      mimetype: 'text/vcard',
-      fileName: 'contact.vcf',
-    });
+    if (!contacts.length) return await message.send('No contacts saved yet');
+    const contactList = contacts.map((c) => `*${c.name}:* _${c.jid.split('@')[0]}`).join('\n');
+    return await message.reply(`Saved Contacts\n\n${contactList}`);
   }
 );
 

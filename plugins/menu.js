@@ -1,7 +1,5 @@
-import { font } from '#lib';
-import { config } from '#config';
-import { bot, commands } from '#src';
-import { formatBytes, getRandom, runtime } from '#utils';
+import config from '#config';
+import { bot, commands, formatBytes, getRandom, runtime, font } from '#src';
 import { platform, totalmem, freemem } from 'os';
 
 bot(

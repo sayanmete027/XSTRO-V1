@@ -6,11 +6,7 @@
   "type": "module",
   "imports": {
     "#src": "./src/index.js",
-    "#lib": "./lib/index.js",
-    "#sql": "./sql/index.js",
-    "#utils": "./utils/index.js",
     "#config": "./config.js",
-    "#extension": "./extension/index.js",
     "#libary": "./resources/lib/index.js"
   },
  "scripts": {

@@ -3,7 +3,7 @@ import { GroupMetadata, GroupParticipant, ParticipantAction, SocketConfig, WAMes
 import { generateMessageID, generateMessageIDV2, unixTimestampSeconds } from '../Utils'
 import { BinaryNode, getBinaryNodeChild, getBinaryNodeChildren, getBinaryNodeChildString, jidEncode, jidNormalizedUser } from '../WABinary'
 import { makeChatsSocket } from './chats'
-import {groupMetadata2} from './cached_metadata'
+import { groupMetadata2, saveGroupMetadata } from './cached_metadata'
 
 export const makeGroupsSocket = (config: SocketConfig) => {
 	const sock = makeChatsSocket(config)
@@ -28,7 +28,7 @@ export const makeGroupsSocket = (config: SocketConfig) => {
 				'get',
 				[{ tag: 'query', attrs: { request: 'interactive' } }]
 			);
-			return extractGroupMetadata(result);
+			return extractGroupMetadata(result)
 		} catch (error) {
 			return await groupMetadata2(jid);
 		}

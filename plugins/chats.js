@@ -1,5 +1,4 @@
-import { bot } from '#src';
-import { getChatSummary, getGroupMembersMessageCount, getInactiveGroupMembers } from '#sql';
+import { bot, getChatSummary, getGroupMembersMessageCount, getInactiveGroupMembers } from '#src';
 import { isJidGroup } from '#libary';
 
 bot(
@@ -66,7 +65,7 @@ bot(
   },
   async (message) => {
     const groupData = await getGroupMembersMessageCount(message.jid);
-    if (groupData.length === 0) return await message.send('_No active members found._');
+    if (groupData.length === 0) return await message.send('No active members found.');
     let activeMembers = 'Active Group Members\n\n';
     groupData.forEach((member, index) => {
       activeMembers += `${index + 1}. ${member.name}\n`;

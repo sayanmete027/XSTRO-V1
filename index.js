@@ -1,8 +1,7 @@
 import http from 'http';
 import cluster from 'cluster';
-import { client, eventlogger, initSession, loadPlugins } from '#src';
-import { fetchPlugins, SessionMigrator } from '#extension';
 import config from '#config';
+import { client, eventlogger, initSession, loadPlugins, SessionMigrator } from '#src';
 
 if (cluster.isPrimary) {
   let isRestarting = false;
@@ -45,7 +44,6 @@ if (cluster.isPrimary) {
     eventlogger();
     await initSession();
     await SessionMigrator(`session/${config.SESSION_ID}`, 'database.db');
-    await fetchPlugins();
     await loadPlugins();
     await client();
 
@@ -55,6 +53,8 @@ if (cluster.isPrimary) {
   };
 
   startServer();
-  process.on('unhandledRejection', () => {});
+  process.on('unhandledRejection', (reason, promise) => {
+    console.error('RUNTIME ERROR:', promise, 'CAUSED BY:', reason);
+  });
   process.on('exit', () => process.send('restart'));
 }

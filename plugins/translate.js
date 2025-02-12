@@ -1,5 +1,4 @@
-import { bot } from '#src';
-import { XSTRO } from '#utils';
+import { bot, XSTRO } from '#src';
 
 bot(
   {

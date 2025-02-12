@@ -1,7 +1,5 @@
-import { LANG } from '#extension';
-import { bot } from '#src';
-import { XSTRO } from '#utils';
 import {
+  bot,
   audioToBlackVideo,
   convertToMp3,
   convertWebPFile,
@@ -13,7 +11,9 @@ import {
   toPTT,
   toVideo,
   webpToImage,
-} from '#extension';
+  XSTRO,
+  LANG,
+} from '#src';
 
 bot(
   {
@@ -69,11 +69,11 @@ bot(
     if (!reply_message || (!reply_message?.image && !reply_message?.video))
       return message.reply('Reply Image or Video');
     if (!['left', 'right', 'vertical', 'horizontal'].includes(match)) {
-      return message.send(`_Usage: ${prefix}flip <${validDirections.join('/')}>`);
+      return message.send(`Usage: ${prefix}flip <${validDirections.join('/')}>`);
     }
     media = await message.download();
     media = await flipMedia(media, match);
-    return message.send(media, { caption: `_Flipped to ${match}_` });
+    return message.send(media, { caption: `Flipped to ${match}` });
   }
 );
 
@@ -101,7 +101,7 @@ bot(
     type: 'converter',
   },
   async (message, match, { prefix }) => {
-    if (!match) return message.send(`_Usage: ${prefix}ttp Astro_`);
+    if (!match) return message.send(`Usage: ${prefix}ttp Astro`);
     const buff = await XSTRO.ttp(match);
     const sticker = await createSticker(buff);
     return await message.send(sticker, { type: 'sticker' });
@@ -154,7 +154,7 @@ bot(
   async (message, { jid, reply_message, sendMessage }) => {
     let media;
     if (!reply_message || (!reply_message.video && !reply_message.audio))
-      return message.send('_Reply Video or Audio_');
+      return message.send('Reply Video or Audio');
     media = await message.download();
     media = await toPTT(media);
     return await sendMessage(jid, {
@@ -175,7 +175,7 @@ bot(
   async (message) => {
     let media;
     if (!message.reply_message.video && !message.reply_message.sticker)
-      return message.send('_Reply Video_');
+      return message.send('Reply Video');
     media = await message.download();
     media = await toVideo(media);
     return await message.client.sendMessage(message.jid, {
@@ -214,7 +214,7 @@ bot(
     if (!reply_message || !reply_message.image) return message.reply(LANG.IMAGE);
     if (!match)
       return message.reply(
-        '_Give me dimensions to resize the Image to, ' + prefix + 'resize 800x600_'
+        'Give me dimensions to resize the Image to, ' + prefix + 'resize 800x600'
       );
     match = match.split('x');
     media = await message.download();

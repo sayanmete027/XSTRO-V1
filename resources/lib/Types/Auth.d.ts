@@ -102,4 +102,20 @@ export type AuthenticationState = {
     creds: AuthenticationCreds;
     keys: SignalKeyStore;
 };
+export interface CacheEntry<T> {
+    data: T;
+    timestamp: number;
+}
+export interface SessionRow {
+    id: string;
+    data: string;
+    last_accessed: number;
+}
+export interface BatchOperation {
+    sessionId: string;
+    data: any;
+}
+export interface KeysResult {
+    [key: string]: any;
+}
 export {};

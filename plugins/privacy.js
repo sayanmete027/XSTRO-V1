@@ -1,4 +1,5 @@
 import { bot } from '#src';
+
 bot(
   {
     pattern: 'privacy',
@@ -37,7 +38,7 @@ bot(
       .map(([key, value]) => `${key}: ${value}`)
       .join('\n');
 
-    return await message.send(`${name} WhatsApp Privacy Settings\n\n${privacyText}`);
+    return await message.reply(`${name} WhatsApp Privacy Settings\n\n${privacyText}`);
   }
 );
 
@@ -51,11 +52,11 @@ bot(
   async (message, match) => {
     const value = match.trim();
     if (!['all', 'known'].includes(value)) {
-      return await message.send('_Invalid settings! Use "all" or "known"_');
+      return await message.reply('Invalid settings! Use "all" or "known"');
     }
     await message.client.updateCallPrivacy(value);
-    return await message.send(
-      `_Call privacy updated to: ${value === 'all' ? 'Everyone' : 'Known contacts'}_`
+    return await message.reply(
+      `Call privacy updated to: ${value === 'all' ? 'Everyone' : 'Known contacts'}`
     );
   }
 );
@@ -70,12 +71,12 @@ bot(
   async (message, match) => {
     const value = match.trim();
     if (!['all', 'contacts', 'contact_blacklist', 'none'].includes(value)) {
-      return await message.send(
-        '_Invalid settings Use "all", "contacts", "contact_blacklist", or "none"_'
+      return await message.reply(
+        'Invalid settings Use "all", "contacts", "contact_blacklist", or "none"'
       );
     }
     await message.client.updateLastSeenPrivacy(value);
-    return await message.send(`_Last seen privacy updated to: ${value}_`);
+    return await message.reply(`Last seen privacy updated to: ${value}`);
   }
 );
 
@@ -89,10 +90,10 @@ bot(
   async (message, match) => {
     const value = match.trim();
     if (!['all', 'match_last_seen'].includes(value)) {
-      return await message.send('_Invalid value. Use "all" or "match_last_seen"_');
+      return await message.reply('Invalid value. Use "all" or "match_last_seen"');
     }
     await message.client.updateOnlinePrivacy(value);
-    return await message.send(`_Online privacy updated to: ${value}_`);
+    return await message.reply(`Online privacy updated to: ${value}`);
   }
 );
 
@@ -106,12 +107,12 @@ bot(
   async (message, match) => {
     const value = match.trim();
     if (!['all', 'contacts', 'contact_blacklist', 'none'].includes(value)) {
-      return await message.send(
-        '_Invalid settings Use "all", "contacts", "contact_blacklist", or "none"._'
+      return await message.reply(
+        'Invalid settings Use "all", "contacts", "contact_blacklist", or "none".'
       );
     }
     await message.client.updateProfilePicturePrivacy(value);
-    return await message.send(`_Profile picture privacy updated to: ${value}_`);
+    return await message.reply(`Profile picture privacy updated to: ${value}`);
   }
 );
 
@@ -125,12 +126,12 @@ bot(
   async (message, match) => {
     const value = match.trim();
     if (!['all', 'contacts', 'contact_blacklist', 'none'].includes(value)) {
-      return await message.send(
-        '_Invalid settings Use "all", "contacts", "contact_blacklist", or "none"._'
+      return await message.reply(
+        'Invalid settings Use "all", "contacts", "contact_blacklist", or "none".'
       );
     }
     await message.client.updateStatusPrivacy(value);
-    return await message.send(`_Status privacy updated to: ${value}_`);
+    return await message.reply(`Status privacy updated to: ${value}`);
   }
 );
 
@@ -144,11 +145,11 @@ bot(
   async (message, match) => {
     const value = match.trim();
     if (!['all', 'none'].includes(value)) {
-      return await message.send('_Invalid value. Use "all" or "none"._');
+      return await message.reply('Invalid value. Use "all" or "none".');
     }
     await message.client.updateReadReceiptsPrivacy(value);
-    return await message.send(
-      `_Read receipts privacy updated to: ${value === 'all' ? 'Everyone' : 'No one'}_`
+    return await message.reply(
+      `Read receipts privacy updated to: ${value === 'all' ? 'Everyone' : 'No one'}`
     );
   }
 );
@@ -163,10 +164,10 @@ bot(
   async (message, match) => {
     const value = match.trim();
     if (!['all', 'contacts', 'contact_blacklist'].includes(value)) {
-      return await message.send('_Invalid value. Use "all", "contacts", or "contact_blacklist"._');
+      return await message.reply('Invalid value. Use "all", "contacts", or "contact_blacklist".');
     }
     await message.client.updateGroupsAddPrivacy(value);
-    return await message.send(`_Group add privacy updated to: ${value}_`);
+    return await message.reply(`Group add privacy updated to: ${value}`);
   }
 );
 
@@ -185,13 +186,13 @@ bot(
     };
     const input = match.trim().toLowerCase();
     if (!durations[input]) {
-      return await message.send(
-        '_To use disappering message, "24hrs", "7days", or "90days" to set the time_'
+      return await message.reply(
+        'To use disappering message, "24hrs", "7days", or "90days" to set the time'
       );
     }
     const durationInSeconds = durations[input];
     await message.client.updateDefaultDisappearingMode(durationInSeconds);
-    return await message.send(
+    return await message.reply(
       `Default disappearing mode updated to: ${input.replace('hrs', ' hours').replace('days', ' days')}`
     );
   }

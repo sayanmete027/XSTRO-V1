@@ -5,25 +5,69 @@ const sqlite3_1 = require("sqlite3");
 const WAProto_1 = require("../../WAProto");
 const auth_utils_1 = require("./auth-utils");
 const generics_1 = require("./generics");
-const useSQLiteAuthState = async (dbPath) => {
-    // In-memory cache for faster reads and writes
+const useSQLiteAuthState = async (database) => {
+    // Enhanced memory cache with size limit
     const cache = new Map();
+    const MAX_CACHE_SIZE = 10000;
     const db = await new Promise((resolve, reject) => {
-        const db = new sqlite3_1.Database(dbPath, (err) => {
-            err ? reject(err) : resolve(db);
+        const db = new sqlite3_1.Database(database, (err) => {
+            if (err)
+                return reject(err);
+            // Enable WAL mode and optimize SQLite settings
+            db.exec(`
+                PRAGMA journal_mode = WAL;
+                PRAGMA synchronous = NORMAL;
+                PRAGMA temp_store = MEMORY;
+                PRAGMA cache_size = -2000;
+                PRAGMA mmap_size = 30000000000;
+                CREATE TABLE IF NOT EXISTS session (
+                    id TEXT PRIMARY KEY,
+                    data TEXT
+                );
+                CREATE INDEX IF NOT EXISTS idx_session_id ON session(id);
+            `, (err) => err ? reject(err) : resolve(db));
         });
     });
-    // Initialize database schema
-    await new Promise((resolve, reject) => {
-        db.exec(`
-            CREATE TABLE IF NOT EXISTS session (
-                id TEXT PRIMARY KEY,
-                data TEXT
-            );
-        `, (err) => (err ? reject(err) : resolve()));
-    });
+    // Batch processing queue
+    let writeQueue = [];
+    let writeTimer = null;
+    const BATCH_DELAY = 50; // ms
+    const processBatchWrites = async () => {
+        if (writeQueue.length === 0)
+            return;
+        const currentQueue = writeQueue;
+        writeQueue = [];
+        writeTimer = null;
+        try {
+            await new Promise((resolve, reject) => {
+                db.serialize(() => {
+                    db.run('BEGIN TRANSACTION');
+                    const stmt = db.prepare('INSERT INTO session (id, data) VALUES (?, ?) ON CONFLICT(id) DO UPDATE SET data = excluded.data');
+                    currentQueue.forEach(({ id, data }) => {
+                        if (data !== null) {
+                            stmt.run(id, data);
+                        }
+                    });
+                    stmt.finalize();
+                    db.run('COMMIT', (err) => err ? reject(err) : resolve());
+                });
+            });
+        }
+        catch (error) {
+            console.error('Batch write error:', error);
+            // Re-queue failed writes
+            writeQueue = [...currentQueue, ...writeQueue];
+            scheduleBatchWrite();
+        }
+    };
+    const scheduleBatchWrite = () => {
+        if (!writeTimer && writeQueue.length > 0) {
+            writeTimer = setTimeout(processBatchWrites, BATCH_DELAY);
+        }
+    };
     const readData = async (type, id) => {
         const sessionId = id ? `${type}:${id}` : type;
+        // Check cache first
         if (cache.has(sessionId)) {
             return cache.get(sessionId);
         }
@@ -35,67 +79,55 @@ const useSQLiteAuthState = async (dbPath) => {
                     return resolve(null);
                 try {
                     const data = JSON.parse(row.data, generics_1.BufferJSON.reviver);
-                    // Update cache
+                    // Update cache with size limit check
+                    if (cache.size >= MAX_CACHE_SIZE) {
+                        const firstKey = cache.keys().next().value;
+                        cache.delete(firstKey);
+                    }
                     cache.set(sessionId, data);
                     resolve(data);
                 }
-                catch (parseError) {
-                    reject(parseError);
+                catch (error) {
+                    reject(error);
                 }
             });
         });
     };
     const writeData = async (type, id, data) => {
         const sessionId = id ? `${type}:${id}` : type;
+        const serialized = JSON.stringify(data, generics_1.BufferJSON.replacer);
         // Update cache immediately
+        if (cache.size >= MAX_CACHE_SIZE) {
+            const firstKey = cache.keys().next().value;
+            cache.delete(firstKey);
+        }
         cache.set(sessionId, data);
-        return new Promise((resolve, reject) => {
-            const serialized = JSON.stringify(data, generics_1.BufferJSON.replacer);
-            db.run('INSERT INTO session (id, data) VALUES (?, ?) ' +
-                'ON CONFLICT(id) DO UPDATE SET data = excluded.data', [sessionId, serialized], (err) => (err ? reject(err) : resolve()));
-        });
+        // Add to batch queue
+        writeQueue.push({ id: sessionId, data: serialized });
+        scheduleBatchWrite();
     };
     const deleteData = async (type, id) => {
         const sessionId = `${type}:${id}`;
-        // Remove from cache
         cache.delete(sessionId);
         return new Promise((resolve, reject) => {
-            db.run('DELETE FROM session WHERE id = ?', [sessionId], (err) => (err ? reject(err) : resolve()));
+            db.run('DELETE FROM session WHERE id = ?', [sessionId], (err) => err ? reject(err) : resolve());
         });
     };
-    // Initialize or load credentials
+    // Initialize credentials
     const credsData = await readData('creds');
     const creds = credsData || (0, auth_utils_1.initAuthCreds)();
     if (!credsData) {
         await writeData('creds', null, creds);
     }
-    // Batch write queue for optimizing multiple writes
-    let writeQueue = [];
-    let writeTimeout = null;
-    const processBatchWrites = () => {
-        if (writeQueue.length === 0)
-            return;
-        const currentQueue = [...writeQueue];
-        writeQueue = [];
-        writeTimeout = null;
-        db.serialize(() => {
-            db.run('BEGIN TRANSACTION');
-            currentQueue.forEach(({ sessionId, data }) => {
-                const serialized = JSON.stringify(data, generics_1.BufferJSON.replacer);
-                db.run('INSERT INTO session (id, data) VALUES (?, ?) ' +
-                    'ON CONFLICT(id) DO UPDATE SET data = excluded.data', [sessionId, serialized]);
-            });
-            db.run('COMMIT');
-        });
-    };
     return {
         state: {
             creds,
             keys: {
                 get: async (type, ids) => {
                     const result = {};
-                    // Check cache first for all IDs
-                    ids.forEach(id => {
+                    const uncachedIds = [];
+                    // Process cached items first
+                    for (const id of ids) {
                         const sessionId = `${type}:${id}`;
                         if (cache.has(sessionId)) {
                             let data = cache.get(sessionId);
@@ -104,17 +136,22 @@ const useSQLiteAuthState = async (dbPath) => {
                             }
                             result[id] = data;
                         }
-                    });
-                    // Get remaining IDs from database
-                    const uncachedIds = ids.filter(id => !(`${type}:${id}` in cache));
-                    if (uncachedIds.length === 0) {
-                        return result;
+                        else {
+                            uncachedIds.push(id);
+                        }
                     }
+                    if (uncachedIds.length === 0)
+                        return result;
+                    // Batch fetch uncached items
                     return new Promise((resolve, reject) => {
                         const sessionIds = uncachedIds.map(id => `${type}:${id}`);
-                        db.all('SELECT id, data FROM session WHERE id IN (' + sessionIds.map(() => '?').join(',') + ')', sessionIds, (err, rows) => {
+                        const query = 'SELECT id, data FROM session WHERE id IN (' +
+                            sessionIds.map(() => '?').join(',') + ')';
+                        db.all(query, sessionIds, (err, rows) => {
                             if (err)
                                 return reject(err);
+                            if (!rows)
+                                return resolve(result);
                             rows.forEach(row => {
                                 try {
                                     const originalId = row.id.split(':')[1];
@@ -122,14 +159,18 @@ const useSQLiteAuthState = async (dbPath) => {
                                     if (type === 'app-state-sync-key') {
                                         data = WAProto_1.proto.Message.AppStateSyncKeyData.fromObject(data);
                                     }
-                                    // Update cache
+                                    if (cache.size >= MAX_CACHE_SIZE) {
+                                        const firstKey = cache.keys().next().value;
+                                        cache.delete(firstKey);
+                                    }
                                     cache.set(row.id, data);
                                     result[originalId] = data;
                                 }
-                                catch (parseError) {
-                                    reject(parseError);
+                                catch (error) {
+                                    console.error('Parse error:', error);
                                 }
                             });
+                            // Set null for missing IDs
                             ids.forEach(id => {
                                 if (!(id in result)) {
                                     result[id] = null;
@@ -140,26 +181,34 @@ const useSQLiteAuthState = async (dbPath) => {
                     });
                 },
                 set: async (data) => {
-                    // Update cache immediately
+                    const batchWrites = [];
                     for (const category in data) {
                         for (const id in data[category]) {
                             const value = data[category][id];
                             const sessionId = `${category}:${id}`;
                             if (value) {
+                                if (cache.size >= MAX_CACHE_SIZE) {
+                                    const firstKey = cache.keys().next().value;
+                                    cache.delete(firstKey);
+                                }
                                 cache.set(sessionId, value);
-                                writeQueue.push({ sessionId, data: value });
+                                batchWrites.push({
+                                    id: sessionId,
+                                    data: JSON.stringify(value, generics_1.BufferJSON.replacer)
+                                });
                             }
                             else {
                                 cache.delete(sessionId);
-                                writeQueue.push({ sessionId, data: null });
+                                batchWrites.push({
+                                    id: sessionId,
+                                    data: null
+                                });
                             }
                         }
                     }
-                    // Schedule batch write
-                    if (!writeTimeout) {
-                        writeTimeout = setTimeout(processBatchWrites, 100); // Batch writes every 100ms
-                    }
-                    return Promise.resolve();
+                    // Add all operations to batch queue
+                    writeQueue.push(...batchWrites);
+                    scheduleBatchWrite();
                 }
             }
         },

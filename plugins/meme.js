@@ -1,5 +1,4 @@
-import { bot } from '#src';
-import { XSTRO } from '#utils';
+import { bot, XSTRO } from '#src';
 
 bot(
   {
@@ -9,7 +8,7 @@ bot(
     type: 'memes',
   },
   async (message, match) => {
-    if (!match) return message.send('_Give me words_');
+    if (!match) return message.send('Give me words');
     const res = await XSTRO.meme(match, 'andrew');
     return await message.send(res);
   }
@@ -23,7 +22,7 @@ bot(
     type: 'memes',
   },
   async (message, match) => {
-    if (!match) return message.send('_Give me words_');
+    if (!match) return message.send('Give me words');
     const res = await XSTRO.meme(match, 'elonmusk');
     return await message.send(res);
   }
@@ -37,7 +36,7 @@ bot(
     type: 'memes',
   },
   async (message, match) => {
-    if (!match) return message.send('_Give me words_');
+    if (!match) return message.send('Give me words');
     const res = await XSTRO.meme(match, 'messi');
     return await message.send(res);
   }
@@ -51,7 +50,7 @@ bot(
     type: 'memes',
   },
   async (message, match) => {
-    if (!match) return message.send('_Give me words_');
+    if (!match) return message.send('Give me words');
     const res = await XSTRO.meme(match, 'obama');
     return await message.send(res);
   }
@@ -65,7 +64,7 @@ bot(
     type: 'memes',
   },
   async (message, match) => {
-    if (!match) return message.send('_Give me words_');
+    if (!match) return message.send('Give me words');
     const res = await XSTRO.meme(match, 'ronaldo');
     return await message.send(res);
   }
@@ -79,7 +78,7 @@ bot(
     type: 'memes',
   },
   async (message, match) => {
-    if (!match) return message.send('_Give me words_');
+    if (!match) return message.send('Give me words');
     const res = await XSTRO.meme(match, 'trump');
     return await message.send(res);
   }

@@ -1,6 +1,4 @@
-import { LANG } from '#extension';
-import { bot } from '#src';
-import { XSTRO } from '#utils';
+import { bot, XSTRO, LANG } from '#src';
 
 bot(
   {
@@ -10,9 +8,9 @@ bot(
     type: 'forex',
   },
   async (message, match) => {
-    if (!match) return message.send('_Give me a symbol, EURUSD_');
+    if (!match) return message.send('Give me a symbol, EURUSD');
     const res = await XSTRO.forex(match);
-    if (!res) return message.send('_Invaild Forex Pair_');
+    if (!res) return message.send('Invaild Forex Pair');
     return message.send(
       `${match}\n\nLastPrice: ${res.lastPrice}\nCurrency: ${res.currency}\nChangeValue: ${res.changeValue}\nLastUpdate: ${res.lastUpdate}`
     );
