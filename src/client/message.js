@@ -15,8 +15,6 @@ class Message {
     this.key = data.key;
     this.id = data.key.id;
     this.jid = data.key.remoteJid;
-    this.isAdmin = data.isAdmin;
-    this.isBotAdmin = data.isBotAdmin;
     this.isGroup = data.isGroup;
     this.fromMe = data.key.fromMe;
     this.pushName = data.pushName;
@@ -25,10 +23,10 @@ class Message {
     this.sender = data.sender;
     this.mtype = data.type;
     this.user = data.user;
+    this.sudo = data.sudo;
     this.mode = data.mode;
     this.timestamp = data.messageTimestamp;
-    this.text = data.body || '';
-    this.bot = /^(BAE5|3EB0)/.test(data.key.id);
+    this.text = data.body;
     this.mention = data.mention;
     this.quoted = data.quoted;
 
@@ -39,29 +37,28 @@ class Message {
         fromMe: quoted.key.fromMe,
         sender: quoted.sender,
         key: quoted.key,
-        bot: /^(BAE5|3EB0)/.test(quoted.key.id),
         mtype: quoted.mtype,
         message: quoted.message,
         text: quoted.body,
         status: quoted.isStatus,
-        image: quoted.type === 'imageMessage',
-        video: quoted.type === 'videoMessage',
-        audio: quoted.type === 'audioMessage',
-        sticker: quoted.type === 'stickerMessage',
-        document: quoted.type === 'documentMessage',
+        image: Boolean(quoted.message?.imageMessage),
+        video: Boolean(quoted.message?.videoMessage),
+        audio: Boolean(quoted.message?.audioMessage),
+        sticker: Boolean(quoted.message?.stickerMessage),
+        document: Boolean(quoted.message?.documentMessage),
         viewonce: quoted.viewonce,
       };
     } else {
-      this.reply_message = null;
+      this.reply_message = undefined;
     }
   }
 
   async getAdmin() {
-    if (!this.isAdmin) {
+    if (!(await this.data.isAdmin())) {
       await this.send(LANG.ISADMIN);
       return false;
     }
-    if (!this.isBotAdmin) {
+    if (!(await this.data.isBotAdmin())) {
       await this.send(LANG.ISBOTADMIN);
       return false;
     }
@@ -90,12 +87,14 @@ class Message {
     return new Message(
       this.client,
       await this.client.sendMessage(this.jid, {
-        text: `\`\`\`${text.trim().toString()}\`\`\``,
+        text: text.trim().toString(),
         contextInfo: {
           externalAdReply: {
             title: this.pushName,
             body: LANG.BOT_NAME,
             mediaType: 1,
+            mediaUrl: LANG.THUMBNAIL,
+            thumbnailUrl: LANG.THUMBNAIL,
             sourceUrl: LANG.REPO_URL,
             showAdAttribution: true,
           },
@@ -130,12 +129,11 @@ class Message {
     const jid = opts.jid || this.jid;
     const type = opts.type || (await detectType(content));
     const mentions = opts.mentions || this.mention;
-    const quoted =
-      opts?.quoted?.key?.id !== undefined
-        ? opts.quoted
-        : this?.quoted?.key?.id !== undefined
-          ? this.quoted
-          : this.data;
+    const quoted = opts?.quoted?.key?.id
+      ? opts.quoted
+      : this?.quoted?.key?.id
+        ? this.quoted
+        : this.data;
     const msg = await this.client.sendMessage(
       jid,
       {

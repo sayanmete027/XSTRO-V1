@@ -1,6 +1,3 @@
-import dotenv from 'dotenv';
-dotenv.config({ path: 'config.env' });
-
 const config = {
   SESSION_ID: process.env.SESSION_ID || '',
   BOT_INFO: process.env.BOT_INFO || 'αѕтяσχ11;χѕтяσ м∂',

@@ -15,7 +15,7 @@ bot(
       return message.reply('No direct chats found.');
     }
     const data = directChats.map((chat, index) => {
-      return `PERSONAL CHATS: ${chat.name}
+      return `PERSONAL CHATS: ${chat.name}\n
 MSGS: ${chat.messageCount}
 LAST MSG: ${new Date(chat.lastMessageTimestamp).toLocaleString()}`;
     });
@@ -30,7 +30,7 @@ bot(
     desc: 'Get group chats summary',
     type: 'user',
   },
-  async (message) => {
+  async (message, _, { groupMetadata }) => {
     const allChats = await getChatSummary();
     const groupChats = allChats.filter((chat) => isJidGroup(chat.jid));
     if (!groupChats) {
@@ -38,17 +38,10 @@ bot(
     }
     const data = await Promise.all(
       groupChats.map(async (chat, index) => {
-        try {
-          const groupdata = await groupMetadata(chat.jid);
-          return `GC: ${groupdata?.subject}
+        const groupdata = await groupMetadata(chat.jid);
+        return `GC: ${groupdata?.subject}\n
     MSGS: ${chat.messageCount}
     LAST MSG: ${new Date(chat.lastMessageTimestamp).toLocaleString()}`;
-        } catch (error) {
-          console.error(error);
-          return `GC: Unknown Group
-    MSGS: ${chat.messageCount}
-    LAST MSG: ${new Date(chat.lastMessageTimestamp).toLocaleString()}`;
-        }
       })
     );
     return await message.reply(data.join('\n'));

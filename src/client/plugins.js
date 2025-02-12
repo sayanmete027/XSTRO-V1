@@ -14,6 +14,7 @@ export async function runCommand(Instance, message, client) {
   if (!message.body) return;
 
   for (const cmd of commands) {
+    if (cmd.on) cmd.function(Instance, args, { ...Instance, ...message, ...client });
     const handler = message.prefix.find((p) => message.body.startsWith(p));
     const match = message.body.slice(handler.length).match(cmd.pattern);
     if (handler && match) {

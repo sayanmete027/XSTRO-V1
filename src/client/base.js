@@ -12,7 +12,6 @@ import config from '#config';
 import { EventEmitter } from 'events';
 import {
   Xprocess,
-  toJid,
   getMessage,
   saveMessages,
   getConfig,
@@ -21,9 +20,7 @@ import {
   commands,
   runCommand,
   groupMetadata,
-  LANG,
   saveGroupMetadata,
-  editConfig,
 } from '#src';
 
 EventEmitter.defaultMaxListeners = 10000;
@@ -44,8 +41,8 @@ export const client = async () => {
     browser: Browsers.windows('chrome'),
     version,
     emitOwnEvents: true,
-    syncFullHistory: false,
-    shouldSyncHistoryMessage: false,
+    syncFullHistory: true,
+    shouldSyncHistoryMessage: true,
     generateHighQualityLinkPreview: true,
     linkPreviewImageThumbnailWidth: 1280,
     cachedGroupMetadata: async (jid) => await groupMetadata(jid),
@@ -62,7 +59,7 @@ export const client = async () => {
       const { connection, lastDisconnect } = events['connection.update'];
       switch (connection) {
         case 'connecting':
-          console.log(LANG.START_BOOT);
+          console.log('connecting...');
           break;
 
         case 'close':
@@ -72,17 +69,17 @@ export const client = async () => {
           break;
 
         case 'open':
-          await editConfig({sudo: [toJid(conn.user?.id)]})
-          const cmds = commands.filter(
-            (cmd) =>
-              cmd.pattern &&
-              !cmd.dontAddCommandList &&
-              !cmd.pattern.toString().includes('undefined')
-          ).length;
           await conn.sendMessage(conn.user.id, {
-            text: `\`\`\`${LANG.CONNECTED}\n\nVersion: ${config.VERSION}\n\nPlugins: ${cmds}\`\`\``,
+            text: `\`\`\`Owner: ${config.BOT_INFO.split(';')[0]}\nVersion: ${config.VERSION}\nCommands: ${
+              commands.filter(
+                (cmd) =>
+                  cmd.pattern &&
+                  !cmd.dontAddCommandList &&
+                  !cmd.pattern.toString().includes('undefined')
+              ).length
+            }\`\`\``,
           });
-          console.log(LANG.PROCESS_STARTED);
+          console.log(`Connected!`);
           break;
       }
     }
@@ -102,7 +99,7 @@ export const client = async () => {
           await conn.sendMessage(
             msg.from,
             { react: { key: msg.key, text: '💚' } },
-            { statusJidList: [message.key.participant, conn.user.id] }
+            { statusJidList: [message.key?.participant, conn?.user?.id] }
           );
         }
         await Promise.all([runCommand(data, msg, conn), saveMessages(msg)]);

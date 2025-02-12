@@ -61,7 +61,7 @@ export async function getConfig() {
     cmdRead: Boolean(row.cmdRead),
     disabledCmds: JSON.parse(row.disabledCmds),
     sudo: JSON.parse(row.sudo),
-    bannedusers: JSON.parse(row.bannedusers)
+    bannedusers: JSON.parse(row.bannedusers),
   };
 }
 
@@ -80,7 +80,7 @@ export async function editConfig(updates) {
     'cmdRead',
     'disabledCmds',
     'sudo',
-    'bannedusers'
+    'bannedusers',
   ];
 
   const keys = Object.keys(updates).filter((key) => allowedKeys.includes(key));
