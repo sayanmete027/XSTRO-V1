@@ -14,17 +14,16 @@ export async function runCommand(Instance, message, client) {
   if (!message.body) return;
 
   for (const cmd of commands) {
-    if (cmd.on) cmd.function(Instance, args, { ...Instance, ...message, ...client });
     const handler = message.prefix.find((p) => message.body.startsWith(p));
-    const match = message.body.slice(handler.length).match(cmd.name);
-    if (handler && match) {
-      const args = match[2] ?? '';
-
-      try {
-        await cmd.function(Instance, args, { ...Instance, ...message, ...client });
-      } catch (err) {
-        return message.error(cmd, err);
+    const match = message.body.slice(handler?.length || 0).match(cmd.name);
+    const msg = { ...message, ...client, ...Instance };
+    try {
+      if (handler && match) {
+        const args = match[2] ?? '';
+        await cmd.function(Instance, args, msg);
       }
+    } catch (err) {
+      await message.error(cmd, err);
     }
   }
 }

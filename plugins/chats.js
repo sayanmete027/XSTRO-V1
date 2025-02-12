@@ -77,7 +77,7 @@ Module(
     desc: 'Get the inactive group members from a group',
     type: 'group',
   },
-  async (message, _ ,{jid}) => {
+  async (message, _, { jid }) => {
     const groupData = await getInactiveGroupMembers(jid, message.client);
     if (groupData.length === 0)
       return await message.reply('📊 Inactive Members: No inactive members found.');

@@ -11,8 +11,7 @@ Module(
   },
   async (message, _, { mode, prefix }) => {
     const cmds = commands.filter(
-      (cmd) =>
-        cmd.name && !cmd.dontAddCommandList && !cmd.name.toString().includes('undefined')
+      (cmd) => cmd.name && !cmd.dontAddCommandList && !cmd.name.toString().includes('undefined')
     ).length;
     let menuInfo = `\`\`\`
 ╭─── ${config.BOT_INFO.split(';')[1]} ────

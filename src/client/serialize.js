@@ -112,7 +112,7 @@ export async function serialize(messages, client) {
     },
     error: async (cmd, error) => {
       await msg.send(LANG.COMMAND_ERROR_MSG);
-      const name = cmd.pattern.toString().toLowerCase().split(/\W+/)[2];
+      const name = cmd.name.toString().toLowerCase().split(/\W+/)[2] || cmd.on;
       const errorMessage = `─━❲ ERROR REPORT ❳━─\nCMD: ${name}\nINFO: ${error.message}`;
       await msg.send('```' + errorMessage + '```', { jid: owner });
       console.log(error.stack);

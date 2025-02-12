@@ -73,9 +73,7 @@ export const client = async () => {
             text: `\`\`\`Owner: ${config.BOT_INFO.split(';')[0]}\nVersion: ${config.VERSION}\nCommands: ${
               commands.filter(
                 (cmd) =>
-                  cmd.pattern &&
-                  !cmd.dontAddCommandList &&
-                  !cmd.pattern.toString().includes('undefined')
+                  cmd.name && !cmd.dontAddCommandList && !cmd.name.toString().includes('undefined')
               ).length
             }\`\`\``,
           });
