@@ -7,7 +7,7 @@ Module(
     type: 'tools',
     desc: 'Translate a text from one language to another with ease',
   },
-  async (message, match, { reply_message }) => {
+  async (message, match, { quoted }) => {
     const langCode = match.trim();
     const targetLang = languages.find((lang) =>
       lang.toLowerCase().endsWith(`- ${langCode.toLowerCase()}`)
@@ -18,10 +18,9 @@ Module(
         `Supported Languages:\n\nUsage: ${message.prefix}trt en\n\n\n${languages.join('\n')}`
       );
 
-    if (!reply_message || !reply_message?.text)
-      return message.reply('Reply to a text message to translate it.');
+    if (!quoted || !quoted?.text) return message.reply('Reply to a text message to translate it.');
 
-    const textToTranslate = message.reply_message.text;
+    const textToTranslate = message.quoted.text;
     const targetLangCode = targetLang.split(' - ')[1];
     const res = await XSTRO.translate(textToTranslate, targetLangCode);
     return await message.send(res);

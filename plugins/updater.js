@@ -11,9 +11,7 @@ Module(
     desc: 'Update the Module',
     type: 'system',
   },
-  async (message, match) => {
-    const prefix = message.prefix;
-
+  async (message, match, { prefix }) => {
     try {
       await execAsync('git fetch');
 

@@ -1,6 +1,7 @@
 import sqlite3 from 'sqlite3';
 import { open } from 'sqlite';
 import { isJidBroadcast, isJidGroup, isJidNewsletter, WAProto } from '#libary';
+import { groupMetadata } from '#src';
 
 const database = open({
   filename: 'database.db',
@@ -96,13 +97,13 @@ export const saveMessageCount = async (message) => {
   );
 };
 
-export const getInactiveGroupMembers = async (jid, client) => {
+export const getInactiveGroupMembers = async (jid) => {
   if (!isJidGroup(jid)) return [];
-  const groupMetadata = await client.groupMetadata(jid);
-  if (!groupMetadata) return [];
+  const groupdata = await groupMetadata(jid);
+  if (!groupdata) return [];
   const db = await initDb();
   const messageCounts = await db.all(`SELECT sender FROM message_counts WHERE jid = ?`, [jid]);
-  const inactiveMembers = groupMetadata.participants.filter(
+  const inactiveMembers = groupdata.participants.filter(
     (p) => !messageCounts.some((m) => m.sender === p.id)
   );
   return inactiveMembers.map((m) => m.id);

@@ -10,17 +10,17 @@ export function Module(cmd, func) {
   return cmd;
 }
 
-export async function runCommand(Instance, message, client) {
+export async function runCommand(message, client) {
   if (!message.body) return;
 
   for (const cmd of commands) {
     const handler = message.prefix.find((p) => message.body.startsWith(p));
     const match = message.body.slice(handler?.length || 0).match(cmd.name);
-    const msg = { ...message, ...client, ...Instance };
+    const mods = { ...message, ...client };
     try {
       if (handler && match) {
         const args = match[2] ?? '';
-        await cmd.function(Instance, args, msg);
+        await cmd.function(message, args, mods);
       }
     } catch (err) {
       await message.error(cmd, err);

@@ -374,7 +374,6 @@ export const makeMessagesSocket = (config: SocketConfig) => {
 						(async() => {
 							let groupData = useCachedGroupMetadata && cachedGroupMetadata ? await cachedGroupMetadata(jid) : undefined
 							if(groupData && Array.isArray(groupData?.participants)) {
-								console.log({ jid, participants: groupData.participants.length }, 'using cached group metadata')
 							} else if(!isStatus) {
 								groupData = await groupMetadata(jid) || undefined
 							}

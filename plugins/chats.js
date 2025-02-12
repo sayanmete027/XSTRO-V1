@@ -1,4 +1,10 @@
-import { Module, getChatSummary, getGroupMembersMessageCount, getInactiveGroupMembers } from '#src';
+import {
+  Module,
+  getChatSummary,
+  getGroupMembersMessageCount,
+  getInactiveGroupMembers,
+  groupMetadata,
+} from '#src';
 import { isJidGroup } from '#libary';
 
 Module(
@@ -11,15 +17,13 @@ Module(
   async (message) => {
     const allChats = await getChatSummary();
     const directChats = allChats.filter((chat) => chat.name);
-    if (directChats.length === 0) {
-      return message.reply('No direct chats found.');
-    }
-    const data = directChats.map((chat, index) => {
-      return `PERSONAL CHATS: ${chat.name}\n
-MSGS: ${chat.messageCount}
-LAST MSG: ${new Date(chat.lastMessageTimestamp).toLocaleString()}`;
-    });
-    return await message.reply(data.join('\n\n'));
+    if (!directChats) return message.reply('No chats found!');
+    return await message.reply(
+      directChats.map(
+        (data) =>
+          `*From:* ${data.name}\n*Messages:* ${data.messageCount}\n*Last Chat:* ${new Date(data.lastMessageTimestamp).toLocaleString()}\n\n`
+      )
+    );
   }
 );
 
@@ -30,21 +34,17 @@ Module(
     desc: 'Get group chats summary',
     type: 'user',
   },
-  async (message, _, { groupMetadata }) => {
+  async (message) => {
     const allChats = await getChatSummary();
     const groupChats = allChats.filter((chat) => isJidGroup(chat.jid));
-    if (!groupChats) {
-      return message.reply('No Groups found yet!');
-    }
+    if (!groupChats) return message.reply('No Groups found!');
     const data = await Promise.all(
-      groupChats.map(async (chat, index) => {
-        const groupdata = await groupMetadata(chat.jid);
-        return `GC: ${groupdata?.subject}\n
-    MSGS: ${chat.messageCount}
-    LAST MSG: ${new Date(chat.lastMessageTimestamp).toLocaleString()}`;
+      groupChats.map(async (data) => {
+        const subject = (await groupMetadata(data.jid)).subject;
+        return `*From:* ${subject}\n*Messages:* ${data.messageCount}\n*LastMessage:* ${new Date(data.lastMessageTimestamp).toLocaleString()}\n\n`;
       })
     );
-    return await message.reply(data.join('\n'));
+    return await message.reply(data);
   }
 );
 
@@ -57,7 +57,7 @@ Module(
     type: 'group',
   },
   async (message) => {
-    const groupData = await getGroupMembersMessageCount(message.jid);
+    const groupData = await getGroupMembersMessageCount(message.from);
     if (groupData.length === 0) return await message.send('No active members found.');
     let activeMembers = 'Active Group Members\n\n';
     groupData.forEach((member, index) => {
@@ -77,11 +77,10 @@ Module(
     desc: 'Get the inactive group members from a group',
     type: 'group',
   },
-  async (message, _, { jid }) => {
-    const groupData = await getInactiveGroupMembers(jid, message.client);
-    if (groupData.length === 0)
-      return await message.reply('📊 Inactive Members: No inactive members found.');
-    let inactiveMembers = '📊 Inactive Members:\n\n';
+  async (message) => {
+    const groupData = await getInactiveGroupMembers(message.from);
+    if (groupData.length === 0) return await message.reply('No inactive members found.');
+    let inactiveMembers = 'Inactive Members:\n\n';
     inactiveMembers += `Total Inactive: ${groupData.length}\n\n`;
     groupData.forEach((jid, index) => {
       inactiveMembers += `${index + 1}. @${jid.split('@')[0]}\n`;

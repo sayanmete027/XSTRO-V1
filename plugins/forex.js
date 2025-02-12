@@ -12,7 +12,7 @@ Module(
     const res = await XSTRO.forex(match);
     if (!res) return message.send('Invaild Forex Pair');
     return message.send(
-      `${match}\n\nLastPrice: ${res.lastPrice}\nCurrency: ${res.currency}\nChangeValue: ${res.changeValue}\nLastUpdate: ${res.lastUpdate}`
+      `${match.toUpperCase()}\n\nLastPrice: ${res.lastPrice}\nCurrency: ${res.currency}\nChangeValue: ${res.changeValue}\nLastUpdate: ${res.lastUpdate}`
     );
   }
 );

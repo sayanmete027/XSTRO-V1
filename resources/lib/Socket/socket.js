@@ -381,7 +381,7 @@ const makeSocket = (config) => {
                     attrs: {
                         jid: authState.creds.me.id,
                         stage: 'companion_hello',
-                         
+                        // eslint-disable-next-line camelcase
                         should_show_push_notification: 'true'
                     },
                     content: [

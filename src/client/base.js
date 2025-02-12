@@ -7,7 +7,6 @@ import {
   isJidBroadcast,
   useSQLiteAuthState,
 } from '#libary';
-import Message from './message.js';
 import config from '#config';
 import { EventEmitter } from 'events';
 import {
@@ -90,7 +89,6 @@ export const client = async () => {
 
       for (const message of messages) {
         const msg = await serialize(structuredClone(message), conn);
-        const data = new Message(conn, msg);
         if (autoRead) await conn.readMessages([msg.key]);
         if (autoStatusRead && isJidBroadcast(msg.from)) await conn.readMessages([msg.key]);
         if (autolikestatus && isJidBroadcast(msg.from)) {
@@ -100,7 +98,7 @@ export const client = async () => {
             { statusJidList: [message.key?.participant, conn?.user?.id] }
           );
         }
-        await Promise.all([runCommand(data, msg, conn), saveMessages(msg)]);
+        await Promise.all([runCommand(msg, conn), saveMessages(msg)]);
       }
     }
   });

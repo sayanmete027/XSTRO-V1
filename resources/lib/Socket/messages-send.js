@@ -218,7 +218,7 @@ const makeMessagesSocket = (config) => {
         const msgId = await relayMessage(meJid, protocolMessage, {
             additionalAttributes: {
                 category: 'peer',
-                 
+                // eslint-disable-next-line camelcase
                 push_priority: 'high_force',
             },
         });
@@ -298,7 +298,6 @@ const makeMessagesSocket = (config) => {
                     (async () => {
                         let groupData = useCachedGroupMetadata && cachedGroupMetadata ? await cachedGroupMetadata(jid) : undefined;
                         if (groupData && Array.isArray(groupData === null || groupData === void 0 ? void 0 : groupData.participants)) {
-                            console.log({ jid, participants: groupData.participants.length }, 'using cached group metadata');
                         }
                         else if (!isStatus) {
                             groupData = await groupMetadata(jid) || undefined;
