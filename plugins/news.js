@@ -1,9 +1,9 @@
-import { bot, XSTRO } from '#src';
+import { Module, XSTRO } from '#src';
 
-bot(
+Module(
   {
-    pattern: 'news',
-    public: true,
+    name: 'news',
+    fromMe: false,
     desc: 'Get World News Now',
     type: 'news',
   },
@@ -17,10 +17,10 @@ bot(
   }
 );
 
-bot(
+Module(
   {
-    pattern: 'footballnews',
-    public: true,
+    name: 'footballnews',
+    fromMe: false,
     desc: 'Get Latest Football News',
     type: 'news',
   },
@@ -34,10 +34,10 @@ bot(
   }
 );
 
-bot(
+Module(
   {
-    pattern: 'animenews',
-    public: true,
+    name: 'animenews',
+    fromMe: false,
     desc: "Get's Latest Anime News",
     type: 'news',
   },
@@ -51,10 +51,10 @@ bot(
   }
 );
 
-bot(
+Module(
   {
-    pattern: 'technews',
-    public: true,
+    name: 'technews',
+    fromMe: false,
     desc: 'Get Tech latest news',
     type: 'news',
   },
@@ -70,10 +70,10 @@ bot(
   }
 );
 
-bot(
+Module(
   {
-    pattern: 'wabeta',
-    public: true,
+    name: 'wabeta',
+    fromMe: false,
     desc: 'WhatsApp Beta Info News',
     type: 'news',
   },
@@ -89,10 +89,10 @@ bot(
   }
 );
 
-bot(
+Module(
   {
-    pattern: 'voxnews',
-    public: true,
+    name: 'voxnews',
+    fromMe: false,
     desc: 'VoxNews',
     type: 'news',
   },

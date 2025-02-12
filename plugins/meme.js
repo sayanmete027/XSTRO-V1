@@ -1,9 +1,9 @@
-import { bot, XSTRO } from '#src';
+import { Module, XSTRO } from '#src';
 
-bot(
+Module(
   {
-    pattern: 'andrew',
-    public: true,
+    name: 'andrew',
+    fromMe: false,
     desc: 'Fake Andrew Tate Tweet',
     type: 'memes',
   },
@@ -14,10 +14,10 @@ bot(
   }
 );
 
-bot(
+Module(
   {
-    pattern: 'elonmusk',
-    public: true,
+    name: 'elonmusk',
+    fromMe: false,
     desc: 'Fake Elon Musk Tweet',
     type: 'memes',
   },
@@ -28,10 +28,10 @@ bot(
   }
 );
 
-bot(
+Module(
   {
-    pattern: 'messi',
-    public: true,
+    name: 'messi',
+    fromMe: false,
     desc: 'Fake Messi Tweet',
     type: 'memes',
   },
@@ -42,10 +42,10 @@ bot(
   }
 );
 
-bot(
+Module(
   {
-    pattern: 'obama',
-    public: true,
+    name: 'obama',
+    fromMe: false,
     desc: 'Fake Obama Tweet',
     type: 'memes',
   },
@@ -56,10 +56,10 @@ bot(
   }
 );
 
-bot(
+Module(
   {
-    pattern: 'ronaldo',
-    public: true,
+    name: 'ronaldo',
+    fromMe: false,
     desc: 'Fake Ronaldo Tweet',
     type: 'memes',
   },
@@ -70,10 +70,10 @@ bot(
   }
 );
 
-bot(
+Module(
   {
-    pattern: 'trump',
-    public: true,
+    name: 'trump',
+    fromMe: false,
     desc: 'Fake Trump Tweet',
     type: 'memes',
   },

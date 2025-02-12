@@ -1,11 +1,11 @@
 import config from '#config';
-import { bot, LANG, toJid } from '#src';
+import { Module, LANG, toJid } from '#src';
 import { isJidGroup } from '#libary';
 
-bot(
+Module(
   {
-    pattern: 'vv',
-    public: false,
+    name: 'vv',
+    fromMe: true,
     desc: 'Forwards A Viewonce Message',
     type: 'whatsapp',
   },
@@ -16,10 +16,10 @@ bot(
   }
 );
 
-bot(
+Module(
   {
-    pattern: 'tovv',
-    public: true,
+    name: 'tovv',
+    fromMe: true,
     desc: 'Make A Message To Viewonce',
     type: 'whatsapp',
   },
@@ -31,10 +31,10 @@ bot(
   }
 );
 
-bot(
+Module(
   {
-    pattern: 'myname',
-    public: false,
+    name: 'myname',
+    fromMe: true,
     type: 'whatsapp',
     desc: 'Changes your WhatsApp Name',
   },
@@ -45,10 +45,10 @@ bot(
   }
 );
 
-bot(
+Module(
   {
-    pattern: 'setpp',
-    public: false,
+    name: 'setpp',
+    fromMe: true,
     type: 'whatsapp',
     desc: 'Set Your Profile Picture',
   },
@@ -60,10 +60,10 @@ bot(
   }
 );
 
-bot(
+Module(
   {
-    pattern: 'quoted',
-    public: false,
+    name: 'quoted',
+    fromMe: true,
     type: 'whatsapp',
     desc: 'quoted message',
   },
@@ -77,10 +77,10 @@ bot(
   }
 );
 
-bot(
+Module(
   {
-    pattern: 'save',
-    public: false,
+    name: 'save',
+    fromMe: true,
     type: 'whatsapp',
     desc: 'Saves Status',
   },
@@ -90,10 +90,10 @@ bot(
   }
 );
 
-bot(
+Module(
   {
-    pattern: 'dlt',
-    public: false,
+    name: 'dlt',
+    fromMe: true,
     type: 'whatsapp',
     desc: 'Deletes Message',
   },
@@ -103,10 +103,10 @@ bot(
   }
 );
 
-bot(
+Module(
   {
-    pattern: 'archive',
-    public: false,
+    name: 'archive',
+    fromMe: true,
     type: 'whatsapp',
     desc: 'archive whatsapp chat',
   },
@@ -122,10 +122,10 @@ bot(
   }
 );
 
-bot(
+Module(
   {
-    pattern: 'unarchive',
-    public: false,
+    name: 'unarchive',
+    fromMe: true,
     type: 'whatsapp',
     desc: 'unarchive whatsapp chat',
   },
@@ -141,10 +141,10 @@ bot(
   }
 );
 
-bot(
+Module(
   {
-    pattern: 'delete',
-    public: false,
+    name: 'delete',
+    fromMe: true,
     type: 'whatsapp',
     desc: 'Deletes A chat',
   },
@@ -164,10 +164,10 @@ bot(
   }
 );
 
-bot(
+Module(
   {
-    pattern: 'onwa',
-    public: true,
+    name: 'onwa',
+    fromMe: true,
     type: 'whatsapp',
     desc: 'Checks if users exist on WhatsApp',
   },
@@ -187,10 +187,10 @@ bot(
   }
 );
 
-bot(
+Module(
   {
-    pattern: 'blocklist',
-    public: false,
+    name: 'blocklist',
+    fromMe: true,
     type: 'whatsapp',
     desc: 'Fetches BlockList',
   },
@@ -206,10 +206,10 @@ bot(
   }
 );
 
-bot(
+Module(
   {
-    pattern: 'clear',
-    public: false,
+    name: 'clear',
+    fromMe: true,
     type: 'whatsapp',
     desc: 'delete whatsapp chat',
   },
@@ -230,10 +230,10 @@ bot(
   }
 );
 
-bot(
+Module(
   {
-    pattern: 'rpp',
-    public: false,
+    name: 'rpp',
+    fromMe: true,
     type: 'whatsapp',
     desc: 'Removes Profile Picture',
   },
@@ -243,10 +243,10 @@ bot(
   }
 );
 
-bot(
+Module(
   {
-    pattern: 'pin',
-    public: false,
+    name: 'pin',
+    fromMe: true,
     type: 'whatsapp',
     desc: 'pin a chat',
   },
@@ -256,10 +256,10 @@ bot(
   }
 );
 
-bot(
+Module(
   {
-    pattern: 'unpin',
-    public: false,
+    name: 'unpin',
+    fromMe: true,
     type: 'whatsapp',
     desc: 'unpin a msg',
   },
@@ -269,10 +269,10 @@ bot(
   }
 );
 
-bot(
+Module(
   {
-    pattern: 'forward',
-    public: false,
+    name: 'forward',
+    fromMe: true,
     type: 'whatsapp',
     desc: 'Forwards A Replied Message',
   },
@@ -285,10 +285,10 @@ bot(
   }
 );
 
-bot(
+Module(
   {
-    pattern: 'block',
-    public: false,
+    name: 'block',
+    fromMe: true,
     type: 'whatsapp',
     desc: 'Blocks A Person',
   },
@@ -299,10 +299,10 @@ bot(
   }
 );
 
-bot(
+Module(
   {
-    pattern: 'unblock',
-    public: false,
+    name: 'unblock',
+    fromMe: true,
     type: 'whatsapp',
     desc: 'Unblocks A Person',
   },
@@ -313,10 +313,10 @@ bot(
   }
 );
 
-bot(
+Module(
   {
-    pattern: 'edit',
-    public: false,
+    name: 'edit',
+    fromMe: true,
     type: 'whatsapp',
     desc: 'Edits A Sent Message',
   },
@@ -328,10 +328,10 @@ bot(
   }
 );
 
-bot(
+Module(
   {
-    pattern: 'jid',
-    public: true,
+    name: 'jid',
+    fromMe: true,
     type: 'whatsapp',
     desc: 'Get Jid of Current Chat',
   },
@@ -350,10 +350,10 @@ bot(
   }
 );
 
-bot(
+Module(
   {
-    pattern: 'bio',
-    public: true,
+    name: 'bio',
+    fromMe: true,
     type: 'whatsapp',
     desc: 'Change your whatsapp bio',
   },
@@ -364,10 +364,10 @@ bot(
   }
 );
 
-bot(
+Module(
   {
-    pattern: 'react',
-    public: false,
+    name: 'react',
+    fromMe: true,
     type: 'whatsapp',
     desc: 'React to A Message',
   },
@@ -380,10 +380,10 @@ bot(
   }
 );
 
-bot(
+Module(
   {
-    pattern: 'star',
-    public: false,
+    name: 'star',
+    fromMe: true,
     type: 'whatsapp',
     desc: 'Stars or Unstars a Message',
   },
@@ -394,10 +394,10 @@ bot(
   }
 );
 
-bot(
+Module(
   {
-    pattern: 'unstar',
-    public: false,
+    name: 'unstar',
+    fromMe: true,
     type: 'whatsapp',
     desc: 'Stars or Unstars a Message',
   },
@@ -408,10 +408,10 @@ bot(
   }
 );
 
-bot(
+Module(
   {
-    pattern: 'owner',
-    public: true,
+    name: 'owner',
+    fromMe: true,
     type: 'whatsapp',
     desc: 'Get Bot Owner',
   },
@@ -436,10 +436,10 @@ END:VCARD
   }
 );
 
-bot(
+Module(
   {
-    pattern: 'gforward',
-    public: false,
+    name: 'gforward',
+    fromMe: true,
     type: 'whatsapp',
     desc: 'Forwards a replied message to multiple groups',
   },
@@ -456,10 +456,10 @@ bot(
   }
 );
 
-bot(
+Module(
   {
-    pattern: 'ptv',
-    public: true,
+    name: 'ptv',
+    fromMe: true,
     desc: 'Convert video to pvt video note',
     type: 'whatsapp',
   },

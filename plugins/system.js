@@ -1,12 +1,12 @@
-import { bot, Xprocess, runtime } from '#src';
+import { Module, Xprocess, runtime } from '#src';
 import { resolve } from 'path';
 import { arch, cpus, platform, uptime } from 'os';
 import { existsSync, readFileSync } from 'fs';
 
-bot(
+Module(
   {
-    pattern: 'ping',
-    public: true,
+    name: 'ping',
+    fromMe: false,
     desc: 'Get Performance',
     type: 'system',
   },
@@ -18,15 +18,15 @@ bot(
   }
 );
 
-bot(
+Module(
   {
-    pattern: 'file',
-    fromMe: true,
+    name: 'file',
+    fromMe: false,
     desc: 'Send the content of a specified file',
     type: 'system',
   },
   async (message, match) => {
-    if (!match) return message.reply('Give me bot file. Eg config.js');
+    if (!match) return message.reply('Give me Module file. Eg config.js');
     const filePath = resolve(process.cwd(), match.trim());
     if (!existsSync(filePath)) return message.reply(`File not in that DIR`);
     const fileContent = readFileSync(filePath, 'utf-8');
@@ -34,11 +34,11 @@ bot(
   }
 );
 
-bot(
+Module(
   {
-    pattern: 'runtime',
-    public: true,
-    desc: 'Get Runtime of bot',
+    name: 'runtime',
+    fromMe: false,
+    desc: 'Get Runtime of Module',
     type: 'system',
   },
   async (message) => {
@@ -46,10 +46,10 @@ bot(
   }
 );
 
-bot(
+Module(
   {
-    pattern: 'restart',
-    public: false,
+    name: 'restart',
+    fromMe: false,
     desc: 'Restarts Bot',
     type: 'system',
   },
@@ -59,10 +59,10 @@ bot(
   }
 );
 
-bot(
+Module(
   {
-    pattern: 'shutdown',
-    public: false,
+    name: 'shutdown',
+    fromMe: false,
     desc: 'Off Bot',
     type: 'system',
   },
@@ -72,10 +72,10 @@ bot(
   }
 );
 
-bot(
+Module(
   {
-    pattern: 'logout',
-    public: false,
+    name: 'logout',
+    fromMe: false,
     desc: 'End your Xstro Session',
     type: 'system',
   },
@@ -85,10 +85,10 @@ bot(
   }
 );
 
-bot(
+Module(
   {
-    pattern: 'cpu',
-    public: false,
+    name: 'cpu',
+    fromMe: false,
     desc: 'Get CPU Information',
     type: 'system',
   },

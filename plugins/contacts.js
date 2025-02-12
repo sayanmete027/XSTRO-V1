@@ -1,10 +1,10 @@
-import { bot, getContacts } from '#src';
+import { Module, getContacts } from '#src';
 
-bot(
+Module(
   {
-    pattern: 'contacts',
-    public: false,
-    desc: 'Get all contacts saved by bot',
+    name: 'contacts',
+    fromMe: true,
+    desc: 'Get all contacts saved by Module',
     type: 'contacts',
   },
   async (message) => {
@@ -15,10 +15,10 @@ bot(
   }
 );
 
-bot(
+Module(
   {
-    pattern: 'vcf',
-    public: true,
+    name: 'vcf',
+    fromMe: true,
     isGroup: true,
     type: 'contacts',
   },

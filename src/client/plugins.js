@@ -1,9 +1,9 @@
 export const commands = [];
 
-export function bot(cmd, func) {
+export function Module(cmd, func) {
   cmd.function = func;
-  cmd.pattern = new RegExp(`^\\s*(${cmd.pattern})(?:\\s+([\\s\\S]+))?$`, 'i');
-  cmd.public = cmd.public || false;
+  cmd.name = new RegExp(`^\\s*(${cmd.name})(?:\\s+([\\s\\S]+))?$`, 'i');
+  cmd.fromMe = cmd.fromMe || false;
   cmd.isGroup = cmd.isGroup || false;
   cmd.dontAddCommandList = cmd.dontAddCommandList || false;
   commands.push(cmd);
@@ -16,7 +16,7 @@ export async function runCommand(Instance, message, client) {
   for (const cmd of commands) {
     if (cmd.on) cmd.function(Instance, args, { ...Instance, ...message, ...client });
     const handler = message.prefix.find((p) => message.body.startsWith(p));
-    const match = message.body.slice(handler.length).match(cmd.pattern);
+    const match = message.body.slice(handler.length).match(cmd.name);
     if (handler && match) {
       const args = match[2] ?? '';
 

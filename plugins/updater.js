@@ -1,14 +1,14 @@
-import { bot } from '#src';
+import { Module } from '#src';
 import { exec } from 'child_process';
 import { promisify } from 'util';
 
 const execAsync = promisify(exec);
 
-bot(
+Module(
   {
-    pattern: 'update',
-    public: false,
-    desc: 'Update the bot',
+    name: 'update',
+    fromMe: true,
+    desc: 'Update the Module',
     type: 'system',
   },
   async (message, match) => {

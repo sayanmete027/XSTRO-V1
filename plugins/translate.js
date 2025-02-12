@@ -1,9 +1,9 @@
-import { bot, XSTRO } from '#src';
+import { Module, XSTRO } from '#src';
 
-bot(
+Module(
   {
-    pattern: 'trt',
-    public: true,
+    name: 'trt',
+    fromMe: false,
     type: 'tools',
     desc: 'Translate a text from one language to another with ease',
   },

@@ -1,10 +1,10 @@
-import { bot, getChatSummary, getGroupMembersMessageCount, getInactiveGroupMembers } from '#src';
+import { Module, getChatSummary, getGroupMembersMessageCount, getInactiveGroupMembers } from '#src';
 import { isJidGroup } from '#libary';
 
-bot(
+Module(
   {
-    pattern: 'listpc',
-    public: false,
+    name: 'listpc',
+    fromMe: true,
     desc: 'Get direct messages summary',
     type: 'user',
   },
@@ -23,10 +23,10 @@ LAST MSG: ${new Date(chat.lastMessageTimestamp).toLocaleString()}`;
   }
 );
 
-bot(
+Module(
   {
-    pattern: 'listgc',
-    public: false,
+    name: 'listgc',
+    fromMe: true,
     desc: 'Get group chats summary',
     type: 'user',
   },
@@ -48,12 +48,12 @@ bot(
   }
 );
 
-bot(
+Module(
   {
-    pattern: 'active',
-    public: true,
+    name: 'active',
+    fromMe: true,
     isGroup: true,
-    desc: 'Return the Active Group Members from when the bot started running',
+    desc: 'Return the Active Group Members from when the Module started running',
     type: 'group',
   },
   async (message) => {
@@ -69,16 +69,16 @@ bot(
   }
 );
 
-bot(
+Module(
   {
-    pattern: 'inactive',
-    public: true,
+    name: 'inactive',
+    fromMe: true,
     isGroup: true,
     desc: 'Get the inactive group members from a group',
     type: 'group',
   },
-  async (message) => {
-    const groupData = await getInactiveGroupMembers(message.jid, message.client);
+  async (message, _ ,{jid}) => {
+    const groupData = await getInactiveGroupMembers(jid, message.client);
     if (groupData.length === 0)
       return await message.reply('📊 Inactive Members: No inactive members found.');
     let inactiveMembers = '📊 Inactive Members:\n\n';

@@ -1,5 +1,5 @@
 import {
-  bot,
+  Module,
   audioToBlackVideo,
   convertToMp3,
   convertWebPFile,
@@ -15,10 +15,10 @@ import {
   LANG,
 } from '#src';
 
-bot(
+Module(
   {
-    pattern: 'sticker',
-    public: true,
+    name: 'sticker',
+    fromMe: false,
     desc: 'Converts Images and Videos to Sticker',
     type: 'converter',
   },
@@ -34,11 +34,11 @@ bot(
   }
 );
 
-bot(
+Module(
   {
-    pattern: 'take',
-    public: true,
-    desc: 'rebrands a sticker to bot',
+    name: 'take',
+    fromMe: false,
+    desc: 'rebrands a sticker to Module',
     type: 'converter',
   },
   async (message, match) => {
@@ -57,10 +57,10 @@ bot(
   }
 );
 
-bot(
+Module(
   {
-    pattern: 'flip',
-    public: true,
+    name: 'flip',
+    fromMe: false,
     desc: 'Flip media left/right/vertical/horizontal',
     type: 'converter',
   },
@@ -77,10 +77,10 @@ bot(
   }
 );
 
-bot(
+Module(
   {
-    pattern: 'black',
-    public: true,
+    name: 'black',
+    fromMe: false,
     desc: 'Converts Audio to Black Video',
     type: 'converter',
   },
@@ -93,10 +93,10 @@ bot(
   }
 );
 
-bot(
+Module(
   {
-    pattern: 'ttp',
-    public: true,
+    name: 'ttp',
+    fromMe: false,
     desc: 'Designs ttp Stickers',
     type: 'converter',
   },
@@ -108,10 +108,10 @@ bot(
   }
 );
 
-bot(
+Module(
   {
-    pattern: 'photo',
-    public: true,
+    name: 'photo',
+    fromMe: false,
     desc: 'Convert Sticker to Photo',
     type: 'converter',
   },
@@ -124,10 +124,10 @@ bot(
   }
 );
 
-bot(
+Module(
   {
-    pattern: 'mp3',
-    public: true,
+    name: 'mp3',
+    fromMe: false,
     desc: 'Convert Video to Audio',
     type: 'converter',
   },
@@ -144,10 +144,10 @@ bot(
   }
 );
 
-bot(
+Module(
   {
-    pattern: 'ptt',
-    public: true,
+    name: 'ptt',
+    fromMe: false,
     desc: 'Convert Video to WhatsApp Opus',
     type: 'converter',
   },
@@ -165,10 +165,10 @@ bot(
   }
 );
 
-bot(
+Module(
   {
-    pattern: 'mp4',
-    public: true,
+    name: 'mp4',
+    fromMe: false,
     desc: 'Converts Video to playable WhatsApp Video',
     type: 'converter',
   },
@@ -185,10 +185,10 @@ bot(
   }
 );
 
-bot(
+Module(
   {
-    pattern: 'crop',
-    public: true,
+    name: 'crop',
+    fromMe: false,
     desc: 'Converts Image or Sticker to Cropped Sticker',
     type: 'converter',
   },
@@ -202,10 +202,10 @@ bot(
   }
 );
 
-bot(
+Module(
   {
-    pattern: 'resize',
-    public: true,
+    name: 'resize',
+    fromMe: false,
     desc: 'Resizes an Image',
     type: 'converter',
   },

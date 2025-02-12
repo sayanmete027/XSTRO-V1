@@ -1,9 +1,9 @@
-import { bot } from '#src';
+import { Module } from '#src';
 
-bot(
+Module(
   {
-    pattern: 'privacy',
-    public: false,
+    name: 'privacy',
+    fromMe: true,
     desc: 'View your privacy settings',
     type: 'privacy',
   },
@@ -42,10 +42,10 @@ bot(
   }
 );
 
-bot(
+Module(
   {
-    pattern: 'setcall',
-    public: false,
+    name: 'setcall',
+    fromMe: true,
     desc: 'Update call privacy settings',
     type: 'privacy',
   },
@@ -61,10 +61,10 @@ bot(
   }
 );
 
-bot(
+Module(
   {
-    pattern: 'setseen',
-    public: false,
+    name: 'setseen',
+    fromMe: true,
     desc: 'Update last seen privacy settings',
     type: 'privacy',
   },
@@ -80,10 +80,10 @@ bot(
   }
 );
 
-bot(
+Module(
   {
-    pattern: 'setonline',
-    public: false,
+    name: 'setonline',
+    fromMe: true,
     desc: 'Update online privacy settings',
     type: 'privacy',
   },
@@ -97,10 +97,10 @@ bot(
   }
 );
 
-bot(
+Module(
   {
-    pattern: 'ppset',
-    public: false,
+    name: 'ppset',
+    fromMe: true,
     desc: 'Update profile picture privacy settings',
     type: 'privacy',
   },
@@ -116,10 +116,10 @@ bot(
   }
 );
 
-bot(
+Module(
   {
-    pattern: 'setstatus',
-    public: false,
+    name: 'setstatus',
+    fromMe: true,
     desc: 'Update status privacy settings',
     type: 'privacy',
   },
@@ -135,10 +135,10 @@ bot(
   }
 );
 
-bot(
+Module(
   {
-    pattern: 'setrr',
-    public: false,
+    name: 'setrr',
+    fromMe: true,
     desc: 'Update read receipts privacy settings',
     type: 'privacy',
   },
@@ -154,10 +154,10 @@ bot(
   }
 );
 
-bot(
+Module(
   {
-    pattern: 'groupadd',
-    public: false,
+    name: 'groupadd',
+    fromMe: true,
     desc: 'Update group add privacy settings',
     type: 'privacy',
   },
@@ -171,10 +171,10 @@ bot(
   }
 );
 
-bot(
+Module(
   {
-    pattern: 'disappear',
-    public: false,
+    name: 'disappear',
+    fromMe: true,
     desc: 'Update default disappearing messages duration',
     type: 'privacy',
   },

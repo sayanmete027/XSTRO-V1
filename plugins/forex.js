@@ -1,9 +1,9 @@
-import { bot, XSTRO, LANG } from '#src';
+import { Module, XSTRO, LANG } from '#src';
 
-bot(
+Module(
   {
-    pattern: 'forex',
-    public: true,
+    name: 'forex',
+    fromMe: false,
     desc: 'Get Forex Data for Pair',
     type: 'forex',
   },
@@ -17,10 +17,10 @@ bot(
   }
 );
 
-bot(
+Module(
   {
-    pattern: 'fxmajor',
-    public: true,
+    name: 'fxmajor',
+    fromMe: false,
     desc: 'Get Current Market Details for Forex Majors',
     type: 'forex',
   },
@@ -47,10 +47,10 @@ Rating: ${item.Rating}
   }
 );
 
-bot(
+Module(
   {
-    pattern: 'fxminor',
-    public: true,
+    name: 'fxminor',
+    fromMe: false,
     desc: 'Get Current Market Details for Forex Minors',
     type: 'forex',
   },
@@ -76,10 +76,10 @@ Rating: ${item.Rating}
   }
 );
 
-bot(
+Module(
   {
-    pattern: 'fxexotic',
-    public: true,
+    name: 'fxexotic',
+    fromMe: false,
     desc: 'Get Current Market Details for Forex Exotic',
     type: 'forex',
   },
@@ -106,10 +106,10 @@ Rating: ${item.Rating}
   }
 );
 
-bot(
+Module(
   {
-    pattern: 'fxamericas',
-    public: true,
+    name: 'fxamericas',
+    fromMe: false,
     desc: 'Get Current Market Details for Forex Americas',
     type: 'forex',
   },
@@ -135,10 +135,10 @@ Rating: ${item.Rating}
   }
 );
 
-bot(
+Module(
   {
-    pattern: 'fxeurope',
-    public: true,
+    name: 'fxeurope',
+    fromMe: false,
     desc: 'Get Current Market Details for Forex Europe',
     type: 'forex',
   },
@@ -164,10 +164,10 @@ Rating: ${item.Rating}
   }
 );
 
-bot(
+Module(
   {
-    pattern: 'fxasia',
-    public: true,
+    name: 'fxasia',
+    fromMe: false,
     desc: 'Get Current Market Details for Forex Asia',
     type: 'forex',
   },
@@ -193,10 +193,10 @@ Rating: ${item.Rating}
   }
 );
 
-bot(
+Module(
   {
-    pattern: 'fxpacific',
-    public: true,
+    name: 'fxpacific',
+    fromMe: false,
     desc: 'Get Current Market Details for Forex Pacific',
     type: 'forex',
   },
@@ -222,10 +222,10 @@ Rating: ${item.Rating}
   }
 );
 
-bot(
+Module(
   {
-    pattern: 'fxeast',
-    public: true,
+    name: 'fxeast',
+    fromMe: false,
     desc: 'Get Current Market Details for Forex Middle East',
     type: 'forex',
   },
@@ -251,10 +251,10 @@ Rating: ${item.Rating}
   }
 );
 
-bot(
+Module(
   {
-    pattern: 'fxafrica',
-    public: true,
+    name: 'fxafrica',
+    fromMe: false,
     desc: 'Get Current Market Details for Forex Africa',
     type: 'forex',
   },
