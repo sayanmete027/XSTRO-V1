@@ -3,11 +3,15 @@
 > [!Important]  
 > Open-source WhatsApp bot made to handle various tasks, and perform automated services for basic and business users. I disclaim any and all liability for any misuse of this software. It is for educational purposes only—please use it responsibly.
 
+<div align="center">
+
 [![npm](https://img.shields.io/npm/dm/xstro-utils?style=for-the-badge)](https://www.npmjs.com/package/xstro-utils)  
 [![Forks](https://img.shields.io/github/forks/AstroX11/Xstro?style=for-the-badge)](https://github.com/AstroX11/Xstro/network/members)  
-[![Stars](https://img.shields.io/github/stars/AstroX11/Xstro?style=for-the-badge)](https://github.com/AstroX11/Xstro/stargazers)
+[![Stars](https://img.shields.io/github/stars/AstroX11/Xstro?style=for-the-badge)](https://github.com/AstroX11/Xstro/stargazers)  
 [![FORK](https://img.shields.io/badge/Fork_Repo-blue?style=for-the-badge&logo=github)](https://github.com/AstroX11/Xstro/fork)  
-[![BOT SESSION](https://img.shields.io/badge/Get_Session-black?style=for-the-badge&logo=react)](https://bit.ly/41mQBbY)
+[![BOT SESSION](https://img.shields.io/badge/Get_Session-black?style=for-the-badge&logo=github)](https://bit.ly/41mQBbY)
+
+</div>
 
 ## Build Your Own Session
 
@@ -20,8 +24,8 @@
    ```
 
 4. Create a new directory, navigate to it in your terminal, and follow these steps:
-   - [Session Source](https://github.com/AstroX11/XstroSession)
-   - [Session Crypto](https://github.com/AstroX11/session-maker-crypto)
+   - [Generator](https://github.com/AstroX11/XstroSession)
+   - [Encryptor](https://github.com/AstroX11/session-maker-crypto)
 
 ## Deployments
 
