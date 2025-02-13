@@ -115,7 +115,7 @@ export async function serialize(messages, client) {
           contextInfo: { mentionedJid: mentions, ...(contextInfo || {}) },
           ...restOpts,
         },
-        {...restOpts}
+        { ...restOpts }
       );
       return serialize(msg, client);
     },
