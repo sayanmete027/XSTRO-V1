@@ -22,7 +22,7 @@ Module(
     isGroup: true,
     type: 'contacts',
   },
-  async (message) => {
+  async (message, _, { sendMessage: send }) => {
     const { subject, participants } = await groupMetadata(message.from);
     const contacts = await Promise.all(
       participants.map(async ({ id }, index) => {
@@ -31,6 +31,10 @@ Module(
       })
     );
     const vcard = Buffer.from(contacts.join('\n'), 'utf-8');
-    await message.send(vcard, { mimetype: 'text/vcard', fileName: `${subject}_contacts.vcf` });
+    await send(message.from, {
+      document: vcard,
+      mimetype: 'text/vcard',
+      fileName: `${subject}_contacts.vcf`,
+    });
   }
 );
