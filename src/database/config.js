@@ -1,15 +1,7 @@
-import sqlite3 from 'sqlite3';
-import { open } from 'sqlite';
+import { getDb } from './database.js';
 
-const database = open({
-  filename: 'database.db',
-  driver: sqlite3.Database,
-});
-
-// Initialize database - should be called once at startup
-async function initDb() {
-  const db = await database;
-
+async function initConfigDb() {
+  const db = await getDb();
   await db.exec(`
     CREATE TABLE IF NOT EXISTS config (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -28,7 +20,6 @@ async function initDb() {
     );
   `);
 
-  // Only insert default if no data exists
   const exists = await db.get('SELECT id FROM config LIMIT 1');
   if (!exists) {
     await db.run(`
@@ -38,14 +29,12 @@ async function initDb() {
         ('.', 1, 0, 0, 0, 0, 0, 1, 0, '[]', '[]', '[]')
     `);
   }
-
-  return db;
 }
 
-// Simply get config from database
 export async function getConfig() {
-  await initDb();
-  const db = await database;
+  const db = await getDb();
+  await initConfigDb();
+
   const row = await db.get('SELECT * FROM config LIMIT 1');
   if (!row) return null;
 
@@ -65,9 +54,10 @@ export async function getConfig() {
   };
 }
 
-// Edit specific config values
 export async function editConfig(updates) {
-  await initDb();
+  const db = await getDb();
+  await initConfigDb();
+
   const allowedKeys = [
     'prefix',
     'mode',
@@ -86,7 +76,6 @@ export async function editConfig(updates) {
   const keys = Object.keys(updates).filter((key) => allowedKeys.includes(key));
   if (!keys.length) return;
 
-  const db = await database;
   const setClause = keys.map((key) => `${key} = ?`).join(', ');
   const values = keys.map((key) => {
     const val = updates[key];
