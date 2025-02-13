@@ -6,19 +6,13 @@
 [![FORK](https://img.shields.io/badge/Fork_Repo-black?style=for-the-badge&logo=github)](https://github.com/AstroX11/Xstro/fork)  
 [![BOT SESSION](https://img.shields.io/badge/Get_Session-black?style=for-the-badge&logo=github)](https://bit.ly/41mQBbY)
 
-## Build Your Own Session
+### Build Your Own Session
 
-1. [Install Node.js](https://nodejs.org/)
-2. [Install Git](https://git-scm.com/)
-3. Verify your Node.js installation:
-
-   ```bash
-   node -v
-   ```
-
-4. Create a new directory, navigate to it in your terminal, and follow these steps:
-   - [Generator](https://github.com/AstroX11/XstroSession)
-   - [Encryptor](https://github.com/AstroX11/session-maker-crypto)
+1. Install [Node.js](https://nodejs.org/) and [Git](https://git-scm.com/)
+2. Open terminal and verify Node.js: `node -v`
+3. Use our tools to create your session:
+  - [Session Generator](https://github.com/AstroX11/XstroSession)
+  - [Session Encryptor](https://github.com/AstroX11/session-maker-crypto)
 
 ## Deployments
 
