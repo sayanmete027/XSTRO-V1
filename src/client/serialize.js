@@ -60,7 +60,7 @@ export async function serialize(messages, client) {
         id: stanzaId,
         participant: remoteJid ? participant : isGroup ? participant : undefined,
       },
-      isStatus: remoteJid || false,
+      status: remoteJid || false,
       sender: remoteJid ? participant : participant,
       message: qmessage,
       type: qmtype,

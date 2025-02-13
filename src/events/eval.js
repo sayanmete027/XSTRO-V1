@@ -7,7 +7,7 @@ export async function evaluator(message) {
     try {
       const code = message.body.slice(2);
       const result = await eval(`(async () => { ${code} })()`);
-      await message.send(util.inspect(result, { depth: 0 }));
+      await message.send(util.inspect(result, { depth: 2 }));
     } catch (error) {
       await message.send('Error: ' + error.message);
     }
