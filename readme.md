@@ -3,15 +3,8 @@
 > [!Important]  
 > Open-source WhatsApp bot made to handle various tasks, and perform automated services for basic and business users. I disclaim any and all liability for any misuse of this software. It is for educational purposes only—please use it responsibly.
 
-<div align="center">
-
-[![npm](https://img.shields.io/npm/dm/xstro-utils?style=for-the-badge)](https://www.npmjs.com/package/xstro-utils)  
-[![Forks](https://img.shields.io/github/forks/AstroX11/Xstro?style=for-the-badge)](https://github.com/AstroX11/Xstro/network/members)  
-[![Stars](https://img.shields.io/github/stars/AstroX11/Xstro?style=for-the-badge)](https://github.com/AstroX11/Xstro/stargazers)  
-[![FORK](https://img.shields.io/badge/Fork_Repo-blue?style=for-the-badge&logo=github)](https://github.com/AstroX11/Xstro/fork)  
+[![FORK](https://img.shields.io/badge/Fork_Repo-black?style=for-the-badge&logo=github)](https://github.com/AstroX11/Xstro/fork)  
 [![BOT SESSION](https://img.shields.io/badge/Get_Session-black?style=for-the-badge&logo=github)](https://bit.ly/41mQBbY)
-
-</div>
 
 ## Build Your Own Session
 
@@ -59,7 +52,7 @@
 
 Refer to the [Panel Deployment documentation](https://github.com/AstroX11/Xstro/wiki/Panel-Support).
 
-### Local Deployment (Windows/Linux/macOS)
+### Windows/Linux/macOS
 
 #### Install Node.js
 
