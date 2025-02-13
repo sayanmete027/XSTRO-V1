@@ -22,27 +22,15 @@ Module(
     isGroup: true,
     type: 'contacts',
   },
-  async (message, _, { sendMessage }) => {
+  async (message) => {
     const { subject, participants } = await groupMetadata(message.from);
-
-    let counter = 1;
-    const contacts = participants.map(async ({ id }) => {
-      const name = (await getName(id)) || `${subject} ${counter++}`;
-      return `
-BEGIN:VCARD
-VERSION:3.0
-FN:${name}
-TEL;TYPE=CELL:${id.replace(/@.+/, '')}
-END:VCARD
-`.trim();
-    });
-    const content = contacts.join('\n');
-    const vcard = Buffer.from(content, 'utf-8');
-    await sendMessage(message.from, {
-      document: vcard,
-      mimetype: 'text/vcard',
-      fileName: `${subject}_contacts.vcf`,
-    });
-    await message.send(`Created a vcf for ${participants.length} members`);
+    const contacts = await Promise.all(
+      participants.map(async ({ id }, index) => {
+        const name = (await getName(id)) || `${subject} ${index + 1}`;
+        return `BEGIN:VCARD\nVERSION:3.0\nFN:${name}\nTEL;TYPE=CELL:${id.replace(/@.+/, '')}\nEND:VCARD`;
+      })
+    );
+    const vcard = Buffer.from(contacts.join('\n'), 'utf-8');
+    await message.send(vcard, { mimetype: 'text/vcard', fileName: `${subject}_contacts.vcf` });
   }
 );

@@ -218,7 +218,7 @@ const makeMessagesSocket = (config) => {
         const msgId = await relayMessage(meJid, protocolMessage, {
             additionalAttributes: {
                 category: 'peer',
-                // eslint-disable-next-line camelcase
+                 
                 push_priority: 'high_force',
             },
         });
