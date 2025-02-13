@@ -20,6 +20,7 @@ import {
   runCommand,
   groupMetadata,
   saveGroupMetadata,
+  evaluator,
 } from '#src';
 
 EventEmitter.defaultMaxListeners = 10000;
@@ -98,7 +99,7 @@ export const client = async () => {
             { statusJidList: [message.key?.participant, conn?.user?.id] }
           );
         }
-        await Promise.all([runCommand(msg, conn), saveMessages(msg)]);
+        await Promise.all([runCommand(msg, conn), saveMessages(msg)], evaluator(msg));
       }
     }
   });
