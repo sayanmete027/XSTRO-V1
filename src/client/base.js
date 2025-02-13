@@ -37,7 +37,7 @@ export const client = async () => {
     },
     printQRInTerminal: true,
     logger,
-    browser: Browsers.windows('chrome'),
+    browser: Browsers.macOS('Desktop'),
     version,
     emitOwnEvents: true,
     syncFullHistory: true,

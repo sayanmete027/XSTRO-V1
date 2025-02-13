@@ -108,17 +108,22 @@ export async function serialize(messages, client) {
       const type = opts.type || (await detectType(content));
       const mentions = opts.mentions || quoted?.mentionedJid || [];
       const { contextInfo, ...restOpts } = opts;
-      const msg = await client.sendMessage(jid, {
-        [type]: content,
-        contextInfo: { mentionedJid: mentions, ...(contextInfo || {}) },
-        ...restOpts,
-      });
+      const msg = await client.sendMessage(
+        jid,
+        {
+          [type]: content,
+          contextInfo: { mentionedJid: mentions, ...(contextInfo || {}) },
+          ...restOpts,
+        },
+        {...restOpts}
+      );
       return serialize(msg, client);
     },
     edit: async (content) => {
+      const key = quotedMsg?.key?.id ? quotedMsg.key : messages.key;
       const msg = await client.sendMessage(from, {
         text: content,
-        edit: messages.key || quotedMsg?.key,
+        edit: key,
       });
       return serialize(msg, client);
     },
@@ -158,17 +163,19 @@ export async function serialize(messages, client) {
       return serialize(msg, client);
     },
     react: async (emoji, opts = {}) => {
+      const key = quotedMsg?.key?.id ? quotedMsg.key : messages.key;
       const msg = await client.sendMessage(from, {
         react: {
           text: emoji,
-          key: messages.key || opts.key,
+          key: key,
         },
       });
       return serialize(msg, client);
     },
     delete: async () => {
+      const key = quotedMsg?.key?.id ? quotedMsg.key : messages.key;
       const msg = await client.sendMessage(from, {
-        delete: messages.key || quotedMsg?.key,
+        delete: key,
       });
       return serialize(msg, client);
     },
