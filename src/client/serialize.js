@@ -61,6 +61,7 @@ export async function serialize(message, client) {
     },
     /** @type string */
     jid: message.key.remoteJid,
+    owner: toJid(client?.user?.id),
     message: msg,
     type: type,
     device: getDevice(message?.key?.id),
@@ -86,6 +87,11 @@ export async function serialize(message, client) {
             ban: bannedusers.includes(quoted.participant),
             sudo: quoted.participant === owner || sudo.includes(quoted.participant),
             text: qBody,
+            image: quotedType === 'imageMessage',
+            video: quotedType === 'videoMessage',
+            audio: quotedType === 'audioMessage',
+            document: quotedType === 'documentMessage',
+            viewonce: quotedMessage?.[quotedType]?.viewOnce,
           }
         : undefined,
     send: async function (content, opts = {}) {

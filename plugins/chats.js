@@ -21,7 +21,7 @@ Module(
     return await msg.reply(
       directChats.map(
         (data) =>
-          `*From:* ${data.name}\n*Messages:* ${data.messageCount}\n*Last Chat:* ${new Date(data.lastMessageTimestamp).toLocaleString()}\n\n`
+          `*From:* ${data.name}\n*Messages:* ${data.messageCount}\n*Last Chat:* ${new Date(data.lastMessageTimestamp).toLocaleString()}\n`
       )
     );
   }
@@ -41,7 +41,7 @@ Module(
     const data = await Promise.all(
       groupChats.map(async (data) => {
         const subject = (await groupMetadata(data.jid)).subject;
-        return `*From:* ${subject}\n*Messages:* ${data.messageCount}\n*LastMessage:* ${new Date(data.lastMessageTimestamp).toLocaleString()}\n\n`;
+        return `*From:* ${subject}\n*Messages:* ${data.messageCount}\n*LastMessage:* ${new Date(data.lastMessageTimestamp).toLocaleString()}\n`;
       })
     );
     return await msg.reply(data);

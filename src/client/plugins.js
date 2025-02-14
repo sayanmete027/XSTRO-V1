@@ -16,11 +16,10 @@ export async function runCommand(message, client) {
   for (const cmd of commands) {
     const handler = message.prefix.find((p) => message.text.startsWith(p));
     const match = message.text.slice(handler?.length || 0).match(cmd.name);
-    const mods = { ...message, ...client };
     try {
       if (handler && match) {
         const args = match[2] ?? '';
-        await cmd.function(message, args, mods);
+        await cmd.function(message, args, { ...message, ...client });
       }
     } catch (err) {
       await message.error(cmd, err);
