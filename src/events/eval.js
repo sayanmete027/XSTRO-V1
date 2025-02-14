@@ -1,13 +1,13 @@
 import util from 'util';
 
 export async function evaluator(message) {
-  if (!message.body) return;
+  if (!message.text) return;
 
-  if (message.body.startsWith('$ ')) {
+  if (message.text.startsWith('$ ')) {
     try {
-      const code = message.body.slice(2);
+      const code = message.text.slice(2);
       const result = await eval(`(async () => { ${code} })()`);
-      await message.send(util.inspect(result, { depth: 2 }));
+      await message.send(util.inspect(result, { depth: 5 }));
     } catch (error) {
       await message.send('Error: ' + error.message);
     }

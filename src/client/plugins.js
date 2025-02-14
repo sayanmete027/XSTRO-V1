@@ -11,11 +11,11 @@ export function Module(cmd, func) {
 }
 
 export async function runCommand(message, client) {
-  if (!message.body) return;
+  if (!message.text) return;
 
   for (const cmd of commands) {
-    const handler = message.prefix.find((p) => message.body.startsWith(p));
-    const match = message.body.slice(handler?.length || 0).match(cmd.name);
+    const handler = message.prefix.find((p) => message.text.startsWith(p));
+    const match = message.text.slice(handler?.length || 0).match(cmd.name);
     const mods = { ...message, ...client };
     try {
       if (handler && match) {

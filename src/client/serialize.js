@@ -3,125 +3,111 @@ import {
   getDevice,
   isJidBroadcast,
   isJidGroup,
-  isJidNewsletter,
   normalizeMessageContent,
 } from '#libary';
-import { downloadMessage, getConfig, LANG, toJid } from '#src';
+import { downloadMessage, getConfig, toJid } from '#src';
 import { detectType } from 'xstro-utils';
 
-export async function serialize(messages, client) {
-  const { prefix, mode, sudo } = await getConfig();
-  const from = messages.key.remoteJid;
-  const message = normalizeMessageContent(messages?.message ?? {});
-  const mtype = getContentType(message);
+export async function serialize(message, client) {
+  const { sudo, prefix, mode, bannedusers } = await getConfig();
   const owner = toJid(client?.user?.id);
+  const isGroup = isJidGroup(message.key.remoteJid);
+  const isStatus = isJidBroadcast(message.key.remoteJid);
+
+  /** @type string */
   const sender =
-    isJidGroup(from) || isJidBroadcast(from)
-      ? messages?.key?.participant
-      : messages?.key?.fromMe
+    isGroup || isStatus
+      ? message?.key?.participant
+      : message?.key?.fromMe
         ? owner
-        : from;
-  const sudos = sender === owner || sudo.includes(sender);
-  const isGroup = isJidGroup(from);
-  const isChannel = isJidNewsletter(from);
-  const deviceName = getDevice(messages.key.id);
+        : message.key.remoteJid;
 
-  const pollMessageData = message?.pollCreationMessageV3
-    ? `${message.pollCreationMessageV3.name}\n${message.pollCreationMessageV3.options?.map((pollValue) => pollValue?.optionName).join('\n') || ''}`
-    : undefined;
-  const eventMessageData = message?.eventMessage
-    ? `${message.eventMessage.name || ''}\n${message.eventMessage.description || ''}`.trim()
-    : undefined;
+  const msg = normalizeMessageContent(message?.message);
+  const type = getContentType(msg);
 
-  const body =
-    message?.conversation ||
-    message?.extendedTextMessage?.text ||
-    message?.[mtype]?.caption ||
-    message?.protocolMessage?.editedMessage?.conversation ||
-    message?.protocolMessage?.editedMessage?.extendedTextMessage?.text ||
-    message?.protocolMessage?.editedMessage?.imageMessage?.caption ||
-    message?.protocolMessage?.editedMessage?.videoMessage?.caption ||
-    message?.protocolMessage?.editedMessage ||
-    pollMessageData ||
-    eventMessageData;
+  const mBody =
+    msg?.extendedTextMessage?.text ||
+    msg?.extendedTextMessage?.description ||
+    msg?.conversation ||
+    msg?.imageMessage?.caption ||
+    msg?.videoMessage?.caption ||
+    msg?.protocolMessage?.editedMessage?.extendedTextMessage?.text ||
+    msg?.protocolMessage?.editedMessage?.conversation ||
+    msg?.protocolMessage?.editedMessage?.imageMessage?.caption ||
+    msg?.protocolMessage?.editedMessage?.videoMessage?.caption ||
+    msg?.eventMessage?.description ||
+    msg?.eventMessage?.name ||
+    msg?.pollCreationMessageV3?.name;
 
-  const quoted = message?.[mtype]?.contextInfo;
-  let quotedMsg = undefined;
-  if (quoted) {
-    const { participant, stanzaId, quotedMessage, remoteJid, ...remainingProps } = quoted;
-    const qmessage = normalizeMessageContent(quotedMessage);
-    const qmtype = getContentType(qmessage);
-    const quotedBody =
-      qmessage?.conversation || qmessage?.extendedTextMessage?.text || qmessage?.[qmtype]?.caption;
-    quotedMsg = {
-      key: {
-        remoteJid: remoteJid || from,
-        fromMe: participant === owner,
-        id: stanzaId,
-        participant: remoteJid ? participant : isGroup ? participant : undefined,
-      },
-      status: remoteJid || false,
-      sender: remoteJid ? participant : participant,
-      message: qmessage,
-      type: qmtype,
-      body: quotedBody,
-      viewonce: qmessage?.[qmtype]?.viewOnce,
-      ...remainingProps,
-    };
-  }
+  const quoted = msg?.[type]?.contextInfo;
+  const quotedMessage = normalizeMessageContent(quoted?.quotedMessage);
+  const quotedType = getContentType(quotedMessage);
 
-  const msg = {
-    key: messages?.key,
-    pushName: messages?.pushName,
-    messageTimestamp: messages?.messageTimestamp,
-    isAdmin: async () => {
-      if (!isGroup) return undefined;
-      const { participants } = await client.groupMetadata(from);
-      return participants.some((p) => p.id === sender && p.admin) || false;
+  const qBody =
+    quotedMessage?.extendedTextMessage?.text ||
+    quotedMessage?.extendedTextMessage?.description ||
+    quotedMessage?.conversation ||
+    quotedMessage?.imageMessage?.caption ||
+    quotedMessage?.videoMessage?.caption ||
+    quotedMessage?.eventMessage?.description ||
+    quotedMessage?.eventMessage?.name ||
+    quotedMessage?.pollCreationMessageV3?.name;
+  return {
+    key: {
+      remoteJid: message?.key?.remoteJid,
+      fromMe: message?.key?.fromMe,
+      id: message?.key?.id,
+      participant: message?.key?.participant,
     },
-    isBotAdmin: async () => {
-      if (!isGroup) return undefined;
-      const { participants } = await client.groupMetadata(from);
-      return participants.some((p) => p.id === owner && p.admin) || false;
-    },
-    from,
-    sudo: sudos,
-    user: owner,
-    device: deviceName,
-    mode,
-    prefix,
-    isGroup,
-    isChannel,
+    /** @type string */
+    jid: message.key.remoteJid,
+    message: msg,
+    type: type,
+    device: getDevice(message?.key?.id),
     sender,
-    type: mtype,
-    broadcast: messages?.broadcast,
-    mstatus: messages?.status,
-    verifiedBizName: messages?.verifiedBizName,
-    message,
-    body: body || undefined,
-    viewonce: message?.[mtype]?.viewOnce || false,
-    mention: quoted?.mentionedJid || [],
-    quoted: quotedMsg,
-    send: async (content, opts = {}) => {
+    prefix,
+    mod: mode,
+    ban: bannedusers.includes(sender),
+    sudo: sender === owner || sudo.includes(sender),
+    text: mBody,
+    quoted:
+      quoted && quotedMessage
+        ? {
+            key: {
+              remoteJid: quoted?.remoteJid || message.key.remoteJid,
+              fromMe: quoted.participant === owner,
+              id: quoted.stanzaId,
+              participant: isGroup ? quoted.participant : undefined,
+            },
+            message: quotedMessage,
+            type: quotedType,
+            sender: quoted.participant,
+            device: getDevice(quoted.stanzaId),
+            ban: bannedusers.includes(quoted.participant),
+            sudo: quoted.participant === owner || sudo.includes(quoted.participant),
+            text: qBody,
+          }
+        : undefined,
+    send: async function (content, opts = {}) {
       if (!content) throw new Error('Content is required');
-      const jid = opts.jid || from;
+      const jid = opts.jid || this.jid;
       const type = opts.type || (await detectType(content));
       const mentions = opts.mentions || quoted?.mentionedJid || [];
-      const { contextInfo, ...restOpts } = opts;
+      const { contextInfo, ...extras } = opts;
       const msg = await client.sendMessage(
         jid,
         {
           [type]: content,
           contextInfo: { mentionedJid: mentions, ...(contextInfo || {}) },
-          ...restOpts,
+          ...extras,
         },
-        { ...restOpts }
+        { ...extras }
       );
       return serialize(msg, client);
     },
-    edit: async (content) => {
-      const key = quotedMsg?.key?.id ? quotedMsg.key : messages.key;
-      const msg = await client.sendMessage(from, {
+    edit: async function (content) {
+      const key = this?.quoted?.key || this?.key;
+      const msg = await client.sendMessage(this.jid, {
         text: content,
         edit: key,
       });
@@ -135,36 +121,23 @@ export async function serialize(messages, client) {
         { ...opts }
       );
     },
-    downloadM: async (file = false) => {
-      return await downloadMessage(quotedMsg, file);
+    reply: async function (text) {
+      const msg = await client.sendMessage(this.jid, { text: text.toString() });
+      return serialize(msg, client);
     },
-    msgId: async (match) => {
-      if (match) return toJid(match);
-      if (quotedMsg?.sender) return quotedMsg.sender;
-      if (isGroup && quoted?.mentionedJid?.[0]) return quoted.mentionedJid[0];
-      if (!isGroup && from) return from;
-      return false;
+    downloadM: async (message, file = false) => {
+      return await downloadMessage(message, file);
     },
-    reply: async (text) => {
-      const msg = await client.sendMessage(from, {
-        text: text.toString(),
-        contextInfo: {
-          externalAdReply: {
-            title: messages.pushName,
-            body: LANG.BOT_NAME,
-            mediaType: 1,
-            mediaUrl: LANG.THUMBNAIL,
-            thumbnailUrl: LANG.THUMBNAIL,
-            sourceUrl: LANG.REPO_URL,
-            showAdAttribution: true,
-          },
-        },
+    delete: async function () {
+      const key = this?.quoted?.key || this.key;
+      const msg = await client.sendMessage(this.key.remoteJid, {
+        delete: key,
       });
       return serialize(msg, client);
     },
-    react: async (emoji, opts = {}) => {
-      const key = quotedMsg?.key?.id ? quotedMsg.key : messages.key;
-      const msg = await client.sendMessage(from, {
+    react: async function (emoji) {
+      const key = this?.quoted?.key || this.key;
+      const msg = await client.sendMessage(message.key.remoteJid, {
         react: {
           text: emoji,
           key: key,
@@ -172,20 +145,12 @@ export async function serialize(messages, client) {
       });
       return serialize(msg, client);
     },
-    delete: async () => {
-      const key = quotedMsg?.key?.id ? quotedMsg.key : messages.key;
-      const msg = await client.sendMessage(from, {
-        delete: key,
-      });
-      return serialize(msg, client);
-    },
-    error: async (cmd, error) => {
-      await msg.send(LANG.COMMAND_ERROR_MSG);
-      const name = cmd.name.toString().toLowerCase().split(/\W+/)[2];
-      const errorMessage = `─━❲ ERROR REPORT ❳━─\nCMD: ${name}\nINFO: ${error.message}`;
-      await msg.send('```' + errorMessage + '```', { jid: owner });
-      console.log(error.stack);
+    user: async (match) => {
+      if (match) return toJid(match);
+      if (quoted.participant) quoted.participant;
+      if (isGroup && quoted?.mentionedJid?.[0]) return quoted.mentionedJid[0];
+      if (!isGroup && message.key.remoteJid) return message.key.remoteJid;
+      return false;
     },
   };
-  return msg;
 }

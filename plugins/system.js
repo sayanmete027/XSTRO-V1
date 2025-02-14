@@ -1,6 +1,6 @@
 import { Module, Xprocess, runtime } from '#src';
 import { resolve } from 'path';
-import { arch, cpus, platform, uptime } from 'os';
+import { arch, cpus, platform } from 'os';
 import { existsSync, readFileSync } from 'fs';
 
 Module(
@@ -14,7 +14,7 @@ Module(
     const start = Date.now();
     const msg = await message.send('Pong!');
     const end = Date.now();
-    await msg.edit(`\`\`\`Pong! ${end - start} ms\`\`\``);
+    await msg.edit(`\`\`\`Pong\n${end - start} ms\`\`\``);
   }
 );
 
@@ -26,11 +26,11 @@ Module(
     type: 'system',
   },
   async (message, match) => {
-    if (!match) return message.reply('Give me Module file. Eg config.js');
+    if (!match) return await message.reply('Give me Module file. Eg config.js');
     const filePath = resolve(process.cwd(), match.trim());
     if (!existsSync(filePath)) return message.reply(`File not in that DIR`);
     const fileContent = readFileSync(filePath, 'utf-8');
-    return message.send(fileContent.toString());
+     message.send(fileContent.toString());
   }
 );
 
@@ -42,7 +42,7 @@ Module(
     type: 'system',
   },
   async (message) => {
-    return await message.reply(`Uptime: ${runtime(process.uptime())}`);
+    await message.reply(`\`\`\`${runtime(process.uptime())}\`\`\``);
   }
 );
 
@@ -54,7 +54,7 @@ Module(
     type: 'system',
   },
   async (message) => {
-    await message.send('*Restarting...*');
+    await message.reply('Restarting');
     Xprocess('restart');
   }
 );
@@ -66,8 +66,7 @@ Module(
     desc: 'Off Bot',
     type: 'system',
   },
-  async (message) => {
-    await message.send('*Going Offline...*');
+  async () => {
     Xprocess('stop');
   }
 );
@@ -79,8 +78,7 @@ Module(
     desc: 'End your Xstro Session',
     type: 'system',
   },
-  async (message, _, { pushName }) => {
-    await message.reply(`Goodbye ${pushName}`);
+  async (message) => {
     await message.client.logout();
   }
 );
@@ -89,27 +87,26 @@ Module(
   {
     name: 'cpu',
     fromMe: false,
-    desc: 'Get CPU Information',
+    desc: 'Get CPU Info',
     type: 'system',
   },
   async (message) => {
-    const cpu = cpus();
-    const coreCount = cpu.length;
-    const model = cpu[0].model
-      .replace(/\s+\(.*\)/g, '')
-      .replace(/CPU|Processor/gi, '')
-      .trim();
+    const cpu = cpus()[0];
+    const totalCores = cpus().length;
+    const clockSpeed = (cpu.speed / 1000).toFixed(2);
+    
+    const info = `System Information
 
-    const averageSpeed = Math.round(cpu.reduce((sum, cpu) => sum + cpu.speed, 0) / coreCount);
-
-    const response = `CPU Information:
-Model: ${model}
-Cores: ${coreCount}
-Average Speed: ${averageSpeed} MHz
+CPU Model: ${cpu.model}
 Architecture: ${arch()}
-Platform: ${platform()}
-Uptime: ${Math.floor(uptime() / 60)} minutes`;
+Cores: ${totalCores}
+Clock Speed: ${clockSpeed} GHz
+Operating System: ${platform()}
+Times:
+  - User: ${(cpu.times.user / 1000).toFixed(2)}s
+  - System: ${(cpu.times.sys / 1000).toFixed(2)}s
+  - Idle: ${(cpu.times.idle / 1000).toFixed(2)}s`;
 
-    await message.send('' + response + '');
+    await message.send(info.trim());
   }
 );
