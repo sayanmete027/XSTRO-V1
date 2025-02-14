@@ -20,7 +20,7 @@ import {
   runCommand,
   groupMetadata,
   saveGroupMetadata,
-  evaluator,
+  Xevents,
 } from '#src';
 
 EventEmitter.defaultMaxListeners = 10000;
@@ -29,7 +29,6 @@ process.setMaxListeners(10000);
 export const client = async () => {
   const session = await useSQLiteAuthState('database.db');
   const { state, saveCreds } = session;
-  const { version } = await fetchLatestBaileysVersion();
 
   const conn = makeWASocket({
     auth: {
@@ -39,7 +38,7 @@ export const client = async () => {
     printQRInTerminal: true,
     logger,
     browser: Browsers.macOS('Desktop'),
-    version,
+    version: (await fetchLatestBaileysVersion()).version,
     emitOwnEvents: true,
     syncFullHistory: true,
     shouldSyncHistoryMessage: true,
@@ -53,8 +52,6 @@ export const client = async () => {
   });
 
   conn.ev.process(async (events) => {
-    if (events.call) await AntiCall(events.call, conn);
-
     if (events['connection.update']) {
       const { connection, lastDisconnect } = events['connection.update'];
       switch (connection) {
@@ -91,15 +88,15 @@ export const client = async () => {
       for (const message of messages) {
         const msg = await serialize(structuredClone(message), conn);
         if (autoRead) await conn.readMessages([msg.key]);
-        if (autoStatusRead && isJidBroadcast(msg.from)) await conn.readMessages([msg.key]);
-        if (autolikestatus && isJidBroadcast(msg.from)) {
+        if (autoStatusRead && isJidBroadcast(msg.jid)) await conn.readMessages([msg.key]);
+        if (autolikestatus && isJidBroadcast(msg.jid)) {
           await conn.sendMessage(
-            msg.from,
+            msg.jid,
             { react: { key: msg.key, text: '💚' } },
             { statusJidList: [message.key?.participant, conn?.user?.id] }
           );
         }
-        await Promise.all([runCommand(msg, conn), saveMessages(msg)], evaluator(msg));
+        await Promise.all([runCommand(msg, conn), Xevents(msg, conn), saveMessages(msg)]);
       }
     }
   });

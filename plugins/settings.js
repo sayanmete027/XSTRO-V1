@@ -41,3 +41,22 @@ Module(
     return await msg.reply('prefix updated!');
   }
 );
+Module(
+  {
+    name: 'ssave',
+    fromMe: true,
+    desc: 'Makes the bot save status',
+    type: 'settings',
+  },
+  async (msg, match) => {
+    if (!match) {
+      return msg.reply('Use "on" or "off" to manage status autosave.');
+    }
+    if (match.includes('on')) {
+      await editConfig({ savebroadcast: true });
+    } else if (match.includes('off')) {
+      await editConfig({ savebroadcast: false });
+    }
+    return await msg.reply(`Status autosave is now ${match}`);
+  }
+);

@@ -14,6 +14,7 @@ async function initConfigDb() {
       disabledm INTEGER DEFAULT 0,
       cmdReact INTEGER DEFAULT 1,
       cmdRead INTEGER DEFAULT 0,
+      savebroadcast INTEGER DEFAULT 0,
       disabledCmds TEXT DEFAULT '[]',
       sudo TEXT DEFAULT '[]',
       bannedusers TEXT DEFAULT '[]'
@@ -24,9 +25,9 @@ async function initConfigDb() {
   if (!exists) {
     await db.run(`
       INSERT INTO config 
-        (prefix, mode, autoRead, autoStatusRead, autolikestatus, disablegc, disabledm, cmdReact, cmdRead, disabledCmds, sudo, bannedusers)
+        (prefix, mode, autoRead, autoStatusRead, autolikestatus, disablegc, disabledm, cmdReact, cmdRead, savebroadcast, disabledCmds, sudo, bannedusers)
       VALUES 
-        ('.', 1, 0, 0, 0, 0, 0, 1, 0, '[]', '[]', '[]')
+        ('.', 1, 0, 0, 0, 0, 0, 1, 0, 0, '[]', '[]', '[]')
     `);
   }
 }
@@ -48,6 +49,7 @@ export async function getConfig() {
     disabledm: Boolean(row.disabledm),
     cmdReact: Boolean(row.cmdReact),
     cmdRead: Boolean(row.cmdRead),
+    savebroadcast: Boolean(row.savebroadcast),
     disabledCmds: JSON.parse(row.disabledCmds),
     sudo: JSON.parse(row.sudo),
     bannedusers: JSON.parse(row.bannedusers),
@@ -68,6 +70,7 @@ export async function editConfig(updates) {
     'disabledm',
     'cmdReact',
     'cmdRead',
+    'savebroadcast',
     'disabledCmds',
     'sudo',
     'bannedusers',
