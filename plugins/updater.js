@@ -12,54 +12,42 @@ Module(
     type: 'system',
   },
   async (message, match, { prefix }) => {
-    try {
-      await execAsync('git fetch');
+    await execAsync('git fetch');
 
-      const { stdout: logOutput } = await execAsync('git log master..origin/master');
-      const commits = logOutput
-        .trim()
-        .split('\n')
-        .filter((line) => line.startsWith('commit '));
+    const { stdout: messageOutput } = await execAsync(
+      'git log master..origin/master --pretty=format:%s'
+    );
+    const commitMessages = messageOutput
+      .trim()
+      .split('\n')
+      .filter((msg) => msg.trim());
 
-      if (!match) {
-        if (commits.length === 0) {
-          return await message.reply('No update available');
-        } else {
-          let changes = 'Update Available\n\n';
-          changes += `Changes: ${commits.length}\n`;
-          changes += 'Updates:\n';
-
-          const { stdout: messageOutput } = await execAsync(
-            'git log master..origin/master --pretty=format:%s'
-          );
-          const commitMessages = messageOutput.trim().split('\n');
-
-          commitMessages.forEach((msg, index) => {
-            changes += `${index + 1}. ${msg}\n`;
-          });
-
-          changes += `\nTo update, use ${prefix}update now`;
-          await message.reply(changes);
-        }
+    if (!match) {
+      if (commitMessages.length === 0) {
+        return await message.reply('No update available');
       }
 
-      if (match && match === 'now') {
-        if (commits.length === 0) {
-          return await message.reply('No changes in the latest commit');
-        }
+      const updateList = commitMessages.map((msg, i) => `${i + 1}. ${msg}`).join('\n');
+      const response = `Update Available\n\nChanges: ${commitMessages.length}\nUpdates:\n${updateList}\n\nTo update, use ${prefix}update now`;
+      return await message.reply(response);
+    }
 
-        await message.send('*Updating...*');
-        await execAsync('git stash && git pull origin master');
-        await message.send('*Restarting...*');
-        const dependencyChanged = await updatedDependencies();
-        if (dependencyChanged) {
-          await message.send('*Dependencies changed. Installing new dependencies...*');
-          await execAsync('yarn install');
-        }
-        process.exit(0);
+    if (match === 'now') {
+      if (commitMessages.length === 0) {
+        return await message.reply('No changes in the latest commit');
       }
-    } catch (error) {
-      await message.send(`Error: ${error.message}`);
+
+      await message.send('*Updating...*');
+      await execAsync('git stash && git pull origin master');
+      await message.send('*Restarting...*');
+
+      const dependencyChanged = await updatedDependencies();
+      if (dependencyChanged) {
+        await message.send('*Dependencies changed. Installing new dependencies...*');
+        await execAsync('yarn install');
+      }
+
+      process.exit(0);
     }
   }
 );
@@ -69,7 +57,7 @@ const updatedDependencies = async () => {
     const { stdout } = await execAsync('git diff master..origin/master -- package.json');
     return stdout.includes('"dependencies":');
   } catch (error) {
-    console.error('Error occurred while checking package.json:', error);
+    console.error('Error checking dependencies:', error);
     return false;
   }
 };

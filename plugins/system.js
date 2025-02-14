@@ -30,7 +30,7 @@ Module(
     const filePath = resolve(process.cwd(), match.trim());
     if (!existsSync(filePath)) return message.reply(`File not in that DIR`);
     const fileContent = readFileSync(filePath, 'utf-8');
-     message.send(fileContent.toString());
+    message.send(fileContent.toString());
   }
 );
 
@@ -94,7 +94,7 @@ Module(
     const cpu = cpus()[0];
     const totalCores = cpus().length;
     const clockSpeed = (cpu.speed / 1000).toFixed(2);
-    
+
     const info = `System Information
 
 CPU Model: ${cpu.model}
