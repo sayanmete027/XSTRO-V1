@@ -1,0 +1,9 @@
+{
+  "name": "xstro",
+  "version": "1.7.11",
+  "main": "index.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node index"
+  }
+}

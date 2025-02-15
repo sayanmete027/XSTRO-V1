@@ -5,8 +5,9 @@
   "main": "index.js",
   "type": "commonjs",
   "scripts": {
-    "start": "node index",
-    "postinstall": "yarn --cwd resources install",
+    "start": "yarn --cwd release start",
+    "prepare": "tsc",
+    "postinstall": "yarn --cwd resources install && yarn --cwd build/resources install",
     "build": "yarn --cwd resources build",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix"
@@ -40,6 +41,7 @@
     "eslint-config-prettier": "^10.0.1",
     "eslint-plugin-prettier": "^5.2.3",
     "prettier": "^3.5.1",
+    "shx": "^0.3.4",
     "ts-node": "^10.9.2"
   },
   "dependencies": {

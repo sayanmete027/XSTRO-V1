@@ -3,22 +3,27 @@ import { Message } from "../../types";
 
 interface Command {
   name: RegExp | string;
-  function: Function;
+  function?: Function;
   fromMe?: boolean;
   isGroup?: boolean;
+  desc: string | undefined;
+  type: string | undefined;
   dontAddCommandList?: boolean;
 }
 
 export const commands: Command[] = [];
 
-export function Module(cmd: Command, func: Function): Command {
-  cmd.function = func;
-  cmd.name = new RegExp(`^\\s*(${cmd.name})(?:\\s+([\\s\\S]+))?$`, 'i');
-  cmd.fromMe = cmd.fromMe || false;
-  cmd.isGroup = cmd.isGroup || false;
-  cmd.dontAddCommandList = cmd.dontAddCommandList || false;
-  commands.push(cmd);
-  return cmd;
+export function Module(cmd: Omit<Command, 'function'>, func: Function): Command {
+  const fullCmd: Command = {
+    ...cmd,
+    function: func,
+    name: new RegExp(`^\\s*(${cmd.name})(?:\\s+([\\s\\S]+))?$`, 'i'),
+    fromMe: cmd.fromMe || false,
+    isGroup: cmd.isGroup || false,
+    dontAddCommandList: cmd.dontAddCommandList || false,
+  };
+  commands.push(fullCmd);
+  return fullCmd;
 }
 
 export async function runCommand(message: Message, client: WASocket): Promise<void> {
@@ -30,7 +35,7 @@ export async function runCommand(message: Message, client: WASocket): Promise<vo
     try {
       if (handler && match) {
         const args = match[2] ?? '';
-        await cmd.function(message, args, { ...message, ...client });
+        await cmd.function!(message, args, { ...message, ...client });
       }
     } catch (err) {
       // await message.error(cmd, err as Error);
