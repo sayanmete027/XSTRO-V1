@@ -4,10 +4,10 @@ import os, { tmpdir } from 'os';
 import sharp from 'sharp';
 import { exec } from 'child_process';
 import { promisify } from 'util';
-import { FileTypeFromBuffer, getMimeType } from 'xstro-utils';
+import { FileTypeFromBuffer, getMimeType } from '../../src';
 import Crypto from 'crypto';
 import webp from 'node-webpmux';
-import { LANG } from '#src';
+import { LANG } from '../../src';
 
 const execAsync = promisify(exec);
 const { writeFileSync, existsSync, readFileSync, mkdirSync } = fs;

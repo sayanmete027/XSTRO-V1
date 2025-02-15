@@ -1,11 +1,10 @@
-import path from 'path';
-import fs from 'fs';
-import { fileURLToPath } from 'url';
+import * as path from 'path';
+import * as fs from 'fs';
 
 type JsonData = Record<string, any>;
 
 const data: JsonData = (() => {
-  const dir = path.join(path.dirname(fileURLToPath(import.meta.url)), 'en.json');
+  const dir = path.join(__dirname, 'en.json');
   try {
     return JSON.parse(fs.readFileSync(dir, 'utf8'));
   } catch (error) {
@@ -19,6 +18,6 @@ export const LANG = new Proxy(data, {
     if (typeof prop === 'string' && prop in target) {
       return target[prop];
     }
-    return null; // Return null for missing properties
+    return null;
   },
 });

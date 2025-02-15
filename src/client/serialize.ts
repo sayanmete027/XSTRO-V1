@@ -7,8 +7,7 @@ import {
   WAMessage,
   WASocket,
 } from '../../resources';
-import { downloadMessage, getConfig, toJid } from '../../src';
-import { detectType } from 'xstro-utils';
+import { downloadMessage, getConfig, toJid,detectType } from '../../src';
 
 export async function serialize(message: WAMessage, client: WASocket) {
   const { sudo, prefix, mode, bannedusers } = await getConfig();

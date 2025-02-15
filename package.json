@@ -39,17 +39,19 @@
     "eslint": "^9.20.1",
     "eslint-config-prettier": "^10.0.1",
     "eslint-plugin-prettier": "^5.2.3",
-    "prettier": "^3.5.1"
+    "prettier": "^3.5.1",
+    "ts-node": "^10.9.2"
   },
   "dependencies": {
     "@hapi/boom": "^10.0.1",
+    "axios": "^1.7.9",
+    "file-type": "^16.5.4",
     "node-webpmux": "^3.2.0",
     "pino": "^9.6.0",
     "sharp": "^0.33.5",
     "sqlite": "^5.1.1",
     "sqlite3": "^5.1.7",
-    "typescript": "^5.7.3",
-    "xstro-utils": "^1.0.8"
+    "typescript": "^5.7.3"
   },
   "packageManager": "yarn@1.22.22"
 }

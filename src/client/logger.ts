@@ -26,10 +26,5 @@ export function eventlogger(): void {
   });
 }
 
-export const logger = P(
-  { 
-    timestamp: (): string => `,"time":"${new Date().toJSON()}"` 
-  }, 
-  P.destination('./wa-logs.txt')
-)
-logger.level = 'trace'
+export const logger = P()
+logger.level = 'silent'

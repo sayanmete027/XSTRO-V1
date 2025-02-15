@@ -1,4 +1,4 @@
-function createMap(chars) {
+function createMap(chars:string) {
   var alphanum = [
     'a',
     'b',
@@ -932,12 +932,12 @@ const analuciaCharMap = {
 
 //createMap("𝕒𝕓𝕔𝕕𝕖𝕗𝕘𝕙𝕚𝕛𝕜𝕝𝕞𝕟𝕠𝕡𝕢𝕣𝕤𝕥𝕦𝕧𝕨𝕩𝕪𝕫𝔸𝔹ℂ𝔻𝔼𝔽𝔾ℍ𝕀𝕁𝕂𝕃𝕄ℕ𝕆ℙℚℝ𝕊𝕋𝕌𝕍𝕎𝕏𝕐ℤ𝟘𝟙𝟚𝟛𝟜𝟝𝟞𝟟𝟠𝟡")
 
-function listall(text) {
+function listall(text:string) {
   text = text.trim();
   if (text === '') {
     return '';
   }
-  var finalText = [];
+  var finalText: string[] = [];
 
   finalText.push(tiny(text));
   finalText.push(strikeThrough(text));
@@ -996,31 +996,31 @@ function listall(text) {
   return finalText;
 }
 
-function strikeThrough(text) {
+function strikeThrough(text:string) {
   return text.split('').join('̶') + '̶';
 }
-function tildeStrikeThrough(text) {
+function tildeStrikeThrough(text:string) {
   return text.split('').join('̴') + '̴';
 }
-function underline(text) {
+function underline(text:string) {
   return text.split('').join('̲') + '̲';
 }
-function doubleUnderline(text) {
+function doubleUnderline(text:string) {
   return text.split('').join('̳') + '̳';
 }
-function slashThrough(text) {
+function slashThrough(text:string) {
   return text.split('').join('̷') + '̷';
 }
-function heartsBetween(text) {
+function heartsBetween(text:string) {
   return text.split('').join('♥');
 }
-function arrowBelow(text) {
+function arrowBelow(text:string) {
   return text.split('').join('͎') + '͎';
 }
-function crossAboveBelow(text) {
+function crossAboveBelow(text:string) {
   return text.split('').join('͓̽') + '͓̽';
 }
-function manga(text) {
+function manga(text:string) {
   return text
     .split('')
     .map(function (a) {
@@ -3471,7 +3471,7 @@ const tinyChrmap = {
   Y: 'Y',
   Z: 'Z',
 };
-function tiny(text) {
+function tiny(text:string) {
   return text
     .split('')
     .map(function (a) {
@@ -3479,7 +3479,7 @@ function tiny(text) {
     })
     .join('');
 }
-function ladybug(text) {
+function ladybug(text:string) {
   return text
     .split('')
     .map(function (a) {
@@ -3488,7 +3488,7 @@ function ladybug(text) {
     .join('');
 }
 
-function runes(text) {
+function runes(text:string) {
   return text
     .split('')
     .map(function (a) {
@@ -3496,7 +3496,7 @@ function runes(text) {
     })
     .join('');
 }
-function serif_B(text) {
+function serif_B(text:string) {
   return text
     .split('')
     .map(function (a) {
@@ -3504,7 +3504,7 @@ function serif_B(text) {
     })
     .join('');
 }
-function serif_BI(text) {
+function serif_BI(text:string) {
   return text
     .split('')
     .map(function (a) {
@@ -3512,7 +3512,7 @@ function serif_BI(text) {
     })
     .join('');
 }
-function serif_I(text) {
+function serif_I(text:string) {
   return text
     .split('')
     .map(function (a) {
@@ -3520,7 +3520,7 @@ function serif_I(text) {
     })
     .join('');
 }
-function wingdings(text) {
+function wingdings(text:string) {
   return text
     .split('')
     .map(function (a) {
@@ -3529,7 +3529,7 @@ function wingdings(text) {
     .join('');
 }
 
-function vaporwave(text) {
+function vaporwave(text:string) {
   return text
     .split('')
     .map(function (a) {
@@ -3538,7 +3538,7 @@ function vaporwave(text) {
     .join('');
 }
 
-function sparrow(text) {
+function sparrow(text:string) {
   return text
     .split('')
     .map(function (a) {
@@ -3547,7 +3547,7 @@ function sparrow(text) {
     .join('');
 }
 
-function typewriter(text) {
+function typewriter(text:string) {
   return text
     .split('')
     .map(function (a) {
@@ -3555,7 +3555,7 @@ function typewriter(text) {
     })
     .join('');
 }
-function analucia(text) {
+function analucia(text:string) {
   return text
     .split('')
     .map(function (a) {
@@ -3565,7 +3565,7 @@ function analucia(text) {
 }
 
 const font = {
-  randomStyle: (text) => {
+  randomStyle: (text:string) => {
     let list = listall(text);
     return list[Math.floor(Math.random() * list.length)];
   },
@@ -3591,7 +3591,6 @@ const font = {
   runes,
   serif_B,
   serif_BI,
-  serif_I,
   fancy1,
   fancy2,
   fancy3,
@@ -3627,5 +3626,4 @@ const font = {
   fancy33,
 };
 
-export { font };
-export default font;
+export { font }

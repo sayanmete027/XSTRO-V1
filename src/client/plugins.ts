@@ -33,7 +33,7 @@ export async function runCommand(message: Message, client: WASocket): Promise<vo
         await cmd.function(message, args, { ...message, ...client });
       }
     } catch (err) {
-      await message.error(cmd, err as Error);
+      // await message.error(cmd, err as Error);
     }
   }
 }

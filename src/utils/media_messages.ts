@@ -1,6 +1,6 @@
 import { writeFile } from 'fs/promises';
 import { downloadMediaMessage, getContentType, WAProto } from '../../resources';
-import { FileTypeFromBuffer } from 'xstro-utils';
+import { FileTypeFromBuffer } from '../../src';
 import { Message } from '../../types';
 
 type MediaMessageType = 'imageMessage' | 'documentMessage' | 'audioMessage' | 'videoMessage' | 'stickerMessage';

@@ -1,4 +1,4 @@
-import { LANG } from '#src';
+import { LANG } from '../../src';
 
 // Define the ApiError class with proper types
 class ApiError extends Error {

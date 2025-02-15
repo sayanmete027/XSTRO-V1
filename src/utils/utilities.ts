@@ -1,5 +1,4 @@
-import { LANG } from '#src';
-import { getBuffer } from 'xstro-utils';
+import { LANG ,getBuffer} from '../../src';
 
 const API_ID: string = LANG.API;
 

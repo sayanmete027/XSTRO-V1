@@ -25,7 +25,7 @@ import {
   logger,
   saveMessage
 } from '../../src';
-import CacheStore from './store.js';
+import CacheStore from './store';
 
 EventEmitter.defaultMaxListeners = 10000;
 process.setMaxListeners(10000);
