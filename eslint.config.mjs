@@ -1,37 +1,29 @@
-import prettier from 'eslint-plugin-prettier';
+// eslint.config.js
 
-const eslintConfig = {
-  languageOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    globals: {}
-  },
-  plugins: {
-    prettier: prettier
-  },
-  rules: {
-    'prettier/prettier': [
-      'error',
-      {
-        printWidth: 100,
-        useTabs: false,
-        tabWidth: 2,
-        singleQuote: true,
-        semi: true,
-        quoteProps: 'as-needed',
-        trailingComma: 'es5',
-        bracketSpacing: true,
-        bracketSameLine: false,
-        arrowParens: 'always',
-        endOfLine: 'auto',
-        proseWrap: 'preserve',
-        embeddedLanguageFormatting: 'auto',
-        vueIndentScriptAndStyle: false
-      }
-    ]
-  },
-  files: ['**/*.js'],
-  ignores: ['node_modules/**', 'resources/**', 'resources/lib/*']
-};
+import js from '@eslint/js';
+import tsPlugin from '@typescript-eslint/eslint-plugin';
+import tsParser from '@typescript-eslint/parser';
+import prettierPlugin from 'eslint-plugin-prettier';
+import prettierConfig from 'eslint-config-prettier';
 
-export default eslintConfig;
+export default [
+  js.configs.recommended,
+  {
+    files: ['**/*.ts', '**/*.tsx'],
+    languageOptions: {
+      parser: tsParser,
+      parserOptions: {
+        project: './tsconfig.json',
+      },
+    },
+    plugins: {
+      '@typescript-eslint': tsPlugin,
+      prettier: prettierPlugin,
+    },
+    rules: {
+      ...tsPlugin.configs.recommended.rules,
+      'prettier/prettier': 'error',
+    },
+  },
+  prettierConfig,
+];
