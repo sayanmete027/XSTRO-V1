@@ -5,3 +5,4 @@ database.db-wal
 test.js
 session
 *.tgz
+release
