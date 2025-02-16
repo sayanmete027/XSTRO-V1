@@ -1,24 +1,16 @@
-import { pathToFileURL } from 'url';
 import { join, extname } from 'path';
 import { readdir } from 'fs/promises';
-import { LANG } from '../../src/index';
 
-export async function loadPlugins(): Promise<void> {
-  const pluginsDir: string = join('plugins');
-
-  const files = await readdir(pluginsDir, { withFileTypes: true });
-  await Promise.all(
-    files.map(async (file) => {
-      const fullPath: string = join(pluginsDir, file.name);
-      if (extname(file.name) === '.js') {
-        try {
-          const fileUrl: string = pathToFileURL(fullPath).href;
-          await import(fileUrl);
-        } catch (err) {
-          console.log('ERROR', `${file.name}: ${(err as Error).message}`);
-        }
-      }
-    })
-  );
-  console.log(LANG.PLUGINS);
-}
+export const loadPlugins = async (directory:string) => {
+  try {
+    const files = await readdir(directory);
+    return Promise.all(
+      files
+        .filter((file) => extname(file).toLowerCase() === ".js")
+        .map((file) => require(join(directory, file)))
+    );
+  } catch (error) {
+    console.error("Error reading and requiring files:", error);
+    throw error;
+  }
+};

@@ -44,7 +44,7 @@ if (cluster.isPrimary) {
     eventlogger();
     await initSession();
     await SessionMigrator(`session/${config.SESSION_ID}`, 'database.db');
-    await loadPlugins();
+    await loadPlugins('plugins');
     await client();
 
     http
