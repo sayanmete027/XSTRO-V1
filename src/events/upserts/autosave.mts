@@ -1,6 +1,6 @@
 import { isJidBroadcast } from 'baileys';
-import { getConfig } from '../../src/index.mjs';
-import { Message } from '../../types/index.mjs';
+import { getConfig } from '../../../src/index.mjs';
+import { Message } from '../../../types/index.mjs';
 
 /**
  * Purpose of this to Automatically save status
