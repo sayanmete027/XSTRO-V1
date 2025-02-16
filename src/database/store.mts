@@ -45,29 +45,62 @@ export const getContacts = async (): Promise<{ jid: string; name: string }[]> =>
   return db.all(`SELECT * FROM contacts`);
 };
 
+class Mutex {
+  private mutex = Promise.resolve();
+  async lock(): Promise<() => void> {
+    let release: () => void;
+    const lockPromise = new Promise<void>((res) => (release = res));
+    const previous = this.mutex;
+    this.mutex = previous.then(() => lockPromise);
+    await previous;
+    return release!;
+  }
+}
+
+const dbMutex = new Mutex();
+const processingMessages = new Map<string, Promise<void>>();
+
 export const saveMessage = async (message: Message): Promise<void> => {
-  const m = Object.fromEntries(Object.entries(message).filter(([key]) => key !== 'client'));
-  const { remoteJid: jid, id } = m.key;
-  if (!id || !jid || !m) return;
-
-  await saveContact(m.sender!, m.pushName!);
-  const db: Database = await getDb();
-  await initStoreDb();
-
-  const timestamp = typeof m.messageTimestamp === 'number' ? m.messageTimestamp * 1000 : Date.now();
-
-  await db.run(
-    `INSERT INTO messages (id, jid, message, timestamp) VALUES (?, ?, ?, ?) ON CONFLICT(id) DO UPDATE SET message = excluded.message, timestamp = excluded.timestamp`,
-    [id, jid, JSON.stringify(m), timestamp]
+  const m = Object.fromEntries(
+    Object.entries(message).filter(([key]) => key !== 'client')
   );
-
-  if (m?.sender && isJidGroup(jid)) {
-    await db.run(
-      `INSERT INTO message_counts (jid, sender, count) VALUES (?, ?, 1) ON CONFLICT(jid, sender) DO UPDATE SET count = count + 1`,
-      [jid, m.sender]
-    );
+  if (!m || !m.key) return;
+  const { remoteJid: jid, id } = m.key;
+  if (!id || !jid) return;
+  if (processingMessages.has(id)) return processingMessages.get(id)!;
+  const job = async () => {
+    await saveContact(m.sender!, m.pushName!);
+    const db: Database = await getDb();
+    await initStoreDb();
+    const timestamp =
+      typeof m.messageTimestamp === 'number'
+        ? m.messageTimestamp * 1000
+        : Date.now();
+    const unlock = await dbMutex.lock();
+    try {
+      await db.run(
+        `INSERT INTO messages (id, jid, message, timestamp) VALUES (?, ?, ?, ?) ON CONFLICT(id) DO UPDATE SET message = excluded.message, timestamp = excluded.timestamp`,
+        [id, jid, JSON.stringify(m), timestamp]
+      );
+      if (m?.sender && isJidGroup(jid)) {
+        await db.run(
+          `INSERT INTO message_counts (jid, sender, count) VALUES (?, ?, 1) ON CONFLICT(jid, sender) DO UPDATE SET count = count + 1`,
+          [jid, m.sender]
+        );
+      }
+    } finally {
+      unlock();
+    }
+  };
+  const promise = job();
+  processingMessages.set(id, promise);
+  try {
+    await promise;
+  } finally {
+    processingMessages.delete(id);
   }
 };
+
 
 export const loadMessage = async (id: string): Promise<Message | null> => {
   if (!id) return null;

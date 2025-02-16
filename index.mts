@@ -1,7 +1,7 @@
 import * as http from 'http';
 import cluster from 'cluster';
 import config from './config.mjs';
-import { client, initSession, loadPlugins, SessionMigrator } from './src/index.mjs';
+import { client, initSession, loadPlugins, SessionMigrator, silenceLibsignalLogs } from './src/index.mjs';
 
 if (cluster.isPrimary) {
   let isRestarting: boolean = false;
@@ -44,6 +44,7 @@ if (cluster.isPrimary) {
     await initSession();
     await SessionMigrator(`session/${config.SESSION_ID}`, 'database.db');
     await loadPlugins();
+    silenceLibsignalLogs()
     await client();
 
     http
