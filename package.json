@@ -47,6 +47,7 @@
   "dependencies": {
     "@hapi/boom": "^10.0.1",
     "axios": "^1.7.9",
+    "babel": "^6.23.0",
     "baileys": "^6.7.12",
     "file-type": "^16.5.4",
     "node-webpmux": "^3.2.0",
