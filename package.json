@@ -1,6 +1,6 @@
 {
   "name": "xstro",
-  "version": "2.5.0",
+  "version": "2.5.2",
   "description": "OpenSource WhatsApp Userbot",
   "type": "module",
   "main": "./release/index.js",
@@ -41,7 +41,7 @@
   "dependencies": {
     "@hapi/boom": "^10.0.1",
     "axios": "^1.7.9",
-    "baileys": "^6.7.12",
+    "baileys": "^6.7.13",
     "file-type": "^16.5.4",
     "node-webpmux": "^3.2.0",
     "pino": "^9.6.0",
