@@ -12,7 +12,7 @@ type YahooResponse = { result: unknown };
 
 type MemeType = string;
 
-type NewsResponse = Record<string, unknown>;
+type NewsResponse = Record<any, any>;
 
 type TranslationResponse = { result: string };
 
