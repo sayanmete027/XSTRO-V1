@@ -23,7 +23,8 @@
     "src/**/*.ts",
     "src/**/*.mts",
     "src/**/*.json",
-    "types/**/*"
+    "types/**/*",
+    "index.mts"
   ],
   "exclude": [
     "app.json",
