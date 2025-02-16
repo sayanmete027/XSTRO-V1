@@ -1,4 +1,5 @@
-import { Module, XSTRO } from '#src';
+import { Message } from '../types';
+import { Module, XSTRO } from '../src';
 
 Module(
   {
@@ -7,7 +8,7 @@ Module(
     desc: 'Get World News Now',
     type: 'news',
   },
-  async (message) => {
+  async (message:Message) => {
     const res = await XSTRO.news();
     let data = '';
     for (const item of res) {

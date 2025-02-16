@@ -2,13 +2,17 @@
   "name": "xstro",
   "version": "1.7.11",
   "description": "A simple WhatsApp bot built by AstroX11.",
-  "main": "index.js",
-  "type": "module",
+  "main": "./release/index.js",
+  "types": "./release/index.d.ts",
+  "exports": {
+    ".": {
+      "require": "./release/index.js",
+      "types": "./release/index.d.ts"
+    }
+  },
   "scripts": {
-    "start": "yarn --cwd release start",
-    "prepare": "tsc && babel release --out-dir release",
-    "postinstall": "yarn --cwd resources install && yarn --cwd build/resources install",
-    "build": "yarn --cwd resources build",
+    "start": "node ./release/index",
+    "build": "tsc && babel release --out-dir release",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix"
   },
@@ -51,6 +55,7 @@
   "dependencies": {
     "@hapi/boom": "^10.0.1",
     "axios": "^1.7.9",
+    "baileys": "^6.7.12",
     "file-type": "^16.5.4",
     "node-webpmux": "^3.2.0",
     "pino": "^9.6.0",

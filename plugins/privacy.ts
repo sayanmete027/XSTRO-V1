@@ -1,4 +1,6 @@
-import { Module } from '#src';
+import { Message } from '../types';
+import { getName, Module } from '../src';
+import { WAPrivacyGroupAddValue, WAPrivacyOnlineValue, WAPrivacyValue, WAReadReceiptsValue } from 'baileys/lib';
 
 Module(
   {
@@ -7,12 +9,12 @@ Module(
     desc: 'View your privacy settings',
     type: 'privacy',
   },
-  async (message) => {
+  async (message: Message) => {
     const settings = await message.client.fetchPrivacySettings(true);
-    const name = await message.client.getName(message.user);
+    const name = await getName(message.owner);
 
-    const mapPrivacyValue = (value, type) => {
-      const mappings = {
+    const mapPrivacyValue = (value: string, type?: string): string => {
+      const mappings: Record<string, string> = {
         all: 'Everyone',
         contacts: 'Your contacts',
         contact_blacklist: 'Your contacts except blocked',
@@ -23,7 +25,7 @@ Module(
       return mappings[value] || value;
     };
 
-    const userPrivacy = {
+    const userPrivacy: Record<string, string> = {
       'Read Receipts': mapPrivacyValue(settings.readreceipts),
       'Profile Photo': mapPrivacyValue(settings.profile),
       'Status Updates': mapPrivacyValue(settings.status),
@@ -34,7 +36,7 @@ Module(
       Messages: mapPrivacyValue(settings.messages),
     };
 
-    const privacyText = Object.entries(userPrivacy)
+    const privacyText: string = Object.entries(userPrivacy)
       .map(([key, value]) => `${key}: ${value}`)
       .join('\n');
 
@@ -49,9 +51,9 @@ Module(
     desc: 'Update call privacy settings',
     type: 'privacy',
   },
-  async (message, match) => {
-    const value = match.trim();
-    if (!['all', 'known'].includes(value)) {
+  async (message: Message, match: string) => {
+    const value = match.trim().toLowerCase();
+    if (value !== 'all' && value !== 'known') {
       return await message.reply('Invalid settings! Use "all" or "known"');
     }
     await message.client.updateCallPrivacy(value);
@@ -68,11 +70,12 @@ Module(
     desc: 'Update last seen privacy settings',
     type: 'privacy',
   },
-  async (message, match) => {
-    const value = match.trim();
+  async (message: Message, match: string) => {
+    const value = match.trim().toLowerCase() as WAPrivacyValue
+
     if (!['all', 'contacts', 'contact_blacklist', 'none'].includes(value)) {
       return await message.reply(
-        'Invalid settings Use "all", "contacts", "contact_blacklist", or "none"'
+        'Invalid settings! Use "all", "contacts", "contact_blacklist", or "none".'
       );
     }
     await message.client.updateLastSeenPrivacy(value);
@@ -87,10 +90,11 @@ Module(
     desc: 'Update online privacy settings',
     type: 'privacy',
   },
-  async (message, match) => {
-    const value = match.trim();
+  async (message: Message, match: string) => {
+    const value = match.trim() as WAPrivacyOnlineValue
+
     if (!['all', 'match_last_seen'].includes(value)) {
-      return await message.reply('Invalid value. Use "all" or "match_last_seen"');
+      return await message.reply('Invalid value. Use "all" or "match_last_seen".');
     }
     await message.client.updateOnlinePrivacy(value);
     return await message.reply(`Online privacy updated to: ${value}`);
@@ -104,11 +108,11 @@ Module(
     desc: 'Update profile picture privacy settings',
     type: 'privacy',
   },
-  async (message, match) => {
-    const value = match.trim();
+  async (message: Message, match: string) => {
+    const value = match.trim() as WAPrivacyValue;
     if (!['all', 'contacts', 'contact_blacklist', 'none'].includes(value)) {
       return await message.reply(
-        'Invalid settings Use "all", "contacts", "contact_blacklist", or "none".'
+        'Invalid settings! Use "all", "contacts", "contact_blacklist", or "none".'
       );
     }
     await message.client.updateProfilePicturePrivacy(value);
@@ -123,11 +127,11 @@ Module(
     desc: 'Update status privacy settings',
     type: 'privacy',
   },
-  async (message, match) => {
-    const value = match.trim();
+  async (message: Message, match: string) => {
+    const value = match.trim() as WAPrivacyValue;
     if (!['all', 'contacts', 'contact_blacklist', 'none'].includes(value)) {
       return await message.reply(
-        'Invalid settings Use "all", "contacts", "contact_blacklist", or "none".'
+        'Invalid settings! Use "all", "contacts", "contact_blacklist", or "none".'
       );
     }
     await message.client.updateStatusPrivacy(value);
@@ -142,10 +146,10 @@ Module(
     desc: 'Update read receipts privacy settings',
     type: 'privacy',
   },
-  async (message, match) => {
-    const value = match.trim();
+  async (message: Message, match: string) => {
+    const value = match.trim() as WAReadReceiptsValue;
     if (!['all', 'none'].includes(value)) {
-      return await message.reply('Invalid value. Use "all" or "none".');
+      return await message.reply('Invalid value! Use "all" or "none".');
     }
     await message.client.updateReadReceiptsPrivacy(value);
     return await message.reply(
@@ -161,10 +165,10 @@ Module(
     desc: 'Update group add privacy settings',
     type: 'privacy',
   },
-  async (message, match) => {
-    const value = match.trim();
+  async (message: Message, match: string) => {
+    const value = match.trim() as WAPrivacyGroupAddValue;
     if (!['all', 'contacts', 'contact_blacklist'].includes(value)) {
-      return await message.reply('Invalid value. Use "all", "contacts", or "contact_blacklist".');
+      return await message.reply('Invalid value! Use "all", "contacts", or "contact_blacklist".');
     }
     await message.client.updateGroupsAddPrivacy(value);
     return await message.reply(`Group add privacy updated to: ${value}`);
@@ -178,7 +182,7 @@ Module(
     desc: 'Update default disappearing messages duration',
     type: 'privacy',
   },
-  async (message, match) => {
+  async (message: Message, match: string) => {
     const durations = {
       '24hrs': 24 * 3600, // 24 hours
       '7days': 7 * 24 * 3600, // 7 days

@@ -1,4 +1,4 @@
-import { Module, Xprocess, runtime } from '../src/index';
+import { Module, Xprocess, runtime } from '../src';
 import { resolve } from 'path';
 import { arch, cpus, platform } from 'os';
 import { existsSync, readFileSync } from 'fs';
@@ -79,8 +79,8 @@ Module(
     desc: 'End your Xstro Session',
     type: 'system',
   },
-  async (message: any, args: string, { logout }) => {
-    await logout();
+  async (message:Message) => {
+    await message.client.logout()
   }
 );
 

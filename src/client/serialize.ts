@@ -6,8 +6,9 @@ import {
   normalizeMessageContent,
   WAMessage,
   WASocket,
-} from '../../resources/lib/index';
+} from 'baileys';
 import { downloadMessage, getConfig, toJid,detectType } from '../../src/index';
+import { Message } from '../../types';
 
 export async function serialize(message: WAMessage, client: WASocket) {
   const { sudo, prefix, mode, bannedusers } = await getConfig();
@@ -100,24 +101,24 @@ export async function serialize(message: WAMessage, client: WASocket) {
           viewonce: quotedMessage?.imageMessage?.viewOnce! || quotedMessage?.videoMessage?.viewOnce! || quotedMessage?.audioMessage?.viewOnce!,
         }
         : undefined,
-    send: async function (content: Buffer | string, options) {
+    send: async function (content: Buffer | string, options:object) {
       if (!content) return
       const type = await detectType(content)
       if (type === 'text') {
         const message = await client.sendMessage(this.jid, { text: content.toString(), ...options }, { ...options })
         return serialize(message!, client)
       } else if (type === 'video') {
-        const message = await client.sendMessage(this.jid, { video: content, ...options }, { ...options })
+        const message = await client.sendMessage(this.jid, { video: Buffer.from(content), ...options }, { ...options })
         return serialize(message!, client)
       } else if (type === 'image') {
-        const message = await client.sendMessage(this.jid, { image: content, ...options }, { ...options })
+        const message = await client.sendMessage(this.jid, { image: Buffer.from(content), ...options }, { ...options })
         return serialize(message!, client)
       } else if (type === 'sticker') {
-        const message = await client.sendMessage(this.jid, { sticker: content, ...options }, { ...options })
+        const message = await client.sendMessage(this.jid, { sticker: Buffer.from(content), ...options }, { ...options })
         return serialize(message!, client)
       }
     },
-    edit: async function (content) {
+    edit: async function (content:string) {
       const key = this?.quoted?.key || this?.key;
       const msg = await client.sendMessage(this.jid, {
         text: content,
@@ -125,7 +126,7 @@ export async function serialize(message: WAMessage, client: WASocket) {
       });
       return serialize(msg!, client);
     },
-    forward: async (jid: string, message, opts = {}) => {
+    forward: async (jid: string, message:Message, opts = {}) => {
       if (!jid || !message) throw new Error('No jid or message provided');
       return await client.sendMessage(
         jid,
@@ -137,7 +138,7 @@ export async function serialize(message: WAMessage, client: WASocket) {
       const msg = await client.sendMessage(this.jid, { text: text.toString() });
       return serialize(msg!, client);
     },
-    downloadM: async (message, file = false) => {
+    downloadM: async (message:Message, file = false) => {
       return await downloadMessage(message, file);
     },
     delete: async function () {
@@ -164,5 +165,6 @@ export async function serialize(message: WAMessage, client: WASocket) {
       if (!isGroup && message.key.remoteJid) return message.key.remoteJid;
       return false;
     },
+    client: client
   };
 }

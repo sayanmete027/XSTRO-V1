@@ -1,24 +1,26 @@
-import config from '#config';
-import { Module, commands, formatBytes, getRandom, runtime, font } from '#src';
+import config from '../config';
+import { Module, commands, formatBytes, getRandom, runtime, font } from '../src';
 import { platform, totalmem, freemem } from 'os';
+import { Message } from '../types';
 
 Module(
   {
     name: 'menu',
     fromMe: false,
     desc: 'Show All Commands',
+    type: undefined,
     dontAddCommandList: true,
   },
-  async (message, _, { mode, prefix }) => {
+  async (message: Message) => {
     const cmds = commands.filter(
       (cmd) => cmd.name && !cmd.dontAddCommandList && !cmd.name.toString().includes('undefined')
     ).length;
     let menuInfo = `\`\`\`
 ╭─── ${config.BOT_INFO.split(';')[1]} ────
-│ Prefix: ${getRandom(prefix)}
+│ Prefix: ${getRandom(message.prefix)}
 │ Owner: ${config.BOT_INFO.split(';')[0]}		
 │ Plugins: ${cmds}
-│ Mode: ${mode ? 'Private' : 'Public'}
+│ Mode: ${message.mod ? 'Private' : 'Public'}
 │ Uptime: ${runtime(process.uptime())}
 │ Platform: ${platform()}
 │ Ram: ${formatBytes(totalmem() - freemem())}
@@ -61,22 +63,29 @@ Module(
     name: 'list',
     fromMe: false,
     desc: 'Show All Commands',
+    type: undefined,
     dontAddCommandList: true,
   },
-  async (message) => {
-    let cmdsList = 'Command List\n\n';
-    let cmdList = [];
-    let cmd, desc;
+  async (message:Message) => {
+    let cmdsList: string = 'Command List\n\n';
+    let cmdList: { cmd: string; desc?: string }[] = [];
+    let cmd: string | undefined;
+    let desc: string | undefined;
+    
     commands.map((command) => {
-      if (command.name) cmd = command.name.toString().split(/\W+/)[2];
-      desc = command.desc || false;
+      if (command.name) {
+        const parts = command.name.toString().split(/\W+/);
+        cmd = parts.length > 2 ? parts[2] : undefined;
+      }
+      desc = command?.desc;
       if (!command.dontAddCommandList && cmd !== undefined) cmdList.push({ cmd, desc });
     });
+    
     cmdList.sort((a, b) => a.cmd.localeCompare(b.cmd));
     cmdList.forEach(({ cmd, desc }, num) => {
-      cmdsList += `${(num += 1)} ${cmd}\n`;
+      cmdsList += `${num + 1} ${cmd}\n`;
       if (desc) cmdsList += `${desc}\n\n`;
-    });
+    });    
 
     return await message.reply(cmdsList);
   }

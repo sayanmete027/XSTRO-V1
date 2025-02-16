@@ -1,0 +1,38 @@
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+const src_1 = require("../src");
+(0, src_1.Module)({
+  name: 'contacts',
+  fromMe: true,
+  desc: 'Get all contacts saved by Module',
+  type: 'contacts'
+}, async message => {
+  const contacts = await (0, src_1.getContacts)();
+  if (!contacts.length) return await message.send('No contacts saved yet');
+  const contactList = contacts.map(c => `${c.name}: ${c.jid.split('@')[0]}`).join('\n');
+  return await message.reply(`Saved Contacts\n\n${contactList}`);
+});
+(0, src_1.Module)({
+  name: 'vcf',
+  fromMe: true,
+  isGroup: true,
+  desc: 'Get All Group Members Contacts',
+  type: 'contacts'
+}, async message => {
+  const metadata = await (0, src_1.groupMetadata)(message.jid);
+  const contacts = await Promise.all(metadata?.participants?.map(async ({
+    id
+  }, index) => {
+    const name = (await (0, src_1.getName)(id)) || `${metadata?.subject} ${index + 1}`;
+    return `BEGIN:VCARD\nVERSION:3.0\nFN:${name}\nTEL;TYPE=CELL:${id.replace(/@.+/, '')}\nEND:VCARD`;
+  }) || []);
+  const vcard = Buffer.from(contacts.join('\n'), 'utf-8');
+  await message.client.sendMessage(message.jid, {
+    document: vcard,
+    mimetype: 'text/vcard',
+    fileName: `${metadata?.subject}_contacts.vcf`
+  });
+});

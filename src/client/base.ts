@@ -5,16 +5,16 @@ import {
   DisconnectReason,
   Browsers,
   isJidBroadcast,
-  useSQLiteAuthState,
   WAProto,
   WASocket
-} from '../../resources/lib/index';
+} from 'baileys';
 
 import { Boom } from '@hapi/boom';
 import config from '../../config';
 import { EventEmitter } from 'events';
 import {
   Xprocess,
+  useSQLiteAuthState,
   getConfig,
   serialize,
   commands,
@@ -25,7 +25,7 @@ import {
   loadMessage,
   logger,
   saveMessage
-} from '../../src/index';
+} from '../../src';
 import CacheStore from './store';
 
 EventEmitter.defaultMaxListeners = 10000;

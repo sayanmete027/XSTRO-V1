@@ -1,4 +1,5 @@
-import { Module, XSTRO, LANG } from '#src';
+import { Message } from '../types';
+import { Module, XSTRO, LANG } from '../src';
 
 Module(
   {
@@ -7,7 +8,7 @@ Module(
     desc: 'Get Forex Data for Pair',
     type: 'forex',
   },
-  async (message, match) => {
+  async (message: Message, match: string) => {
     if (!match) return message.send('Give me a symbol, EURUSD');
     const res = await XSTRO.forex(match);
     if (!res) return message.send('Invaild Forex Pair');
@@ -24,7 +25,7 @@ Module(
     desc: 'Get Current Market Details for Forex Majors',
     type: 'forex',
   },
-  async (message) => {
+  async (message: Message) => {
     const res = await (await fetch(`${LANG.API}/api/fxmajor`)).json();
     if (!res) return message.send('No data from market available');
     await message.send(
@@ -54,7 +55,7 @@ Module(
     desc: 'Get Current Market Details for Forex Minors',
     type: 'forex',
   },
-  async (message) => {
+  async (message: Message) => {
     const res = await (await fetch(`${LANG.API}/api/fxminor`)).json();
     if (!res) return message.send('No data from market available');
     const data = res
@@ -83,7 +84,7 @@ Module(
     desc: 'Get Current Market Details for Forex Exotic',
     type: 'forex',
   },
-  async (message) => {
+  async (message: Message) => {
     const res = await (await fetch(`${LANG.API}/api/fxexotic`)).json();
     if (!res) return message.send('No data from market available');
     await message.send(
@@ -113,11 +114,11 @@ Module(
     desc: 'Get Current Market Details for Forex Americas',
     type: 'forex',
   },
-  async (message) => {
+  async (message: Message) => {
     const res = await (await fetch(`${LANG.API}/api/fxamericas`)).json();
     if (!res) return message.send('No data from market available');
     const data = res
-      .map((item) => {
+      .map((item: any) => {
         return `
 Symbol: ${item.Symbol}
 Pair: ${item.Pair}
@@ -142,11 +143,11 @@ Module(
     desc: 'Get Current Market Details for Forex Europe',
     type: 'forex',
   },
-  async (message) => {
+  async (message: Message) => {
     const res = await (await fetch(`${LANG.API}/api/fxeurope`)).json();
     if (!res) return message.send('No data from market available');
     const data = res
-      .map((item) => {
+      .map((item: any) => {
         return `
 Symbol: ${item.Symbol}
 Pair: ${item.Pair}
@@ -171,11 +172,11 @@ Module(
     desc: 'Get Current Market Details for Forex Asia',
     type: 'forex',
   },
-  async (message) => {
+  async (message: Message) => {
     const res = await (await fetch(`${LANG.API}/api/fxasia`)).json();
     if (!res) return message.send('No data from market available');
     const data = res
-      .map((item) => {
+      .map((item: any) => {
         return `
 Symbol: ${item.Symbol}
 Pair: ${item.Pair}
@@ -200,11 +201,11 @@ Module(
     desc: 'Get Current Market Details for Forex Pacific',
     type: 'forex',
   },
-  async (message) => {
+  async (message: Message) => {
     const res = await (await fetch(`${LANG.API}/api/fxpacific`)).json();
     if (!res) return message.send('No data from market available');
     const data = res
-      .map((item) => {
+      .map((item: any) => {
         return `
 Symbol: ${item.Symbol}
 Pair: ${item.Pair}
@@ -229,11 +230,11 @@ Module(
     desc: 'Get Current Market Details for Forex Middle East',
     type: 'forex',
   },
-  async (message) => {
+  async (message: Message) => {
     const res = await (await fetch(`${LANG.API}/api/fxmiddle-east`)).json();
     if (!res) return message.send('No data from market available');
     const data = res
-      .map((item) => {
+      .map((item: any) => {
         return `
 Symbol: ${item.Symbol}
 Pair: ${item.Pair}
@@ -258,11 +259,11 @@ Module(
     desc: 'Get Current Market Details for Forex Africa',
     type: 'forex',
   },
-  async (message) => {
+  async (message: Message) => {
     const res = await (await fetch(`${LANG.API}/api/fxafrica`)).json();
     if (!res) return message.send('No data from market available');
     const data = res
-      .map((item) => {
+      .map((item: any) => {
         return `
 Symbol: ${item.Symbol}
 Pair: ${item.Pair}

@@ -1,4 +1,4 @@
-import { isJidBroadcast } from '../../resources/lib/index';
+import { isJidBroadcast } from 'baileys';
 import { getConfig } from '../../src/index';
 import { Message } from '../../types';
 

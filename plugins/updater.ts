@@ -1,5 +1,6 @@
-import { Module } from '#src';
+import { Module } from '../src';
 import { exec } from 'child_process';
+import { Message } from '../types';
 import { promisify } from 'util';
 
 const execAsync = promisify(exec);
@@ -11,7 +12,8 @@ Module(
     desc: 'Update the Module',
     type: 'system',
   },
-  async (message, match, { prefix }) => {
+  async (message: Message, match: string) => {
+    const prefix = message.prefix
     await execAsync('git fetch');
 
     const { stdout: messageOutput } = await execAsync(

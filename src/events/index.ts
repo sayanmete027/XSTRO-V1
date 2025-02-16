@@ -1,7 +1,7 @@
 import { evaluator } from './eval';
 import { autoSaveBroadCast } from './autosave';
 import { Message } from '../../types/Message';
-import { WASocket } from '../../resources/lib/index';
+import { WASocket } from 'baileys';
 
 export const Xevents = async (messages: Message, client: WASocket) => {
     const tasks = [evaluator(messages), autoSaveBroadCast(messages)];

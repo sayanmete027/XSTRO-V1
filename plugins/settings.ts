@@ -1,4 +1,5 @@
-import { Module, editConfig, getConfig } from '#src';
+import { Module, editConfig, getConfig } from '../src';
+import { Message } from '../types';
 
 Module(
   {
@@ -7,7 +8,7 @@ Module(
     desc: 'Get Configurations setup',
     type: 'settings',
   },
-  async (msg) => {
+  async (msg: Message) => {
     const config = await getConfig();
     const configs = [
       'prefix',
@@ -35,7 +36,7 @@ Module(
     desc: 'Manage bot handler',
     type: 'settings',
   },
-  async (msg, match) => {
+  async (msg: Message, match: string) => {
     if (!match) return msg.reply('provide new prefix!');
     await editConfig({ prefix: [match] });
     return await msg.reply('prefix updated!');
@@ -48,7 +49,7 @@ Module(
     desc: 'Makes the bot save status',
     type: 'settings',
   },
-  async (msg, match) => {
+  async (msg: Message, match: string) => {
     if (!match) {
       return msg.reply('Use "on" or "off" to manage status autosave.');
     }

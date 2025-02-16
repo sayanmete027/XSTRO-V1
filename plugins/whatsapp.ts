@@ -1,4 +1,5 @@
-import { Module } from '#src';
+import { Module } from '../src';
+import { Message } from '../types';
 
 Module(
   {
@@ -7,12 +8,12 @@ Module(
     desc: 'forward a viewonce message',
     type: 'whatsapp',
   },
-  async (msg, match, { quoted }) => {
-    if (!quoted || !quoted.viewonce) {
+  async (msg: Message) => {
+    if (!msg.quoted || !msg.quoted.viewonce) {
       return msg.reply('Reply viewonce');
     }
-    quoted.message[quoted.type].viewOnce = false;
-    await msg.forward(msg.owner, quoted, { quoted: quoted });
+    msg.quoted.message![msg.quoted.type!].viewOnce = false;
+    await msg.forward(msg.owner, msg?.quoted, { quoted: msg.quoted });
     return msg.reply('done');
   }
 );
@@ -24,9 +25,9 @@ Module(
     desc: 'Updates your WA name',
     type: 'whatsapp',
   },
-  async (msg, match, { updateProfileName }) => {
+  async (msg: Message, match: string) => {
     if (!match) return msg.reply('provide new name');
-    await updateProfileName(match);
+    await msg.client.updateProfileName(match);
     return msg.reply('done');
   }
 );

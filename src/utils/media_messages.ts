@@ -1,5 +1,5 @@
 import { writeFile } from 'fs/promises';
-import { downloadMediaMessage, getContentType, WAProto } from '../../resources/lib/index';
+import { downloadMediaMessage, getContentType, WAProto } from 'baileys';
 import { FileTypeFromBuffer } from '../../src/index';
 import { Message } from '../../types';
 

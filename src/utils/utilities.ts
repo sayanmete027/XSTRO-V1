@@ -20,6 +20,24 @@ type ShortenResponse = { result: string };
 
 type PdfBuffer = Buffer;
 
+export interface NewsArticle {
+  title: string;
+  description?: string;
+  url: string;
+  author?: string;
+  link?: string;
+}
+
+export interface XSTRO {
+  news: () => Promise<NewsArticle[]>;
+  footballnews: () => Promise<NewsArticle[]>;
+  animenews: () => Promise<NewsArticle[]>;
+  technews: () => Promise<NewsArticle[]>;
+  wabeta: () => Promise<NewsArticle[]>;
+  voxnews: () => Promise<NewsArticle[]>;
+}
+
+
 const XSTRO = {
   short: async (url: string): ApiResponse<string> => {
     try {
@@ -86,7 +104,7 @@ const XSTRO = {
     }
   },
 
-  news: async (): ApiResponse<NewsResponse> => {
+  news: async (): ApiResponse<NewsArticle> => {
     try {
       const res = await fetch(`${API_ID}/api/news`);
       return await res.json();
@@ -133,7 +151,7 @@ const XSTRO = {
     }
   },
 
-  meme: async (text: string, type: MemeType): ApiResponse<PdfBuffer> => {
+  meme: async (text: string, type: MemeType): ApiResponse<Buffer> => {
     try {
       return await getBuffer(`${API_ID}/api/meme/${type}?text=${encodeURIComponent(text)}`);
     } catch {

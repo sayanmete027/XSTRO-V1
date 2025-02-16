@@ -1,4 +1,4 @@
-import { WAProto } from '../resources/lib/index';
+import { WAProto, WASocket } from 'baileys';
 
 export interface Message {
     key: {
@@ -9,7 +9,7 @@ export interface Message {
     };
     jid: string;
     pushName: string | null | undefined;
-    messageTimestamp: number;
+    messageTimestamp: number | Long.Long;
     owner: string;
     message: WAProto.IMessage | undefined;
     type: string;
@@ -48,4 +48,5 @@ export interface Message {
     delete: () => Promise<Message>;
     react: (emoji: string) => Promise<Message>;
     user: (match: string) => Promise<string | false>;
+    client: WASocket
 }

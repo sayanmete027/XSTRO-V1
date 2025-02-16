@@ -10,7 +10,7 @@ export async function evaluator(message:Message) {
       const result = await eval(`(async () => { ${code} })()`);
       await message.send(util.inspect(result, { depth: 5 }));
     } catch (error) {
-      await message.send('Error: ' + error.message);
+      await message.send('Error: ' + (error instanceof Error ? error.message : String(error)));
     }
   }
 }

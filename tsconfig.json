@@ -1,32 +1,45 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "module": "ES2022",
+    "module": "CommonJS",
+    "moduleResolution": "Node10",
+    "outDir": "release",
+    "rootDir": ".",
     "allowJs": false,
     "checkJs": false,
-    "outDir": "release",
     "strict": false,
     "strictNullChecks": true,
     "skipLibCheck": true,
     "noImplicitThis": true,
     "esModuleInterop": true,
+    "resolveJsonModule": true,
     "forceConsistentCasingInFileNames": true,
     "declaration": false,
-    "moduleResolution": "node",
-    "lib": ["ES6", "DOM"]
+    "declarationMap": false,
+    "sourceMap": false,
+    "composite": false,
+    "lib": ["ES6", "DOM"],
+    "paths": {
+      "*": ["./node_modules/*", "./src/*"]
+    },
+    "typeRoots": ["./node_modules/@types", "./types"],
+    "baseUrl": ".",
+    "allowSyntheticDefaultImports": true
   },
   "include": [
-    "plugins/**/*.ts",
-    "plugins/**/*.json",
-    "src/**/*.ts",
-    "src/**/*.json",
-    "types/**/*.ts",
-    "types/**/*.json",
+    "plugins/**/*",
+    "src/**/*",
+    "types/**/*",
     "index.ts",
-    "config.ts"
+    "config.ts",
+    "**/*.json"
   ],
-  "exclude": ["node_modules", "package.json"],
+  "exclude": ["node_modules", "release"],
   "ts-node": {
-    "files": true
+    "files": true,
+    "compilerOptions": {
+      "module": "CommonJS",
+      "resolveJsonModule": true
+    }
   }
 }
