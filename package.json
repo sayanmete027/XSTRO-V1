@@ -2,14 +2,8 @@
   "name": "xstro",
   "version": "2.0.0",
   "description": "OpenSource WhatsApp Userbot",
+  "type": "module",
   "main": "./release/index.js",
-  "types": "./release/index.d.ts",
-  "exports": {
-    ".": {
-      "require": "./release/index.js",
-      "types": "./release/index.d.ts"
-    }
-  },
   "scripts": {
     "start": "node ./release/index",
     "build": "tsc && babel release --out-dir release",
