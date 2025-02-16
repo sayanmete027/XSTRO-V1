@@ -38,7 +38,7 @@ export async function serialize(message: WAMessage, client: WASocket) {
     msg?.protocolMessage?.editedMessage?.videoMessage?.caption ||
     msg?.eventMessage?.description ||
     msg?.eventMessage?.name ||
-    msg?.pollCreationMessageV3?.name;
+    msg?.pollCreationMessageV3?.name || null;
 
 
   function getContextInfo(msg: any, type: string): { contextInfo: any } | undefined {

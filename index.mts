@@ -1,7 +1,7 @@
 import * as http from 'http';
 import cluster from 'cluster';
 import config from './config.mjs';
-import { client, eventlogger, initSession, loadPlugins, SessionMigrator } from './src/index.mjs';
+import { client, initSession, loadPlugins, SessionMigrator } from './src/index.mjs';
 
 if (cluster.isPrimary) {
   let isRestarting: boolean = false;
@@ -41,7 +41,6 @@ if (cluster.isPrimary) {
 } else {
   const startServer = async (): Promise<void> => {
     console.log('Starting...');
-    eventlogger();
     await initSession();
     await SessionMigrator(`session/${config.SESSION_ID}`, 'database.db');
     await loadPlugins();

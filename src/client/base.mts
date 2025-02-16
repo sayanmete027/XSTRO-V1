@@ -8,7 +8,7 @@ import {
   WAProto,
   WASocket
 } from 'baileys';
-
+import * as P from 'pino'
 import { Boom } from '@hapi/boom';
 import config from '../../config.mjs';
 import { EventEmitter } from 'events';
@@ -23,13 +23,15 @@ import {
   saveGroupMetadata,
   Xevents,
   loadMessage,
-  logger,
   saveMessage
 } from '../../src/index.mjs';
 import CacheStore from './store.mjs';
 
 EventEmitter.defaultMaxListeners = 10000;
 process.setMaxListeners(10000);
+
+const logger = P.pino()
+logger.level = 'silent'
 
 export const client = async (): Promise<WASocket> => {
   const session = await useSQLiteAuthState('database.db');
@@ -90,6 +92,7 @@ export const client = async (): Promise<WASocket> => {
 
       for (const message of messages) {
         const msg = await serialize(structuredClone(message), conn);
+        if(!msg) return
         if (autoRead) await conn.readMessages([msg.key]);
         if (autoStatusRead && isJidBroadcast(msg.jid)) await conn.readMessages([msg.key]);
         if (autolikestatus && isJidBroadcast(msg.jid)) {
@@ -99,7 +102,7 @@ export const client = async (): Promise<WASocket> => {
             { statusJidList: [msg.key.participant, msg.owner] }
           );
         }
-        await Promise.all([runCommand(msg, conn), Xevents(msg, conn), saveMessage(msg)]);
+        await Promise.all([runCommand(msg), Xevents(msg, conn), saveMessage(msg)]);
       }
     }
   });

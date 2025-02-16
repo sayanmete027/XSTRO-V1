@@ -46,24 +46,25 @@ export const getContacts = async (): Promise<{ jid: string; name: string }[]> =>
 };
 
 export const saveMessage = async (message: Message): Promise<void> => {
-  const { remoteJid: jid, id } = message.key;
-  if (!id || !jid || !message) return;
+  const m = Object.fromEntries(Object.entries(message).filter(([key]) => key !== 'client'));
+  const { remoteJid: jid, id } = m.key;
+  if (!id || !jid || !m) return;
 
-  await saveContact(message.sender!, message.pushName!);
+  await saveContact(m.sender!, m.pushName!);
   const db: Database = await getDb();
   await initStoreDb();
 
-  const timestamp = typeof message.messageTimestamp === 'number' ? message.messageTimestamp * 1000 : Date.now();
+  const timestamp = typeof m.messageTimestamp === 'number' ? m.messageTimestamp * 1000 : Date.now();
 
   await db.run(
     `INSERT INTO messages (id, jid, message, timestamp) VALUES (?, ?, ?, ?) ON CONFLICT(id) DO UPDATE SET message = excluded.message, timestamp = excluded.timestamp`,
-    [id, jid, JSON.stringify(message), timestamp]
+    [id, jid, JSON.stringify(m), timestamp]
   );
 
-  if (message?.sender && isJidGroup(jid)) {
+  if (m?.sender && isJidGroup(jid)) {
     await db.run(
       `INSERT INTO message_counts (jid, sender, count) VALUES (?, ?, 1) ON CONFLICT(jid, sender) DO UPDATE SET count = count + 1`,
-      [jid, message.sender]
+      [jid, m.sender]
     );
   }
 };

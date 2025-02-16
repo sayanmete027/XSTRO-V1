@@ -2,7 +2,7 @@ import fs, { readFile } from 'fs/promises';
 import { Readable } from 'stream';
 import axios, { AxiosRequestConfig, AxiosError } from 'axios';
 
-import * as filetype from 'file-type';
+import { fileTypeFromBuffer } from 'file-type';
 
 const mimeToExtensionMap: Record<string, string> = {
 	'image/jpeg': 'jpg',
@@ -78,24 +78,24 @@ export const getStreamFromBuffer = (buffer: Buffer): Readable => {
 export const FileTypeFromUrl = async (url: string): Promise<string | null> => {
 	const response = await axios.get(url, { responseType: 'arraybuffer' });
 	const buffer = Buffer.from(response.data);
-	const typeResult = await filetype.fromBuffer(buffer);
+	const typeResult = await fileTypeFromBuffer(buffer);
 	return typeResult ? mimeToExtensionMap[typeResult.mime] || typeResult.ext : null;
 };
 
 export const FileTypeFromBuffer = async (buffer: Buffer): Promise<string | null> => {
-	const typeResult = await filetype.fromBuffer(buffer);
+	const typeResult = await fileTypeFromBuffer(buffer);
 	return typeResult ? mimeToExtensionMap[typeResult.mime] || typeResult.ext : null;
 };
 
 export const FileTypeFromBlob = async (blob: Blob): Promise<string | null> => {
 	const buffer = await blob.arrayBuffer().then(Buffer.from);
-	const typeResult = await filetype.fromBuffer(buffer);
+	const typeResult = await fileTypeFromBuffer(buffer);
 	return typeResult ? mimeToExtensionMap[typeResult.mime] || typeResult.ext : null;
 };
 
 export const FileTypeFromStream = async (stream: Readable): Promise<string | null> => {
 	const buffer = await getBufferFromStream(stream);
-	const typeResult = await filetype.fromBuffer(buffer);
+	const typeResult = await fileTypeFromBuffer(buffer);
 	return typeResult ? mimeToExtensionMap[typeResult.mime] || typeResult.ext : null;
 };
 
@@ -187,9 +187,9 @@ export async function getBuffer(
 			if (attempt === maxRetries) {
 				throw new Error(
 					`Failed to fetch buffer after ${maxRetries} attempts. ` +
-						`URL: ${url}. ` +
-						`Status: ${axiosError.response?.status}. ` +
-						`Message: ${axiosError.message}`
+					`URL: ${url}. ` +
+					`Status: ${axiosError.response?.status}. ` +
+					`Message: ${axiosError.message}`
 				);
 			}
 
@@ -201,8 +201,8 @@ export async function getBuffer(
 			) {
 				throw new Error(
 					`Client error: ${axiosError.response.status}. ` +
-						`URL: ${url}. ` +
-						`Message: ${axiosError.message}`
+					`URL: ${url}. ` +
+					`Message: ${axiosError.message}`
 				);
 			}
 
@@ -273,26 +273,6 @@ export async function getMimeType(input: any) {
 		throw new Error('Input must be a Buffer, file path, or URL.');
 	}
 
-	const type = await filetype.fromBuffer(buffer);
+	const type = await fileTypeFromBuffer(buffer);
 	return type?.mime || 'unknown';
 }
-
-export default {
-	buffertoJson,
-	jsontoBuffer,
-	transformBuffer,
-	bufferToFile,
-	toBuffer,
-	extractUrlFromString,
-	getBufferFromStream,
-	getStreamFromBuffer,
-	FileTypeFromUrl,
-	FileTypeFromBuffer,
-	FileTypeFromBlob,
-	FileTypeFromStream,
-	detectType,
-	getBuffer,
-	getJson,
-	postJson,
-	getMimeType
-};

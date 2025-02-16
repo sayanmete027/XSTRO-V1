@@ -26,7 +26,7 @@ export function Module(cmd: Omit<Command, 'function'>, func: Function): Command 
   return fullCmd;
 }
 
-export async function runCommand(message: Message, client: WASocket): Promise<void> {
+export async function runCommand(message: Message): Promise<void> {
   if (!message.text) return;
 
   for (const cmd of commands) {
@@ -35,7 +35,7 @@ export async function runCommand(message: Message, client: WASocket): Promise<vo
     try {
       if (handler && match) {
         const args = match[2] ?? '';
-        await cmd.function!(message, args, { ...message, ...client });
+        await cmd.function!(message, args);
       }
     } catch (err) {
       // await message.error(cmd, err as Error);
