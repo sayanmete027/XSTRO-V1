@@ -1,4 +1,3 @@
-import { WASocket } from "baileys";
 import { Message } from "../../types/index.mjs";
 
 interface Command {
@@ -38,7 +37,8 @@ export async function runCommand(message: Message): Promise<void> {
         await cmd.function!(message, args);
       }
     } catch (err) {
-      // await message.error(cmd, err as Error);
+      const cmdName = cmd.name.toString().toLowerCase().split(/\W+/)[2]
+      await message.error(err as Error, cmdName);
     }
   }
 }

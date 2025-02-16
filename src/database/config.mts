@@ -2,7 +2,7 @@ import { Database } from 'sqlite';
 import { getDb } from './database.mjs';
 
 type Config = {
-  prefix: [string];
+  prefix: string[];
   mode: boolean;
   autoRead: boolean;
   autoStatusRead: boolean;
@@ -56,7 +56,7 @@ export async function getConfig(): Promise<Config> {
   const row = await db.get('SELECT * FROM config LIMIT 1');
 
   return {
-    prefix: row.prefix,
+    prefix: Array.isArray(row.prefix) ? row.prefix : Array.from(row.prefix),
     mode: Boolean(row.mode),
     autoRead: Boolean(row.autoRead),
     autoStatusRead: Boolean(row.autoStatusRead),

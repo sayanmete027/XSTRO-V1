@@ -1,16 +1,19 @@
-import { pathToFileURL } from 'url';
-import { join, extname } from 'path';
+import { pathToFileURL, fileURLToPath } from 'url';
+import { join, extname, dirname } from 'path';
 import { readdir } from 'fs/promises';
 import { LANG } from '../../src/index.mjs';
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
 export async function loadPlugins(): Promise<void> {
-  const pluginsDir: string = join('plugins');
+  const pluginsDir = join(__dirname, '../../plugins');
 
   const files = await readdir(pluginsDir, { withFileTypes: true });
   await Promise.all(
     files.map(async (file) => {
       const fullPath: string = join(pluginsDir, file.name);
-      if (extname(file.name) === '.js') {
+      if (extname(file.name) === '.js' || extname(file.name) === '.mts') {
         try {
           const fileUrl: string = pathToFileURL(fullPath).href;
           await import(fileUrl);

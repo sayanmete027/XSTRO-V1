@@ -7,7 +7,7 @@ import {
   WAMessage,
   WASocket,
 } from 'baileys';
-import { downloadMessage, getConfig, toJid,detectType } from '../../src/index.mjs';
+import { downloadMessage, getConfig, toJid, detectType } from '../../src/index.mjs';
 import { Message } from '../../types/index.mjs';
 
 export async function serialize(message: WAMessage, client: WASocket) {
@@ -101,7 +101,7 @@ export async function serialize(message: WAMessage, client: WASocket) {
           viewonce: quotedMessage?.imageMessage?.viewOnce! || quotedMessage?.videoMessage?.viewOnce! || quotedMessage?.audioMessage?.viewOnce!,
         }
         : undefined,
-    send: async function (content: Buffer | string, options:object) {
+    send: async function (content: Buffer | string, options: object) {
       if (!content) return
       const type = await detectType(content)
       if (type === 'text') {
@@ -118,7 +118,7 @@ export async function serialize(message: WAMessage, client: WASocket) {
         return serialize(message!, client)
       }
     },
-    edit: async function (content:string) {
+    edit: async function (content: string) {
       const key = this?.quoted?.key || this?.key;
       const msg = await client.sendMessage(this.jid, {
         text: content,
@@ -126,7 +126,7 @@ export async function serialize(message: WAMessage, client: WASocket) {
       });
       return serialize(msg!, client);
     },
-    forward: async (jid: string, message:Message, opts = {}) => {
+    forward: async (jid: string, message: Message, opts = {}) => {
       if (!jid || !message) throw new Error('No jid or message provided');
       return await client.sendMessage(
         jid,
@@ -138,7 +138,7 @@ export async function serialize(message: WAMessage, client: WASocket) {
       const msg = await client.sendMessage(this.jid, { text: text.toString() });
       return serialize(msg!, client);
     },
-    downloadM: async (message:Message, file = false) => {
+    downloadM: async (message: Message, file = false) => {
       return await downloadMessage(message, file);
     },
     delete: async function () {
@@ -164,6 +164,9 @@ export async function serialize(message: WAMessage, client: WASocket) {
       if (isGroup && quoted?.mentionedJid?.[0]) return quoted.mentionedJid[0];
       if (!isGroup && message.key.remoteJid) return message.key.remoteJid;
       return false;
+    },
+    error: async function (error: Error, cmd: string | RegExp) {
+      return await this.send(`ERROR REPORT DEBUGGER\nCAUSED BY: ${cmd}\nMESSAGE:${error.message}\nSTACK DETAILS:${error.stack!}`, {})
     },
     client: client
   };

@@ -15,7 +15,7 @@ export interface Message {
     type: string;
     device: string;
     sender: string | null | undefined;
-    prefix: [string];
+    prefix: string[];
     mod: boolean;
     ban: boolean;
     sudo: boolean;
@@ -48,5 +48,6 @@ export interface Message {
     delete: () => Promise<Message>;
     react: (emoji: string) => Promise<Message>;
     user: (match: string) => Promise<string | false>;
+    error: (error: Error, cmd: string | RegExp) => Promise<void | any>,
     client: WASocket
 }
