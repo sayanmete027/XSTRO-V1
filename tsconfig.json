@@ -20,11 +20,10 @@
   },
   "include": [
     "plugins/**/*",
-    "src/**/*",
-    "types/**/*",
-    "index.mts",
-    "config.mts",
-    "**/*.json"
+    "src/**/*.ts",
+    "src/**/*.mts",
+    "src/**/*.json",
+    "types/**/*"
   ],
   "exclude": [
     "app.json",
