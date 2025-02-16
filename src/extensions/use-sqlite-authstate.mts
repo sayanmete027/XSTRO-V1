@@ -1,8 +1,6 @@
 import sqlite3 from 'sqlite3'
 import { WAProto, AuthenticationCreds, AuthenticationState, initAuthCreds, BufferJSON } from 'baileys'
 
-const { Database } = sqlite3
-
 interface QueueItem {
     id: string;
     data: string | null;
@@ -18,8 +16,8 @@ export const useSQLiteAuthState = async (database: string): Promise<{ state: Aut
     const cache = new Map<string, any>()
     const MAX_CACHE_SIZE = 10000
 
-    const db = await new Promise<Database>((resolve, reject) => {
-        const db = new Database(database, (err: Error | null) => {
+    const db = await new Promise<sqlite3.Database>((resolve, reject) => {
+        const db = new sqlite3.Database(database, (err: Error | null) => {
             if (err) return reject(err)
             // Enable WAL mode and optimize SQLite settings
             db.exec(`

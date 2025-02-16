@@ -28,6 +28,7 @@
   ],
   "exclude": [
     "app.json",
-    "package.json"
+    "package.json",
+    "tsconfig.json"
   ]
 }
