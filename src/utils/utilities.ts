@@ -1,4 +1,4 @@
-import { LANG ,getBuffer} from '../../src';
+import { LANG ,getBuffer} from '../../src/index';
 
 const API_ID: string = LANG.API;
 

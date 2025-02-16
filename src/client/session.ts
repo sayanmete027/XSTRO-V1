@@ -2,7 +2,7 @@ import { mkdirSync, writeFileSync } from 'node:fs';
 import { createDecipheriv } from 'node:crypto';
 import { join } from 'node:path';
 import { config } from '../../config';
-import { LANG } from '../../src';
+import { LANG } from '../../src/index';
 
 interface SessionData {
   key: string;

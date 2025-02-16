@@ -1,6 +1,6 @@
 import { writeFile } from 'fs/promises';
-import { downloadMediaMessage, getContentType, WAProto } from '../../resources';
-import { FileTypeFromBuffer } from '../../src';
+import { downloadMediaMessage, getContentType, WAProto } from '../../resources/lib/index';
+import { FileTypeFromBuffer } from '../../src/index';
 import { Message } from '../../types';
 
 type MediaMessageType = 'imageMessage' | 'documentMessage' | 'audioMessage' | 'videoMessage' | 'stickerMessage';

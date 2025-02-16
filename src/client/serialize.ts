@@ -6,8 +6,8 @@ import {
   normalizeMessageContent,
   WAMessage,
   WASocket,
-} from '../../resources';
-import { downloadMessage, getConfig, toJid,detectType } from '../../src';
+} from '../../resources/lib/index';
+import { downloadMessage, getConfig, toJid,detectType } from '../../src/index';
 
 export async function serialize(message: WAMessage, client: WASocket) {
   const { sudo, prefix, mode, bannedusers } = await getConfig();

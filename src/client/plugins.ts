@@ -1,4 +1,4 @@
-import { WASocket } from "../../resources";
+import { WASocket } from "../../resources/lib/index";
 import { Message } from "../../types";
 
 interface Command {

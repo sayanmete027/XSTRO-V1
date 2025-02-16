@@ -1,7 +1,8 @@
-import { Module, Xprocess, runtime } from '#src';
+import { Module, Xprocess, runtime } from '../src/index';
 import { resolve } from 'path';
 import { arch, cpus, platform } from 'os';
 import { existsSync, readFileSync } from 'fs';
+import { Message } from '../types';
 
 Module(
   {
@@ -10,7 +11,7 @@ Module(
     desc: 'Get Performance',
     type: 'system',
   },
-  async (message) => {
+  async (message: Message) => {
     const start = Date.now();
     const msg = await message.send('Pong!');
     const end = Date.now();
@@ -25,8 +26,8 @@ Module(
     desc: 'Send the content of a specified file',
     type: 'system',
   },
-  async (message, match) => {
-    if (!match) return await message.reply('Give me Module file. Eg config.js');
+  async (message: Message, match: string) => {
+    if (!match) return await message.reply('Provide a filename. Eg config');
     const filePath = resolve(process.cwd(), match.trim());
     if (!existsSync(filePath)) return message.reply(`File not in that DIR`);
     const fileContent = readFileSync(filePath, 'utf-8');
@@ -41,7 +42,7 @@ Module(
     desc: 'Get Runtime of Module',
     type: 'system',
   },
-  async (message) => {
+  async (message: Message) => {
     await message.reply(`\`\`\`${runtime(process.uptime())}\`\`\``);
   }
 );
@@ -53,7 +54,7 @@ Module(
     desc: 'Restarts Bot',
     type: 'system',
   },
-  async (message) => {
+  async (message: Message) => {
     await message.reply('Restarting');
     Xprocess('restart');
   }
@@ -78,8 +79,8 @@ Module(
     desc: 'End your Xstro Session',
     type: 'system',
   },
-  async (message) => {
-    await message.client.logout();
+  async (message: any, args: string, { logout }) => {
+    await logout();
   }
 );
 
@@ -90,7 +91,7 @@ Module(
     desc: 'Get CPU Info',
     type: 'system',
   },
-  async (message) => {
+  async (message: Message) => {
     const cpu = cpus()[0];
     const totalCores = cpus().length;
     const clockSpeed = (cpu.speed / 1000).toFixed(2);

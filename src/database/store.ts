@@ -1,6 +1,6 @@
 import { Database } from 'sqlite';
-import { isJidBroadcast, isJidGroup, isJidNewsletter } from '../../resources';
-import { groupMetadata } from '../../src';
+import { isJidBroadcast, isJidGroup, isJidNewsletter } from '../../resources/lib/index';
+import { groupMetadata } from '../../src/index';
 import { getDb } from './database';
 import { Message } from '../../types';
 

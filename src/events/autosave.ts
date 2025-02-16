@@ -1,5 +1,5 @@
-import { isJidBroadcast } from '../../resources';
-import { getConfig } from '../../src';
+import { isJidBroadcast } from '../../resources/lib/index';
+import { getConfig } from '../../src/index';
 import { Message } from '../../types';
 
 /**

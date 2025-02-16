@@ -1,7 +1,7 @@
 import * as http from 'http';
 import cluster from 'cluster';
 import config from './config';
-import { client, eventlogger, initSession, loadPlugins, SessionMigrator } from './src';
+import { client, eventlogger, initSession, loadPlugins, SessionMigrator } from './src/index';
 
 if (cluster.isPrimary) {
   let isRestarting: boolean = false;

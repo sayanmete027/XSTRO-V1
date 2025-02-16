@@ -8,7 +8,8 @@ import {
   useSQLiteAuthState,
   WAProto,
   WASocket
-} from '../../resources';
+} from '../../resources/lib/index';
+
 import { Boom } from '@hapi/boom';
 import config from '../../config';
 import { EventEmitter } from 'events';
@@ -24,7 +25,7 @@ import {
   loadMessage,
   logger,
   saveMessage
-} from '../../src';
+} from '../../src/index';
 import CacheStore from './store';
 
 EventEmitter.defaultMaxListeners = 10000;

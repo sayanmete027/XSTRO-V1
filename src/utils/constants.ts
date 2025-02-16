@@ -1,4 +1,4 @@
-import { jidNormalizedUser } from '../../resources';
+import { jidNormalizedUser } from '../../resources/lib/index';
 
 export function Xprocess(type: 'restart' | 'stop'): void {
   if (type === 'restart') {

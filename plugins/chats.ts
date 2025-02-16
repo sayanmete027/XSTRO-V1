@@ -4,8 +4,8 @@ import {
   getGroupMembersMessageCount,
   getInactiveGroupMembers,
   groupMetadata,
-} from '../src';
-import { isJidGroup } from '../resources';
+} from '../src/index';
+import { isJidGroup } from '../resources/lib/index';
 import { Message } from '../types';
 
 Module(

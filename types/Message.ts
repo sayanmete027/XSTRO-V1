@@ -1,4 +1,4 @@
-import { WAProto } from '../resources';
+import { WAProto } from '../resources/lib/index';
 
 export interface Message {
     key: {

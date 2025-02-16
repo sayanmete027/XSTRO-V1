@@ -4,10 +4,10 @@ import os, { tmpdir } from 'os';
 import sharp from 'sharp';
 import { exec } from 'child_process';
 import { promisify } from 'util';
-import { FileTypeFromBuffer, getMimeType } from '../../src';
+import { FileTypeFromBuffer, getMimeType } from '../../src/index';
 import Crypto from 'crypto';
 import webp from 'node-webpmux';
-import { LANG } from '../../src';
+import { LANG } from '../../src/index';
 
 const execAsync = promisify(exec);
 const { writeFileSync, existsSync, readFileSync, mkdirSync } = fs;

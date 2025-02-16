@@ -1,6 +1,6 @@
 import { Database } from 'sqlite';
 import { getDb } from './database';
-import { GroupMetadata } from '../../resources';
+import { GroupMetadata } from '../../resources/lib/index';
 
 async function initMetadataDb(): Promise<void> {
   const db: Database = await getDb();

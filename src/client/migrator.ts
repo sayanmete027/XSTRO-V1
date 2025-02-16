@@ -1,5 +1,5 @@
 import sqlite3 from 'sqlite3';
-import { getSessionId, setSessionId } from '../../src';
+import { getSessionId, setSessionId } from '../../src/index';
 import fs from 'fs/promises';
 import path from 'path';
 import config from '../../config';
