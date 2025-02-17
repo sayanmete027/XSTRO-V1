@@ -42,7 +42,9 @@ export async function serialize(message: WAMessage, client: WASocket) {
 
 
   function getContextInfo(msg: any, type: string): { contextInfo: any } | undefined {
-    return msg[type] as { contextInfo: any };
+    if (!msg || !type || typeof msg !== 'object') return undefined;
+    const messageContent = msg?.[type!];
+    return messageContent ? { contextInfo: messageContent.contextInfo } : undefined;
   }
 
   const quoted = getContextInfo(msg, type)?.contextInfo;
