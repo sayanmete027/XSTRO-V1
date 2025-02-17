@@ -5,7 +5,7 @@
 
 [![FORK](https://img.shields.io/badge/Fork_Repo-black?style=for-the-badge&logo=github)](https://github.com/AstroX11/Xstro/fork)
 [![BOT SESSION](https://img.shields.io/badge/Get_Session-black?style=for-the-badge&logo=github)](https://bit.ly/41mQBbY)
-[![GET STARTED](https://img.shields.io/badge/Get_Session-black?style=for-the-badge&logo=vue)](https://astrox11.github.io/xstroweb/)
+[![GET STARTED](https://img.shields.io/badge/Get_started-black?style=for-the-badge&logo=)](https://astrox11.github.io/xstroweb/)
 
 ### Custom Session Generator
 
