@@ -30,7 +30,7 @@
 
 4. [Panel Deploy](https://github.com/AstroX11/Xstro/wiki/Panel-Support).
 
-### Setup Guide
+### Setup Guide (Create Your Own)
 
 #### Install Node.js  
 - **Windows:** [Download & Install](https://nodejs.org/)  
