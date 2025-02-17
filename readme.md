@@ -181,8 +181,6 @@ export async function greetingsListener(message:Message) {
 > [!Note]
 > These custom events depends on the type of baileys events listeners, make sure you create based on the correct one, else it won't work.
 
-## Contributing
+## Start Contributing
 
-Want to help? Fork the repository, create a pull request, and make sure everything works.
-
-[Contribute Here](https://github.com/AstroX11/Xstro/blob/master/.github/contributing.md)
+Want to help? Fork the repository, create a pull request, and make sure everything works
