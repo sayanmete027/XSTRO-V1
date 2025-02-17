@@ -7,6 +7,8 @@
 [![BOT SESSION](https://img.shields.io/badge/Get_Session-black?style=for-the-badge&logo=github)](https://bit.ly/41mQBbY)
 [![GET STARTED](https://img.shields.io/badge/Get_started-black?style=for-the-badge&logo=)](https://astrox11.github.io/xstroweb/)
 
+## Learn Xstro
+
 ### Custom Session Generator
 
 1. [Session Generator](https://github.com/AstroX11/XstroSession)
