@@ -22,7 +22,7 @@
 
 2. [Koyeb Deploy](https://app.koyeb.com/services/deploy?type=git&builder=dockerfile&repository=https://github.com/AstroX11/Xstro&branch=master&name=xstro&env%5BSESSION_ID%5D=null&env%5BSUDO%5D=null&env%5BBOT_INFO%5D=αѕтяσχ11;χѕтяσ%20м∂&env%5BSTICKER_PACK%5D=мα∂є%20бу;χѕтяσ%20мυℓтι%20∂єνι¢є%20вσт&env%5BWARN_COUNT%5D=3&env%5BTIME_ZONE%5D=Africa/Lagos).
 
-3.[Render Deploy](https://render.com/deploy?repo=https://github.com/AstroX11/Xstro).
+3. [Render Deploy](https://render.com/deploy?repo=https://github.com/AstroX11/Xstro).
    - To ensure uptime, set up a monitor using Better Stack:
    - [Sign Up](https://betterstack.com/users/sign-up)
    - [Log In](https://betterstack.com/users/sign-in#magic)
