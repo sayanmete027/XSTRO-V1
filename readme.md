@@ -5,7 +5,7 @@
 
 [![FORK](https://img.shields.io/badge/Fork_Repo-black?style=for-the-badge&logo=github)](https://github.com/AstroX11/Xstro/fork)
 [![BOT SESSION](https://img.shields.io/badge/Get_Session-black?style=for-the-badge&logo=github)](https://bit.ly/41mQBbY)
-[![DEPLOY NOW](https://img.shields.io/badge/Get_started-black?style=for-the-badge&logo=)](https://astrox11.github.io/xstroweb/)
+[![DEPLOY NOW](https://img.shields.io/badge/Deploy Bot-black?style=for-the-badge&logo=)](https://astrox11.github.io/xstroweb/)
 
 ### Features and Development
 
