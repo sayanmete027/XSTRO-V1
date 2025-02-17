@@ -1,7 +1,7 @@
-# `xstro wa bot`
+# `Xstro WA Bot`
 
 > [!Important]  
-> Open-source WhatsApp bot made to handle various tasks, and perform automated services for basic and business users. I disclaim any and all liability for any misuse of this software. It is for educational purposes only—please use it responsibly.
+> Open-source WhatsApp bot designed to handle various tasks and perform automated services for both basic and business users. I disclaim any and all liability for any misuse of this software. It is for educational purposes only—please use it responsibly.
 
 [![FORK](https://img.shields.io/badge/Fork_Repo-black?style=for-the-badge&logo=github)](https://github.com/AstroX11/Xstro/fork)
 [![BOT SESSION](https://img.shields.io/badge/Get_Session-black?style=for-the-badge&logo=github)](https://bit.ly/41mQBbY)
@@ -10,18 +10,18 @@
 ### Features and Development
 
 > [!Note]
-> Below is a comprehensive and easy to understand details on how to create your custom functionalites and specifications, some of you would wonder why didn't I add some fun features like games etc...  It's a WhatsApp bot, and those features do not concern my and this project, Implement those at your end.
+> Below is a comprehensive and easy-to-understand guide on how to create your custom functionalities and specifications. Some of you might wonder why I didn't add fun features like games, etc. It's a WhatsApp bot, and those features are not the focus of this project. Implement those at your end if needed.
 
 ### Custom Session Generator
 
 1. [Session Generator](https://github.com/AstroX11/XstroSession)
 2. [Session Encryptor](https://github.com/AstroX11/session-maker-crypto)
 
- - A well detailed usage is provided from the repositories on how to to use them propely, also use postgre to save session, and again, if you try to steal your users session, using such I condem you and your tatic, as I strongly oppose this method of social enginnering.
+- A detailed usage guide is provided in the repositories on how to use them properly. Also, use PostgreSQL to save sessions. Again, if you try to steal your users' sessions using such methods, I condemn you and your tactics, as I strongly oppose this method of social engineering.
 
-### How can I create a command ?
+### How can I create a command?
 
-It's easy but frist I want to you know and undertsand the `Types` of our command structure and seralized Messages.
+It's easy, but first, I want you to know and understand the `Types` of our command structure and serialized messages.
 
 ```ts
 /** Values of our Command Definitions **/
@@ -93,27 +93,28 @@ export interface Message {
     client: WASocket
 }
 ```
+
 ### How do I use them now?
 
 ```ts
-/** import the Module function and Message Types **/
+/** Import the Module function and Message Types **/
 import { Module, Message } from '../src/index.mjs'
 
 /** Define a Module, a command register **/
 Module(
   {
     name: 'hello', // name of the command
-    fromMe: false, // is the command for sudo users? make it true, for it respond to only sudo users
-    isGroup: false, // use this only if you want the command to work in a Group!
+    fromMe: false, // is the command for sudo users? make it true if it should respond only to sudo users
+    isGroup: false, // use this only if you want the command to work in a group!
     desc: 'Greetings', // provide the description of the command if you want it to appear on the list
     type: 'system', // specify the type or category which the command falls under
   },
   async (message: Message) => {
-    await message.send('hi, i just replied you') // send a message, this send function supports only text, image, video and audio
+    await message.send('hi, I just replied to you') // send a message; this send function supports only text, image, video, and audio
   }
 );
-
 ```
+
 #### Send a Message
 
 ```ts
@@ -123,7 +124,7 @@ await message.send('hi')
 #### Edit a Message
 
 ```ts
-const msg = await message.send('hi') // Make to use a thing to define a returnable instance of seralize inorder to callback the edit to edit this message, else it would edit the you sent your self, not the target message.
+const msg = await message.send('hi') // Make sure to define a returnable instance of serialize in order to callback the edit to edit this message; otherwise, it would edit the message you sent yourself, not the target message.
 await msg.edit('hello') // Edits it to the new value (String only)
 ```
 
@@ -131,56 +132,56 @@ await msg.edit('hello') // Edits it to the new value (String only)
 
 ```ts
 const jid = `12345678990@whatsapp.net`
-const msg = await message.send('Hello this is an instance that will be forwarded')
-await message.forward(jid, msg, {quoted: msg}) // forwards the message, jid and the message is a must, quoted is optional parameter
+const msg = await message.send('Hello, this is an instance that will be forwarded')
+await message.forward(jid, msg, {quoted: msg}) // forwards the message; jid and the message are mandatory, quoted is an optional parameter
 ```
 
 #### Basic Reply
 
 ```ts
-await message.reply('okay you got!') // Just reply a message and it supports only text
+await message.reply('Okay, you got it!') // Just reply to a message; it supports only text
 ```
 
-#### Download a message
+#### Download a Message
 
 ```ts
 const msg = await message.send(ImageBuffer) // sends an image, could be video, audio
 
-await message.downloadM(msg) // Downloads the message as buffer
+await message.downloadM(msg) // Downloads the message as a buffer
 
 /** If you want to save the downloaded file **/
 await message.downloadM(msg, true)
 ```
 
-#### Delete a message
+#### Delete a Message
 
 ```ts
-await message.delete() // deletes your message, if you reply a message when you call this, it would delete the replied message and not yours
+await message.delete() // deletes your message; if you reply to a message when you call this, it would delete the replied message and not yours
 ```
 
-#### React to a message
+#### React to a Message
 
 ```ts
-await message.react('😍') // react to a message, if you reply a message, it would react to that and not the one you sent
+await message.react('😍') // react to a message; if you reply to a message, it would react to that and not the one you sent
 ```
 
 ### Custom Events
 
-
 ```ts
-/** import the Types **/
+/** Import the Types **/
 import { Message } from '../../../src/index.mjs';
 
-export async function greetingsListener(message:Message) {
-  if(message.text.startsWith('Good Morning')) {
+export async function greetingsListener(message: Message) {
+  if (message.text.startsWith('Good Morning')) {
     // you can add regex for that if checker
-    return message.reply(`${message.pushName} GoodDay`)
+    return message.reply(`${message.pushName}, Good Day`)
   }
 }
 ```
+
 > [!Note]
-> These custom events depends on the type of baileys events listeners, make sure you create based on the correct one, else it won't work.
+> These custom events depend on the type of Baileys event listeners. Make sure you create them based on the correct one; otherwise, they won't work.
 
 ## Start Contributing
 
-Want to help? Fork the repository, create a pull request, and make sure everything works
+Want to help? Fork the repository, create a pull request, and make sure everything works.
