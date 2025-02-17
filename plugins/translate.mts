@@ -1,5 +1,4 @@
-import { Message } from '../types/index.mjs';
-import { Module, XSTRO } from '../src/index.mjs';
+import { Module, XSTRO, Message } from '../src/index.mjs';
 
 Module(
   {
@@ -8,7 +7,7 @@ Module(
     type: 'tools',
     desc: 'Translate a text from one language to another with ease',
   },
-  async (message:Message, match:string) => {
+  async (message: Message, match: string) => {
     const langCode = match.trim();
     const targetLang = languages.find((lang) =>
       lang.toLowerCase().endsWith(`- ${langCode.toLowerCase()}`)

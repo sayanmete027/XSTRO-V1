@@ -1,5 +1,4 @@
-import { Message } from '../types/index.mjs';
-import { Module, getContacts, getName, groupMetadata } from '../src/index.mjs';
+import { Module, getContacts, getName, groupMetadata,Message } from '../src/index.mjs';
 
 Module(
   {

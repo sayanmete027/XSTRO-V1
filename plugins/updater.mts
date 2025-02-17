@@ -1,6 +1,5 @@
-import { Module } from '../src/index.mjs';
+import { Module, Message } from '../src/index.mjs';
 import { exec } from 'child_process';
-import { Message } from '../types/index.mjs';
 import { promisify } from 'util';
 
 const execAsync = promisify(exec);

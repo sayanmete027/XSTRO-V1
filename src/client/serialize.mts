@@ -7,8 +7,7 @@ import {
   WAMessage,
   WASocket,
 } from 'baileys';
-import { downloadMessage, getConfig, toJid, detectType } from '../../src/index.mjs';
-import { Message } from '../../types/index.mjs';
+import { downloadMessage, getConfig, toJid, detectType, Message } from '../../src/index.mjs';
 
 export async function serialize(message: WAMessage, client: WASocket) {
   const { sudo, prefix, mode, bannedusers } = await getConfig();

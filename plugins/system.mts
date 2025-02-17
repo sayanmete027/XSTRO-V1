@@ -1,8 +1,7 @@
-import { Module, Xprocess, runtime } from '../src/index.mjs';
+import { Module, Xprocess, runtime, Message } from '../src/index.mjs';
 import { resolve } from 'path';
 import { arch, cpus, platform } from 'os';
 import { existsSync, readFileSync } from 'fs';
-import { Message } from '../types/index.mjs';
 
 Module(
   {
@@ -79,7 +78,7 @@ Module(
     desc: 'End your Xstro Session',
     type: 'system',
   },
-  async (message:Message) => {
+  async (message: Message) => {
     await message.client.logout()
   }
 );

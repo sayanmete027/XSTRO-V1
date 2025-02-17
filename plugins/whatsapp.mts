@@ -1,5 +1,4 @@
-import { Module } from '../src/index.mjs';
-import { Message } from '../types/index.mjs';
+import { Module, Message } from '../src/index.mjs';
 
 Module(
   {

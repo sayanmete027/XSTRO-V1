@@ -1,4 +1,4 @@
-import { Message } from "../../types/index.mjs";
+import { Message } from "../../src/index.mjs";
 
 interface Command {
   name: RegExp | string;

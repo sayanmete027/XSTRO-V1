@@ -1,5 +1,4 @@
-import { Message } from '../types/index.mjs';
-import { Module, XSTRO } from '../src/index.mjs';
+import { Module, XSTRO,Message } from '../src/index.mjs';
 
 Module(
   {

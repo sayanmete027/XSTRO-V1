@@ -1,7 +1,6 @@
 import { writeFile } from 'fs/promises';
 import { downloadMediaMessage, getContentType, WAProto } from 'baileys';
-import { FileTypeFromBuffer } from '../../src/index.mjs';
-import { Message } from '../../types/index.mjs';
+import { FileTypeFromBuffer,Message } from '../../src/index.mjs';
 
 type MediaMessageType = 'imageMessage' | 'documentMessage' | 'audioMessage' | 'videoMessage' | 'stickerMessage';
 

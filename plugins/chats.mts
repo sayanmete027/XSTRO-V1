@@ -4,9 +4,9 @@ import {
   getGroupMembersMessageCount,
   getInactiveGroupMembers,
   groupMetadata,
+  Message
 } from '../src/index.mjs';
 import { isJidGroup } from 'baileys';
-import { Message } from '../types/index.mjs';
 
 Module(
   {

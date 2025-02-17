@@ -1,5 +1,4 @@
-import { Module, editConfig, getConfig } from '../src/index.mjs';
-import { Message } from '../types/index.mjs';
+import { Module, editConfig, getConfig, Message } from '../src/index.mjs';
 
 Module(
   {

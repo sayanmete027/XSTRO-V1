@@ -1,5 +1,5 @@
 import util from 'util';
-import { Message } from '../../../types/index.mjs';
+import { Message } from '../../../src/index.mjs';
 
 export async function evaluator(message:Message) {
   if (!message.text) return;

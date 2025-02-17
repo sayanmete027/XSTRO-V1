@@ -1,8 +1,7 @@
 import { Database } from 'sqlite';
 import { isJidBroadcast, isJidGroup, isJidNewsletter } from 'baileys';
-import { groupMetadata } from '../../src/index.mjs';
+import { groupMetadata, Message } from '../../src/index.mjs';
 import { getDb } from './database.mjs';
-import { Message } from '../../types/index.mjs';
 
 async function initStoreDb(): Promise<void> {
   const db: Database = await getDb();

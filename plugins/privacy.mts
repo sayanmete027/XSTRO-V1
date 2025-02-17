@@ -1,5 +1,4 @@
-import { Message } from '../types/index.mjs';
-import { getName, Module } from '../src/index.mjs';
+import { getName, Module, Message } from '../src/index.mjs';
 import { WAPrivacyGroupAddValue, WAPrivacyOnlineValue, WAPrivacyValue, WAReadReceiptsValue } from 'baileys/lib';
 
 Module(
