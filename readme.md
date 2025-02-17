@@ -7,7 +7,10 @@
 [![BOT SESSION](https://img.shields.io/badge/Get_Session-black?style=for-the-badge&logo=github)](https://bit.ly/41mQBbY)
 [![GET STARTED](https://img.shields.io/badge/Get_started-black?style=for-the-badge&logo=)](https://astrox11.github.io/xstroweb/)
 
-## Learn Xstro
+## I want to build mine.
+
+> [!Notice]
+> Below is a comprehensive and easy to understand details on how to create your custom functionalites and specifications, some of you would wonder why didn't I add some fun features like games etc...  It's a WhatsApp bot, and those features do not concern my and this project, Implement those at your end.
 
 ### Custom Session Generator
 
