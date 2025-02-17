@@ -5,7 +5,7 @@
 
 [![FORK](https://img.shields.io/badge/Fork_Repo-black?style=for-the-badge&logo=github)](https://github.com/AstroX11/Xstro/fork)
 [![BOT SESSION](https://img.shields.io/badge/Get_Session-black?style=for-the-badge&logo=github)](https://bit.ly/41mQBbY)
-[![GET STARTED](https://img.shields.io/badge/Get_started-black?style=for-the-badge&logo=)](https://astrox11.github.io/xstroweb/)
+[![DEPLOY NOW](https://img.shields.io/badge/Get_started-black?style=for-the-badge&logo=)](https://astrox11.github.io/xstroweb/)
 
 ### Features and Development
 
@@ -114,7 +114,43 @@ Module(
 );
 
 ```
+#### Send a Message
 
+```ts
+await message.send('hi')
+```
+
+#### Edit a Message
+
+```ts
+const msg = await message.send('hi') // Make to use a thing to define a returnable instance of seralize inorder to callback the edit to edit this message, else it would edit the you sent your self, not the target message.
+await msg.edit('hello') // Edits it to the new value (String only)
+```
+
+#### Forward a Message
+
+```ts
+const jid = `12345678990@whatsapp.net`
+const msg = await message.send('Hello this is an instance that will be forwarded')
+await message.forward(jid, msg, {quoted: msg}) // forwards the message, jid and the message is a must, quoted is optional parameter
+```
+
+#### Basic Reply
+
+```ts
+await message.reply('okay you got!') // Just reply a message and it supports only text
+```
+
+#### Download a message
+
+```ts
+const msg = await message.send(ImageBuffer) // sends an image, could be video, audio
+
+await message.downloadM(msg) // Downloads the message as buffer
+
+/** If you want to save the downloaded file **/
+await message.downloadM(msg, true)
+```
 
 ## Contributing
 
