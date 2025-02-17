@@ -27,10 +27,13 @@ export function Module(cmd: Omit<Command, 'function'>, func: Function): Command 
 
 export async function runCommand(message: Message): Promise<void> {
   if (!message.text) return;
+  if (message.mod && !message.sudo) return
 
   for (const cmd of commands) {
     const handler = message.prefix.find((p) => message?.text?.startsWith(p));
     const match = message.text.slice(handler?.length || 0).match(cmd.name);
+    if (cmd.fromMe && !message.sudo) return
+    if (message.ban && !message.sudo) return message.send('You are banned from using commands')
     try {
       if (handler && match) {
         const args = match[2] ?? '';
