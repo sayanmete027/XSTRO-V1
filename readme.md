@@ -93,6 +93,27 @@ export interface Message {
     client: WASocket
 }
 ```
+### How do I use them now?
+
+```ts
+/** import the Module function and Message Types **/
+import { Module, Message } from '../src/index.mjs'
+
+/** Define a Module, a command register **/
+Module(
+  {
+    name: 'hello', // name of the command
+    fromMe: false, // is the command for sudo users? make it true, for it respond to only sudo users
+    isGroup: false, // use this only if you want the command to work in a Group!
+    desc: 'Greetings', // provide the description of the command if you want it to appear on the list
+    type: 'system', // specify the type or category which the command falls under
+  },
+  async (message: Message) => {
+    await message.send('hi, i just replied you') // send a message, this send function supports only text, image, video and audio
+  }
+);
+
+```
 
 
 ## Contributing
