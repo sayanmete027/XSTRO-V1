@@ -152,6 +152,35 @@ await message.downloadM(msg) // Downloads the message as buffer
 await message.downloadM(msg, true)
 ```
 
+#### Delete a message
+
+```ts
+await message.delete() // deletes your message, if you reply a message when you call this, it would delete the replied message and not yours
+```
+
+#### React to a message
+
+```ts
+await message.react('😍') // react to a message, if you reply a message, it would react to that and not the one you sent
+```
+
+### Custom Events
+
+
+```ts
+/** import the Types **/
+import { Message } from '../../../src/index.mjs';
+
+export async function greetingsListener(message:Message) {
+  if(message.text.startsWith('Good Morning')) {
+    // you can add regex for that if checker
+    return message.reply(`${message.pushName} GoodDay`)
+  }
+}
+```
+> [!Note]
+> These custom events depends on the type of baileys events listeners, make sure you create based on the correct one, else it won't work.
+
 ## Contributing
 
 Want to help? Fork the repository, create a pull request, and make sure everything works.
