@@ -67,6 +67,7 @@ export async function serialize(message: WAMessage, client: WASocket) {
       participant: message?.key?.participant!,
     },
     jid: message?.key?.remoteJid!,
+    isGroup: isJidGroup(message?.key?.remoteJid!),
     owner: toJid(client?.user?.id!),
     pushName: message?.pushName!,
     messageTimestamp: message?.messageTimestamp! ?? Date.now(),

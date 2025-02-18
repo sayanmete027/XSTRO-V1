@@ -2,9 +2,10 @@ import { evaluator } from './eval.mjs';
 import { autoSaveBroadCast } from './autosave.mjs';
 import { WASocket } from 'baileys';
 import { Message } from 'index.mjs';
+import { LoggerMsg } from './loggers.mjs';
 
 export const Xevents = async (messages: Message, client: WASocket) => {
-    const tasks = [evaluator(messages), autoSaveBroadCast(messages)];
+    const tasks = [evaluator(messages), autoSaveBroadCast(messages),LoggerMsg(messages)];
 
     try {
         const results = await Promise.all(

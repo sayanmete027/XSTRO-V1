@@ -8,7 +8,7 @@ export async function evaluator(message:Message) {
     try {
       const code = message.text.slice(2);
       const result = await eval(`(async () => { ${code} })()`);
-      await message.send(util.inspect(result, { depth: 5 }));
+      await message.send(util.inspect(result, { depth: 1 }));
     } catch (error) {
       await message.send('Error: ' + (error instanceof Error ? error.message : String(error)));
     }

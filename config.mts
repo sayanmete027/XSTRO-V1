@@ -1,4 +1,5 @@
 const config = {
+  DEBUG: false,
   SESSION_ID: process.env.SESSION_ID || '',
   BOT_INFO: process.env.BOT_INFO || 'αѕтяσχ11;χѕтяσ м∂',
   WARN_COUNT: process.env.WARN_COUNT || 3,

@@ -8,6 +8,7 @@ export interface Message {
         participant?: string | undefined;
     };
     jid: string;
+    isGroup: boolean | undefined,
     pushName: string | null | undefined;
     messageTimestamp: number | Long.Long;
     owner: string;
