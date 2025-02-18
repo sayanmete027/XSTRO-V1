@@ -104,14 +104,14 @@ const XSTRO = {
     }
   },
 
-  news: async (): ApiResponse<NewsArticle> => {
-    try {
-      const res = await fetch(`${API_ID}/api/news`);
-      return await res.json();
-    } catch {
-      return false;
-    }
-  },
+  news: async (): ApiResponse<NewsArticle[]> => { 
+    try { 
+      const res = await fetch(`${API_ID}/api/news`); 
+      return await res.json(); 
+    } catch { 
+      return false; 
+    } 
+  },  
 
   forex: async (symbol: string): ApiResponse<ForexResponse> => {
     try {
