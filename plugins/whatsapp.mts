@@ -30,3 +30,19 @@ Module(
     return msg.reply('done');
   }
 );
+
+Module(
+  {
+    name: 'tovv',
+    fromMe: false,
+    desc: 'Converts media message to viewonce message',
+    type: 'whatsapp'
+  },
+  async (msg: Message) => {
+    if (!msg.quoted! || msg.quoted?.audio && msg.quoted?.video && msg.quoted?.image) {
+      return msg.send('Reply an Image, Video or Audio message')
+    }
+    msg.quoted.message![msg.quoted.type!].viewOnce = true;
+    await msg.forward(msg.owner, msg?.quoted, { quoted: msg.quoted });
+  }
+)

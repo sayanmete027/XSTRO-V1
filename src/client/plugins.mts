@@ -1,4 +1,4 @@
-import { Message } from "../../src/index.mjs";
+import { LANG, Message } from "../../src/index.mjs";
 
 interface Command {
   name: RegExp | string;
@@ -12,13 +12,14 @@ interface Command {
 
 export const commands: Command[] = [];
 
-export function Module(cmd: Omit<Command, 'function'>, func: Function): Command {
+export function Module(cmd: Partial<Command>, func: Function): Command {
   const fullCmd: Command = {
-    ...cmd,
-    function: func,
     name: new RegExp(`^\\s*(${cmd.name})(?:\\s+([\\s\\S]+))?$`, 'i'),
+    function: func,
     fromMe: cmd.fromMe || false,
     isGroup: cmd.isGroup || false,
+    desc: cmd.desc,
+    type: cmd.type,
     dontAddCommandList: cmd.dontAddCommandList || false,
   };
   commands.push(fullCmd);
@@ -33,9 +34,10 @@ export async function runCommand(message: Message): Promise<void> {
     const handler = message.prefix.find((p) => message?.text?.startsWith(p));
     const match = message.text.slice(handler?.length || 0).match(cmd.name);
     if (cmd.fromMe && !message.sudo) return
-    if (message.ban && !message.sudo) return message.send('You are banned from using commands')
     try {
       if (handler && match) {
+        if (cmd.isGroup && !message.isGroup) return message.send(LANG.GROUP_ONLY)
+        if (message.ban && !message.sudo) return message.send(LANG.BANNED)
         const args = match[2] ?? '';
         await cmd.function!(message, args);
       }
