@@ -111,34 +111,12 @@ export const client = async (): Promise<WASocket> => {
     }
   });
 
-  const countdownDuration = 5 * 60 * 1000;
   setInterval(async () => {
-    logger.debug('Starting metadata fetch cycle...');
-
-    let countdown = countdownDuration / 1000; // in seconds
-    const countdownInterval = setInterval(() => {
-      logger.debug(`Saving metadata in ${countdown} seconds...`);
-      countdown -= 1;
-
-      if (countdown <= 0) {
-        clearInterval(countdownInterval);
-        logger.debug('Countdown finished, saving metadata now...');
-
-        saveMetadata();
-      }
-    }, 1000); // Countdown every second
-  }, 300 * 1000); // Trigger every 5 minutes
-
-  async function saveMetadata() {
-    logger.debug('Fetching groups metadata...');
     const groupsMetadata = await conn.groupFetchAllParticipating();
     for (const [id, metadata] of Object.entries(groupsMetadata)) {
-      logger.debug(`Saving metadata for group ID: ${id}`);
       await saveGroupMetadata(id, metadata);
     }
-    logger.info('Group metadata saved successfully.');
-  }
-
+  }, 300 * 1000);
 
   return conn;
 };
