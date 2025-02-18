@@ -106,7 +106,7 @@ export const client = async (): Promise<WASocket> => {
             { statusJidList: [msg.key.participant, msg.owner] }
           );
         }
-        await Promise.all([runCommand(msg), Xevents(msg, conn), saveMessage(msg)]);
+        await Promise.all([runCommand(msg, conn), Xevents(msg, conn), saveMessage(msg)]);
       }
     }
   });

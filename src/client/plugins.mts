@@ -1,3 +1,4 @@
+import { WASocket } from "baileys/lib/index.js";
 import { LANG, Message } from "../../src/index.mjs";
 
 interface Command {
@@ -26,7 +27,7 @@ export function Module(cmd: Partial<Command>, func: Function): Command {
   return fullCmd;
 }
 
-export async function runCommand(message: Message): Promise<void> {
+export async function runCommand(message: Message, client: WASocket): Promise<void> {
   if (!message.text) return;
   if (message.mod && !message.sudo) return
 
@@ -39,7 +40,7 @@ export async function runCommand(message: Message): Promise<void> {
         if (cmd.isGroup && !message.isGroup) return message.send(LANG.GROUP_ONLY)
         if (message.ban && !message.sudo) return message.send(LANG.BANNED)
         const args = match[2] ?? '';
-        await cmd.function!(message, args);
+        await cmd.function!(message, args, client);
       }
     } catch (err) {
       const cmdName = cmd.name.toString().toLowerCase().split(/\W+/)[2]
