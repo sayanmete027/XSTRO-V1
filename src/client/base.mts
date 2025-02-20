@@ -17,7 +17,6 @@ import {
   useSQLiteAuthState,
   getConfig,
   serialize,
-  commands,
   runCommand,
   groupMetadata,
   saveGroupMetadata,
@@ -26,20 +25,27 @@ import {
   saveMessage
 } from '../../src/index.mjs';
 import CacheStore from './store.mjs';
+import fs from 'fs';
+import path from 'path';
 
 EventEmitter.defaultMaxListeners = 10000;
 process.setMaxListeners(10000);
 
-export const logger = P.pino({
-  level: config.DEBUG ? 'info' : 'silent',
-  transport: {
-    target: 'pino-pretty',
-    options: { colorize: true }
-  }
-});
+const logDir = path.resolve('./debug');
+const logFile = path.join(logDir, 'logs.txt');
+if (!fs.existsSync(logDir)) {
+  fs.mkdirSync(logDir, { recursive: true });
+}
 
-export const client = async (): Promise<WASocket> => {
-  const session = await useSQLiteAuthState('database.db');
+export const logger = P.pino(
+  {
+    level: config.DEBUG ? 'info' : 'silent',
+  },
+  P.pino.destination(logFile)
+);
+
+export const client = async (database: string): Promise<WASocket> => {
+  const session = await useSQLiteAuthState(database ? database : 'database.db');
   const { state, saveCreds } = session;
   const cache = new CacheStore()
 
@@ -65,26 +71,17 @@ export const client = async (): Promise<WASocket> => {
   conn.ev.process(async (events) => {
     if (events['connection.update']) {
       const { connection, lastDisconnect } = events['connection.update'];
-      switch (connection) {
-        case 'connecting':
-          console.log('connecting...');
-          break;
-        case 'close':
-          (lastDisconnect?.error as Boom)?.output?.statusCode === DisconnectReason.loggedOut
-            ? Xprocess('stop')
-            : client();
-          break;
 
-        case 'open':
-          await conn.sendMessage(conn?.user?.id!, {
-            text: `\`\`\`Owner: ${config.BOT_INFO.split(';')[0]}\nVersion: ${config.VERSION}\nCommands: ${commands.filter(
-              (cmd) =>
-                cmd.name && !cmd.dontAddCommandList && !cmd.name.toString().includes('undefined')
-            ).length
-              }\`\`\``,
-          });
-          console.log(`Connected!`);
-          break;
+      if (connection === 'connecting') {
+        console.log('connecting...');
+      }
+      else if (connection === 'close') {
+        (lastDisconnect?.error as Boom)?.output?.statusCode === DisconnectReason.loggedOut
+          ? Xprocess('stop')
+          : client(database);
+      }
+      else if (connection === 'open') {
+        console.log(`Connected!`);
       }
     }
 

@@ -9,6 +9,7 @@ export function silenceLibsignalLogs(): void {
     console[method] = (...args: any[]) => {
       // Expanded patterns to catch all libsignal logs
       const libsignalPatterns = [
+        'Decrypted message with closed session',
         'Closing stale open session',
         'Closing session:',
         'Removing old closed session',
@@ -23,7 +24,8 @@ export function silenceLibsignalLogs(): void {
         'baseKey',
         'baseKeyType',
         'remoteIdentityKey',
-        '_chains'
+        '_chains',
+        'Closing open session in favor of incoming prekey bundle'
       ];
 
       const shouldLog = !args.some(arg => {

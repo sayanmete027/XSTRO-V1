@@ -17,14 +17,14 @@ Module(
   },
   async (msg: Message) => {
     const allChats = await getChatSummary();
-    const directChats = allChats.filter((chat) => chat.name);
+    const directChats = allChats.filter((chat) => chat.name && chat.jid !== msg.owner);
     if (!directChats) return msg.reply('No chats found!');
     const data = directChats
       .map(
         (data) =>
           `*From:* ${data.name}\n*Messages:* ${data.messageCount}\n*Last Chat:* ${new Date(data.lastMessageTimestamp).toLocaleString()}\n`
       )
-      .join('');
+      .join('\n');
     return await msg.reply(data)
   }
 );
@@ -45,7 +45,7 @@ Module(
         const subject = (await groupMetadata(data.jid))?.subject!;
         return `*From:* ${subject}\n*Messages:* ${data.messageCount}\n*LastMessage:* ${new Date(data.lastMessageTimestamp).toLocaleString()}\n`;
       })
-    )).join('');
+    )).join('\n');
     return await msg.reply(data);
   }
 );

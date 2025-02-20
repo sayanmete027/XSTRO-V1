@@ -6,3 +6,4 @@ test.js
 session
 *.tgz
 release
+debug
