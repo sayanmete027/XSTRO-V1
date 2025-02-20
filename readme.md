@@ -178,7 +178,7 @@ export async function greetingsListener(message: Message) {
 }
 ```
 
-> [!Note]
+> [!Tip]
 > These custom events depend on the type of Baileys event listeners. Make sure you create them based on the correct one; otherwise, they won't work.
 
 ## Start Contributing
