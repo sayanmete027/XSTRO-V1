@@ -1,3 +1,8 @@
+/**
+ * This migrator takes a session folder and get the creds and app-state-sync keys and migrate to sqlite3 database
+ * Open source
+ */
+
 import sqlite3 from 'sqlite3';
 import { getSessionId, setSessionId } from '../../src/index.mjs';
 import fs from 'fs/promises';

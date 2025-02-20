@@ -4,7 +4,6 @@
 > Open-source WhatsApp bot designed to handle various tasks and perform automated services for both basic and business users. I disclaim any and all liability for any misuse of this software. It is for educational purposes only—please use it responsibly.
 
 [![FORK](https://img.shields.io/badge/Fork_Repo-black?style=for-the-badge&logo=github)](https://github.com/AstroX11/Xstro/fork)
-[![BOT SESSION](https://img.shields.io/badge/Get_Session-black?style=for-the-badge&logo=github)](https://bit.ly/41mQBbY)
 [![DEPLOY NOW](https://img.shields.io/badge/Deploy_Bot-black?style=for-the-badge&logo=)](https://astrox11.github.io/xstroweb/)
 
 ### Features and Development
@@ -12,12 +11,12 @@
 > [!Note]
 > Below is a comprehensive and easy-to-understand guide on how to create your custom functionalities and specifications. Some of you might wonder why I didn't add fun features like games, etc. It's a WhatsApp bot, and those features are not the focus of this project. Implement those at your end if needed.
 
-### Custom Session Generator
+### Create your own session
 
 1. [Session Generator](https://github.com/AstroX11/XstroSession)
 2. [Session Encryptor](https://github.com/AstroX11/session-maker-crypto)
 
-- A detailed usage guide is provided in the repositories on how to use them properly. Also, use PostgreSQL to save sessions. Again, if you try to steal your users' sessions using such methods, I condemn you and your tactics, as I strongly oppose this method of social engineering.
+- A detailed usage guide is provided in the repositories on how to use them properly. Also, use PostgreSQL to save sessions. Again, if you try to steal your users' sessions using such methods, I condemn you and your tactics, as I strongly oppose this and any method of social engineering.
 
 ### How can I create a command?
 

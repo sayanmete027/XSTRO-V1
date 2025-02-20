@@ -1,3 +1,7 @@
+/**
+ * Private Code, Create your own
+ */
+
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { createDecipheriv } from 'node:crypto';
 import { join } from 'node:path';
