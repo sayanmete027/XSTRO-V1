@@ -1,4 +1,4 @@
-import { WAProto, WASocket } from 'baileys';
+import { WAProto, WASocket } from "baileys";
 
 export interface Message {
     key: {
@@ -8,7 +8,7 @@ export interface Message {
         participant?: string | undefined;
     };
     jid: string;
-    isGroup: boolean | undefined,
+    isGroup: boolean | undefined;
     pushName: string | null | undefined;
     messageTimestamp: number | Long.Long;
     owner: string;
@@ -28,7 +28,7 @@ export interface Message {
             id: string;
             participant?: string | undefined;
         };
-        message: WAProto.IMessage | undefined,
+        message: WAProto.IMessage | undefined;
         type: string | undefined;
         sender: string | undefined;
         device: string;
@@ -49,6 +49,6 @@ export interface Message {
     delete: () => Promise<Message>;
     react: (emoji: string) => Promise<Message>;
     user: (match: string) => Promise<string | false>;
-    error: (error: Error, cmd: string | RegExp) => Promise<void | any>,
-    client: WASocket
+    error: (error: Error, cmd: string | RegExp) => Promise<void | any>;
+    client: WASocket;
 }
