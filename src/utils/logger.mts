@@ -26,7 +26,7 @@ export function silenceLibsignalLogs(): void {
                 "remoteIdentityKey",
                 "_chains",
                 "Closing open session in favor of incoming prekey bundle",
-                "Bad MAC Error: Bad MAC"
+                "Bad MAC Error: Bad MAC",
             ];
 
             const shouldLog = !args.some((arg) => {
