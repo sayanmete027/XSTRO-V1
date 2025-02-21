@@ -1,5 +1,5 @@
 import { isJidUser, WASocket } from "baileys/lib/index.js";
-import { Module, Message } from "../src/index.mjs";
+import { Module, Message } from "#default";
 
 Module(
     {

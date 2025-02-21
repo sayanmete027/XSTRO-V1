@@ -1,2 +1,2 @@
 export * from "./updates/index.mjs";
-export * from "./upserts/xevents.mjs";
+export * from "./upserts/index.mjs";

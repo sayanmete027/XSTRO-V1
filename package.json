@@ -11,6 +11,9 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix"
   },
+  "imports": {
+    "#default": "./release/src/index.mjs"
+  },
   "files": [
     "lib",
     "plugins",

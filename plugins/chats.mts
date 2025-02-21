@@ -1,4 +1,4 @@
-import { Module, getChatSummary, getGroupMembersMessageCount, getInactiveGroupMembers, groupMetadata, Message } from "../src/index.mjs";
+import { Module, getChatSummary, getGroupMembersMessageCount, getInactiveGroupMembers, groupMetadata, Message } from "#default";
 import { isJidGroup } from "baileys";
 
 Module(

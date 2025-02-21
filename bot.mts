@@ -1,7 +1,7 @@
 import * as http from "http";
 import cluster from "cluster";
 import config from "./config.mjs";
-import { client, initSession, loadPlugins, SessionMigrator, silenceLibsignalLogs } from "./src/index.mjs";
+import { client, initSession, loadPlugins, SessionMigrator, silenceLibsignalLogs } from "#default";
 
 if (cluster.isPrimary) {
     let isRestarting: boolean = false;

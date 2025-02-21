@@ -1,1 +1,1 @@
-export * from "./src/index.mjs";
+export * from "#default";

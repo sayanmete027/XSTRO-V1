@@ -1,27 +1,22 @@
-// Core Dependencies
 import { makeWASocket, fetchLatestBaileysVersion, makeCacheableSignalKeyStore, DisconnectReason, Browsers, WAProto, WASocket } from "baileys";
+import { Xprocess, useSQLiteAuthState, MessageUpsert, groupMetadata, saveGroupMetadata, loadMessage } from "#default";
+
 import * as P from "pino";
 import { Boom } from "@hapi/boom";
 import { EventEmitter } from "events";
 import fs from "fs";
 import path from "path";
 
-// Custom Modules
 import config from "../../config.mjs";
-import { Xprocess, useSQLiteAuthState, MessageUpsert, groupMetadata, saveGroupMetadata, loadMessage } from "../../src/index.mjs";
 import CacheStore from "./store.mjs";
 
-// Configuration
 EventEmitter.defaultMaxListeners = 10000;
 process.setMaxListeners(10000);
 
 const logDir = path.resolve("./debug");
 const logFile = path.join(logDir, "logs.log");
 
-// Ensure log directory exists
-if (!fs.existsSync(logDir)) {
-    fs.mkdirSync(logDir, { recursive: true });
-}
+if (!fs.existsSync(logDir)) fs.mkdirSync(logDir, { recursive: true });
 
 // Logger Setup
 export const logger = P.pino(
@@ -31,9 +26,7 @@ export const logger = P.pino(
     P.pino.destination(logFile)
 );
 
-// Main Client Function
 export const client = async (database: string): Promise<WASocket> => {
-    // Authentication Setup
     const session = await useSQLiteAuthState(database || "database.db");
     const { state, saveCreds } = session;
     const cache = new CacheStore();
@@ -58,39 +51,51 @@ export const client = async (database: string): Promise<WASocket> => {
         },
     });
 
-    // Event Processing
-    conn.ev.process(async (events) => {
-        // Connection Updates
-        if (events["connection.update"]) {
-            const { connection, lastDisconnect } = events["connection.update"];
+    /**
+     * Inspriation from
+     */
+    conn.ev.process(
+        // events is a map for event name => event data
+        async (events) => {
+            /**
+             * We handle connection Setup
+             */
+            if (events["connection.update"]) {
+                const { connection, lastDisconnect } = events["connection.update"];
 
-            switch (connection) {
-                case "connecting":
+                if (connection === "connecting") {
                     console.log("connecting...");
-                    break;
-                case "close":
-                    (lastDisconnect?.error as Boom)?.output?.statusCode === DisconnectReason.loggedOut ? Xprocess("stop") : client(database);
-                    break;
-                case "open":
+                }
+                if (connection === "close") {
+                    if ((lastDisconnect?.error as Boom)?.output?.statusCode === DisconnectReason.loggedOut) {
+                        Xprocess("stop");
+                    } else {
+                        client(database);
+                    }
+                }
+                if (connection === "open") {
                     console.log("Connected!");
-                    break;
+                    await conn.sendMessage(conn?.user?.id!, { text: `BeepBoi Hello 👋` });
+                }
+            }
+
+            /**
+             * Save creds to our sqlite3 store
+             */
+            if (events["creds.update"]) {
+                await saveCreds();
+            }
+
+            if (events["messages.upsert"]) {
+                await MessageUpsert({ events: events["messages.upsert"] }, conn);
             }
         }
-
-        // Credentials Update
-        if (events["creds.update"]) {
-            await saveCreds();
-        }
-
-        // Message Handling
-        if (events["messages.upsert"]) {
-            await MessageUpsert(events["messages.upsert"]);
-        }
-    });
+    );
 
     // Group Metadata Sync
     setInterval(async () => {
         const groupsMetadata = await conn.groupFetchAllParticipating();
+        logger.info(groupMetadata)
         for (const [id, metadata] of Object.entries(groupsMetadata)) {
             await saveGroupMetadata(id, metadata);
         }

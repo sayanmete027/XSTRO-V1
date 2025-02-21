@@ -1,4 +1,4 @@
-import { Module, getContacts, getName, groupMetadata, Message } from "../src/index.mjs";
+import { Module, getContacts, getName, groupMetadata, Message } from "#default";
 
 Module(
     {

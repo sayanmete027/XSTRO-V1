@@ -6,7 +6,7 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import { createDecipheriv } from "node:crypto";
 import { join } from "node:path";
 import { config } from "../../config.mjs";
-import { LANG } from "../../src/index.mjs";
+import { LANG } from "#default";
 
 interface SessionData {
     key: string;

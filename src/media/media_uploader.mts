@@ -1,4 +1,4 @@
-import { LANG } from "../../src/index.mjs";
+import { LANG } from "#default";
 
 // Define the ApiError class with proper types
 class ApiError extends Error {

@@ -1,6 +1,6 @@
 import { Database } from "sqlite";
 import { isJidBroadcast, isJidGroup, isJidNewsletter } from "baileys";
-import { groupMetadata, Message } from "../../src/index.mjs";
+import { groupMetadata, Message } from "#default";
 import { getDb } from "./database.mjs";
 
 async function initStoreDb(): Promise<void> {

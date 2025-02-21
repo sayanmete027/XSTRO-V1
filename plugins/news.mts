@@ -1,4 +1,4 @@
-import { Module, XSTRO, Message } from "../src/index.mjs";
+import { Module, XSTRO, Message } from "#default";
 
 Module(
     {

@@ -1,7 +1,7 @@
 import { pathToFileURL, fileURLToPath } from "url";
 import { join, extname, dirname } from "path";
 import { readdir } from "fs/promises";
-import { LANG } from "../../src/index.mjs";
+import { LANG } from "#default";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);

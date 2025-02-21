@@ -1,4 +1,4 @@
-import { LANG, getBuffer } from "../../src/index.mjs";
+import { LANG, getBuffer } from "#default";
 
 const API_ID: string = LANG.API;
 

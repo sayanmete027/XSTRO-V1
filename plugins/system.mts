@@ -1,4 +1,4 @@
-import { Module, Xprocess, runtime, Message } from "../src/index.mjs";
+import { Module, Xprocess, runtime, Message } from "#default";
 import { resolve } from "path";
 import { arch, cpus, platform } from "os";
 import { existsSync, readFileSync } from "fs";

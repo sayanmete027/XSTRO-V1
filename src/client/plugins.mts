@@ -1,5 +1,5 @@
 import { WASocket } from "baileys/lib/index.js";
-import { LANG, Message } from "../../src/index.mjs";
+import { LANG, Message } from "#default";
 
 interface Command {
     name: RegExp | string;

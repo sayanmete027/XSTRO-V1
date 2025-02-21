@@ -4,7 +4,7 @@
  */
 
 import sqlite3 from "sqlite3";
-import { getSessionId, setSessionId } from "../../src/index.mjs";
+import { getSessionId, setSessionId } from "#default";
 import fs from "fs/promises";
 import path from "path";
 import config from "../../config.mjs";

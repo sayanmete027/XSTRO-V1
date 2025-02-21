@@ -1,4 +1,4 @@
-import { Module, Message } from "../src/index.mjs";
+import { Module, Message } from "#default";
 import { exec } from "child_process";
 import { promisify } from "util";
 

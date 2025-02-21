@@ -12,10 +12,11 @@
     "resolveJsonModule": true,
     "forceConsistentCasingInFileNames": true,
     "paths": {
-      "*": ["./node_modules/*", "./src/*"]
+      "*": ["./node_modules/*", "./src/*"],
+      "#default": ["./src/index.mjs"] // Add this to map #default
     },
     "typeRoots": ["./node_modules/@types", "./types"],
-    "baseUrl": ".",
+    "baseUrl": ".", // Required for "paths" to work
     "allowSyntheticDefaultImports": true
   },
   "include": [

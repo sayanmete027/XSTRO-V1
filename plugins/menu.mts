@@ -1,7 +1,7 @@
 import config from "../config.mjs";
-import { Module, commands, formatBytes, getRandom, runtime, font } from "../src/index.mjs";
+import { Module, commands, formatBytes, getRandom, runtime, font } from "#default";
 import { platform, totalmem, freemem } from "os";
-import { Message } from "../src/index.mjs";
+import { Message } from "#default";
 
 Module(
     {
