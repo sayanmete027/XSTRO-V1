@@ -27,7 +27,7 @@ class CacheStore {
             this.stats.set(key, {
                 hits: 0,
                 created: new Date(),
-                lastAccessed: null,
+                lastAccessed: null
             });
         }
     }
