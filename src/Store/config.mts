@@ -1,21 +1,6 @@
 import { Database } from "sqlite";
 import { getDb } from "./database.mjs";
-
-type Config = {
-    prefix: string[];
-    mode: boolean;
-    autoRead: boolean;
-    autoStatusRead: boolean;
-    autolikestatus: boolean;
-    disablegc: boolean;
-    disabledm: boolean;
-    cmdReact: boolean;
-    cmdRead: boolean;
-    savebroadcast: boolean;
-    disabledCmds: string[];
-    sudo: string[];
-    bannedusers: string[];
-};
+import { Config } from "#default";
 
 async function initConfigDb(): Promise<void> {
     const db: Database = await getDb();

@@ -1,4 +1,4 @@
-import { Module,Message } from "#default";
+import { Module, Message } from "#default";
 
 Module(
     {
@@ -14,4 +14,3 @@ Module(
         await msg.edit(`\`\`\`Pong\n${end - start} ms\`\`\``);
     }
 );
-

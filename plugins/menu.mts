@@ -44,12 +44,12 @@ Module(
 
         sortedTypes.forEach((type) => {
             const sortedCommands = commandsByType[type].sort();
-            menuInfo += (`╭──── *${type}* ────\n`);
+            menuInfo += `╭──── *${type}* ────\n`;
             sortedCommands.forEach((cmd) => {
-                menuInfo += (`│${totalCommands}· ${cmd}\n`);
+                menuInfo += `│${totalCommands}· ${cmd}\n`;
                 totalCommands++;
             });
-            menuInfo +=(`╰────────────\n`);
+            menuInfo += `╰────────────\n`;
         });
         return await message.send(menuInfo.trim());
     }

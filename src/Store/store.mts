@@ -1,6 +1,6 @@
 import { Database } from "sqlite";
-import { isJidBroadcast, isJidGroup, isJidNewsletter } from "baileys";
-import { groupMetadata, Message } from "../../src/index.mjs";
+import { isJidBroadcast, isJidGroup, isJidNewsletter, WAMessage, WAProto } from "baileys";
+import { groupMetadata } from "#default";
 import { getDb } from "./database.mjs";
 
 async function initStoreDb(): Promise<void> {
@@ -56,27 +56,27 @@ class Mutex {
 const dbMutex = new Mutex();
 const processingMessages = new Map<string, Promise<void>>();
 
-export const saveMessage = async (message: Message): Promise<void> => {
-    const m = Object.fromEntries(Object.entries(message).filter(([key]) => key !== "client"));
-    if (!m || !m.key) return;
-    const { remoteJid: jid, id } = m.key;
+export const saveMessage = async (message: WAMessage): Promise<void> => {
+    if (!message || !message.key) return;
+    const { remoteJid: jid, id, participant } = message.key;
+    const sender = isJidGroup(jid!) || isJidBroadcast(jid!) || isJidBroadcast(jid!) ? participant : jid;
     if (!id || !jid) return;
     if (processingMessages.has(id)) return processingMessages.get(id)!;
     const job = async () => {
-        await saveContact(m.sender!, m.pushName!);
+        await saveContact(sender!, message.pushName!);
         const db: Database = await getDb();
         await initStoreDb();
-        const timestamp = typeof m.messageTimestamp === "number" ? m.messageTimestamp * 1000 : Date.now();
+        const timestamp = message.messageTimestamp!;
         const unlock = await dbMutex.lock();
         try {
             await db.run(`INSERT INTO messages (id, jid, message, timestamp) VALUES (?, ?, ?, ?) ON CONFLICT(id) DO UPDATE SET message = excluded.message, timestamp = excluded.timestamp`, [
                 id,
                 jid,
-                JSON.stringify(m),
+                JSON.stringify(message),
                 timestamp,
             ]);
-            if (m?.sender && isJidGroup(jid)) {
-                await db.run(`INSERT INTO message_counts (jid, sender, count) VALUES (?, ?, 1) ON CONFLICT(jid, sender) DO UPDATE SET count = count + 1`, [jid, m.sender]);
+            if (sender! && isJidGroup(jid)) {
+                await db.run(`INSERT INTO message_counts (jid, sender, count) VALUES (?, ?, 1) ON CONFLICT(jid, sender) DO UPDATE SET count = count + 1`, [jid, sender!]);
             }
         } finally {
             unlock();
@@ -91,12 +91,12 @@ export const saveMessage = async (message: Message): Promise<void> => {
     }
 };
 
-export const loadMessage = async (id: string): Promise<Message | null> => {
-    if (!id) return null;
+export const loadMessage = async (id: string): Promise<WAMessage | undefined> => {
+    if (!id) return undefined;
     const db: Database = await getDb();
     await initStoreDb();
     const result = await db.get(`SELECT message FROM messages WHERE id = ?`, [id]);
-    return result ? JSON.parse(result.message) : null;
+    return result ? WAProto.WebMessageInfo.fromObject(result) : undefined;
 };
 
 export const getName = async (jid: string): Promise<string | null> => {

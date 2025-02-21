@@ -1,6 +1,6 @@
 import { Database } from "sqlite";
 import { getDb } from "./database.mjs";
-import { GroupMetadata } from "baileys";
+import { GroupData } from "#default";
 
 async function initMetadataDb(): Promise<void> {
     const db: Database = await getDb();
@@ -12,7 +12,7 @@ async function initMetadataDb(): Promise<void> {
   `);
 }
 
-export const saveGroupMetadata = async (jid: string, metadata: GroupMetadata): Promise<void> => {
+export const saveGroupMetadata = async (jid: string, metadata: GroupData): Promise<void> => {
     const db: Database = await getDb();
     await initMetadataDb();
 
@@ -25,12 +25,12 @@ export const saveGroupMetadata = async (jid: string, metadata: GroupMetadata): P
     await db.run(query, [jid, jsonMetadata]);
 };
 
-export const groupMetadata = async (jid: string): Promise<GroupMetadata | null> => {
+export const groupMetadata = async (jid: string): Promise<GroupData | undefined> => {
     const db: Database = await getDb();
     await initMetadataDb();
 
     const query = `SELECT metadata FROM group_metadata WHERE jid = ?;`;
     const result = await db.get(query, [jid]);
 
-    return result && result.metadata ? JSON.parse(result.metadata) : null;
+    return result && result.metadata ? JSON.parse(result.metadata) : undefined;
 };
