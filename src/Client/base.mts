@@ -3,7 +3,7 @@ import { Boom } from "@hapi/boom";
 import * as P from "pino";
 import { EventEmitter } from "events";
 import * as CacheStore from "./store.mjs";
-import { Xprocess, useSQLiteAuthState, groupMetadata, saveGroupMetadata, loadMessage } from "#default";
+import { Xprocess, useSQLiteAuthState, groupMetadata, saveGroupMetadata, loadMessage, Message } from "#default";
 import config from "../../config.mjs";
 
 EventEmitter.defaultMaxListeners = 10000;
@@ -46,7 +46,11 @@ export const client = async (database: string = "database.db"): Promise<WASocket
         if (events["messages.upsert"]) {
             const { messages } = events["messages.upsert"];
             for (const message of messages) {
-                logger.info(structuredClone(message));
+                const msg = await Message(conn, message!);
+                console.log(`Next MEssage DATA:`,msg);
+                if (msg.message!.extendedTextMessage!.text?.includes("hi")) {
+                    await msg.send("hi");
+                }
             }
         }
     });

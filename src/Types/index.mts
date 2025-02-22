@@ -1,4 +1,4 @@
-import { AnyMediaMessageContent, AnyMessageContent, AnyRegularMessageContent, WAProto, WASocket, GroupMetadata } from "baileys";
+import { AnyMediaMessageContent, AnyMessageContent, AnyRegularMessageContent, WAProto, WASocket, GroupMetadata, WAMessage } from "baileys";
 
 export interface Command {
     name: RegExp | string;
@@ -6,17 +6,16 @@ export interface Command {
     fromMe?: boolean;
     isGroup?: boolean;
     desc: string | undefined;
-    type: CommandCategories;
+    type: Category;
     dontAddCommandList?: boolean;
 }
 
-export type CommandCategories = {
-    misc: undefined;
-    system: string;
-    settings: string;
-    tools: string;
-    whatsapp: string;
-};
+type Category = "misc" | "system" | "settings" | "tools" | "whatsapp";
+
+export interface DataType {
+    contentType: "text" | "audio" | "image" | "video" | "sticker" | "document";
+    mimeType: string;
+}
 
 export type BOTINFO = {
     name: string;
@@ -41,7 +40,28 @@ export type Config = {
     bannedusers: string[];
 };
 
+export type sendMessageOptionals = {
+    jid: string;
+    contextInfo?: WAProto.IContextInfo;
+    mentions?: string[];
+    type?: "text" | "audio" | "image" | "video" | "sticker" | "document";
+    mimetype?: string;
+    disappearingMessagesInChat?: boolean | number;
+    fileName?: string;
+    ptt?: boolean;
+    ptv?: boolean;
+    caption?: string;
+    gifPlayback?: boolean;
+    quoted?: WAMessage;
+    ephemeralExpiration?: number | string;
+};
+
+export interface MediaTypeInfo {
+    mimeType: string;
+    contentType: "text" | "audio" | "image" | "video" | "sticker" | "document";
+}
+export type sendTypes = "text" | "audio" | "image" | "video" | "sticker" | "document";
 export type Client = WASocket;
 export type MediaMessageType = "imageMessage" | "videoMessage" | "audioMessage" | "documentMessage";
-export type sendMessageOptionals = WAProto.ContextInfo | AnyMessageContent | AnyMediaMessageContent | AnyRegularMessageContent;
 export type GroupData = GroupMetadata;
+export type ContentType = Buffer | string;

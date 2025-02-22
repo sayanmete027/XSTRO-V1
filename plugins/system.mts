@@ -7,7 +7,7 @@ Module(
         desc: "Get Performance",
         type: "system",
     },
-    async (message: Message) => {
+    async (message: any) => {
         const start = Date.now();
         const msg = await message.send("Pong!");
         const end = Date.now();

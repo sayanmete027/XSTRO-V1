@@ -1,4 +1,6 @@
+import { DataType } from "#default";
 import { jidNormalizedUser } from "baileys";
+import { fileTypeFromBuffer } from "file-type/core.js";
 
 export function Xprocess(type: "restart" | "stop"): void {
     if (type === "restart") {
@@ -93,4 +95,29 @@ export const formatTime = (timestamp: number): string => {
     const ampm = hours >= 12 ? "pm" : "am";
     hours = hours % 12 || 12;
     return `${hours}:${String(minutes).padStart(2, "0")}${ampm}`;
+};
+
+export const getDataType = async (content: Buffer | string): Promise<DataType> => {
+    if (typeof content === "string") content = Buffer.from(content);
+    const data = await fileTypeFromBuffer(content);
+    if (!data) {
+        try {
+            content.toString("utf8");
+            return { contentType: "text", mimeType: "text/plain" };
+        } catch {
+            return { contentType: "document", mimeType: "application/octet-stream" };
+        }
+    }
+    const mimeType = data.mime;
+    if (mimeType.startsWith("text/")) {
+        return { contentType: "text", mimeType };
+    } else if (mimeType.startsWith("image/")) {
+        return { contentType: "image", mimeType };
+    } else if (mimeType.startsWith("video/")) {
+        return { contentType: "video", mimeType };
+    } else if (mimeType.startsWith("audio/")) {
+        return { contentType: "audio", mimeType };
+    } else {
+        return { contentType: "document", mimeType };
+    }
 };

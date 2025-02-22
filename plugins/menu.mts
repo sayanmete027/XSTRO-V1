@@ -84,6 +84,6 @@ Module(
             if (desc) cmdsList += `${desc}\n\n`;
         });
 
-        return await message.reply(cmdsList);
+        return await message.send(cmdsList);
     }
 );

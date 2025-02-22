@@ -7,16 +7,15 @@ import sqlite3 from "sqlite3";
 import { getSessionId, setSessionId } from "#default";
 import fs from "fs/promises";
 import path from "path";
-import config from "../../config.mjs";
 
 interface SessionData {
     [key: string]: any;
 }
 
-export async function SessionMigrator(Sessionfolder: string, SessionDataBasePath: string): Promise<SessionData | void> {
+export async function SessionMigrator(Sessionfolder: string, SessionDataBasePath: string, SESSION_ID:string): Promise<SessionData | void> {
     try {
         const sId = await getSessionId();
-        if (!Sessionfolder || !SessionDataBasePath || sId === config.SESSION_ID) {
+        if (!Sessionfolder || !SessionDataBasePath || sId === SESSION_ID) {
             console.log("No Migration");
             return;
         }
@@ -68,7 +67,7 @@ export async function SessionMigrator(Sessionfolder: string, SessionDataBasePath
             await runQuery(db, "REPLACE INTO session (id, data) VALUES (?, ?)", [key, value]);
         }
         await closeDatabase(db);
-        await setSessionId(config.SESSION_ID);
+        await setSessionId(SESSION_ID);
         return sessionData;
     } catch {
         console.log("No Migration");

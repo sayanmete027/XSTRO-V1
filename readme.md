@@ -83,7 +83,7 @@ export interface Message {
     send: (content: Buffer | string, options?: any) => Promise<Message | any>;
     edit: (content: string) => Promise<Message>;
     forward: (jid: string, message: any, opts?: any) => Promise<any>;
-    reply: (text: string) => Promise<Message>;
+    send: (text: string) => Promise<Message>;
     downloadM: (message: any, file?: boolean) => Promise<ArrayBuffer | any>;
     delete: () => Promise<Message>;
     react: (emoji: string) => Promise<Message>;
@@ -138,7 +138,7 @@ await message.forward(jid, msg, {quoted: msg}) // forwards the message; jid and 
 #### Basic Reply
 
 ```ts
-await message.reply('Okay, you got it!') // Just reply to a message; it supports only text
+await message.send('Okay, you got it!') // Just send to a message; it supports only text
 ```
 
 #### Download a Message
@@ -155,13 +155,13 @@ await message.downloadM(msg, true)
 #### Delete a Message
 
 ```ts
-await message.delete() // deletes your message; if you reply to a message when you call this, it would delete the replied message and not yours
+await message.delete() // deletes your message; if you send to a message when you call this, it would delete the replied message and not yours
 ```
 
 #### React to a Message
 
 ```ts
-await message.react('😍') // react to a message; if you reply to a message, it would react to that and not the one you sent
+await message.react('😍') // react to a message; if you send to a message, it would react to that and not the one you sent
 ```
 
 ### Custom Events
@@ -173,7 +173,7 @@ import { Message } from '../../../src/index.mjs';
 export async function greetingsListener(message: Message) {
   if (message.text.startsWith('Good Morning')) {
     // you can add regex for that if checker
-    return message.reply(`${message.pushName}, Good Day`)
+    return message.send(`${message.pushName}, Good Day`)
   }
 }
 ```
