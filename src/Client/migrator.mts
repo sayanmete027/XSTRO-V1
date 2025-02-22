@@ -12,7 +12,7 @@ interface SessionData {
     [key: string]: any;
 }
 
-export async function SessionMigrator(Sessionfolder: string, SessionDataBasePath: string, SESSION_ID:string): Promise<SessionData | void> {
+export async function SessionMigrator(Sessionfolder: string, SessionDataBasePath: string, SESSION_ID: string): Promise<SessionData | void> {
     try {
         const sId = await getSessionId();
         if (!Sessionfolder || !SessionDataBasePath || sId === SESSION_ID) {

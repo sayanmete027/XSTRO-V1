@@ -22,5 +22,5 @@ export async function loadPlugins(): Promise<void> {
             }
         })
     );
-    console.log('Plugins Synced');
+    console.log("Plugins Synced");
 }

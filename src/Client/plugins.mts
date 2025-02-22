@@ -1,4 +1,4 @@
-import { Client, Command } from "#default";
+import { Client, Command, MessageType } from "#default";
 
 export const commands: Command[] = [];
 
@@ -16,7 +16,7 @@ export function Module(cmd: Partial<Command>, func: Function): Command {
     return fullCmd;
 }
 
-export async function runCommand(message, client: Client): Promise<void> {
+export async function runCommand(message: MessageType, client: Client): Promise<void> {
     if (!message.text) return;
 
     for (const cmd of commands) {
@@ -29,7 +29,7 @@ export async function runCommand(message, client: Client): Promise<void> {
             }
         } catch (err) {
             const cmdName = cmd.name.toString().toLowerCase().split(/\W+/)[2];
-            await message.error(err as Error, cmdName);
+            await message.send(`\`\`\`─━❲ ERROR REPORT ❳━─\n\nFrom: ${cmdName}\nDetails: ${err.message}\`\`\``);
         }
     }
 }

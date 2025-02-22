@@ -1,5 +1,5 @@
 import config from "../config.mjs";
-import { Module, commands, formatBytes, getRandom, runtime } from "#default";
+import { MessageType, Module, commands, formatBytes, getRandom, runtime } from "#default";
 import { platform, totalmem, freemem } from "os";
 
 Module(
@@ -10,14 +10,13 @@ Module(
         type: undefined,
         dontAddCommandList: true,
     },
-    async (message) => {
+    async (message: MessageType) => {
         const cmds = commands.filter((cmd) => cmd.name && !cmd.dontAddCommandList && !cmd.name.toString().includes("undefined")).length;
         let menuInfo = `\`\`\`
 ╭─── ${config.BOT_INFO.split(";")[1]} ────
 │ Prefix: ${getRandom(message.prefix)}
 │ Owner: ${config.BOT_INFO.split(";")[0]}		
 │ Plugins: ${cmds}
-│ Mode: ${message.mod ? "Private" : "Public"}
 │ Uptime: ${runtime(process.uptime())}
 │ Platform: ${platform()}
 │ Ram: ${formatBytes(totalmem() - freemem())}
@@ -63,7 +62,7 @@ Module(
         type: undefined,
         dontAddCommandList: true,
     },
-    async (message) => {
+    async (message: MessageType) => {
         let cmdsList: string = "Command List\n\n";
         let cmdList: { cmd: string; desc?: string }[] = [];
         let cmd: string | undefined;

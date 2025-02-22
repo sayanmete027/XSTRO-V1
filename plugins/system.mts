@@ -1,4 +1,4 @@
-import { Module, Message } from "#default";
+import { Module, MessageType } from "#default";
 
 Module(
     {
@@ -7,7 +7,7 @@ Module(
         desc: "Get Performance",
         type: "system",
     },
-    async (message: any) => {
+    async (message: MessageType) => {
         const start = Date.now();
         const msg = await message.send("Pong!");
         const end = Date.now();

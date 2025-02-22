@@ -1,6 +1,6 @@
 import { DataType } from "#default";
-import { jidNormalizedUser } from "baileys";
-import { fileTypeFromBuffer } from "file-type/core.js";
+import { jidNormalizedUser, WAMessageContent } from "baileys";
+import { fileTypeFromBuffer } from "file-type";
 
 export function Xprocess(type: "restart" | "stop"): void {
     if (type === "restart") {
@@ -20,10 +20,11 @@ export function formatBytes(bytes: number, decimals: number = 2): string {
 }
 
 export function formatDuration(ms: number): string {
-    const hours = Math.floor(ms / (1000 * 60 * 60));
+    const days = Math.floor(ms / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((ms / (1000 * 60 * 60)) % 24);
     const minutes = Math.floor((ms / (1000 * 60)) % 60);
     const seconds = Math.floor((ms / 1000) % 60);
-    return `${hours}hr ${minutes}mins ${seconds}sec`;
+    return `${days}days ${hours}hr ${minutes}mins ${seconds}sec`;
 }
 
 export function runtime(seconds: number): string {
@@ -45,7 +46,7 @@ export const getRandom = <T extends unknown>(array: T[]): T | undefined => {
     return array[Math.floor(Math.random() * array.length)];
 };
 
-export const toJid = (num: string | number): string => {
+export const numToJid = (num: string | number): string => {
     let strNum = typeof num === "string" ? num : num.toString();
     strNum = strNum.replace(/:\d+/, "").replace(/\D/g, "");
     return jidNormalizedUser(`${strNum}@s.whatsapp.net`);
@@ -119,5 +120,53 @@ export const getDataType = async (content: Buffer | string): Promise<DataType> =
         return { contentType: "audio", mimeType };
     } else {
         return { contentType: "document", mimeType };
+    }
+};
+
+export const extractTextFromMessage = function (message: WAMessageContent) {
+    if (!message) return undefined;
+    if (message!.extendedTextMessage) {
+        return message.extendedTextMessage!.text ?? message!.extendedTextMessage!.description ?? message!.extendedTextMessage!.title;
+    }
+    if (message!.videoMessage) {
+        return message!.videoMessage!.caption;
+    }
+    if (message!.imageMessage) {
+        return message!.imageMessage!.caption;
+    }
+    if (message!.conversation) {
+        return message.conversation;
+    }
+    if (message!.eventMessage) {
+        return `${message!.eventMessage!.name}\n${message!.eventMessage!.description}`;
+    }
+    if (message!.pollCreationMessageV3) {
+        return `${message!.pollCreationMessageV3!.name}\n${message!.pollCreationMessageV3!.options!.map((opt) => opt.optionName).toString()}`;
+    }
+    if (message!.pollCreationMessage) {
+        return `${message!.pollCreationMessage!.name}\n${message.pollCreationMessage.options!.map((opt) => opt.optionName).toString()}`;
+    }
+    if (message!.pollCreationMessageV2) {
+        return `${message!.pollCreationMessageV2!.name}\n${message.pollCreationMessageV2.options!.map((opt) => opt.optionName).toString()}`;
+    }
+    if (message!.documentMessage) {
+        return message!.documentMessage!.caption;
+    }
+    if (message!.protocolMessage) {
+        if (message!.protocolMessage!.editedMessage!.extendedTextMessage) {
+            return message.protocolMessage!.editedMessage!.extendedTextMessage.text;
+        }
+        if (message!.protocolMessage!.editedMessage!.videoMessage) {
+            return message!.protocolMessage!.editedMessage!.videoMessage!.caption;
+        }
+        if (message!.protocolMessage!.editedMessage!.imageMessage) {
+            return message!.protocolMessage!.editedMessage!.imageMessage!.caption;
+        }
+        if (message!.protocolMessage!.editedMessage!.conversation) {
+            return message!.protocolMessage!.editedMessage!.conversation;
+        }
+        if (message!.protocolMessage!.editedMessage!.documentMessage) {
+            return message!.protocolMessage!.editedMessage!.documentMessage!.caption;
+        }
     }
 };
