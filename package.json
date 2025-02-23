@@ -1,6 +1,6 @@
 {
   "name": "xstro",
-  "version": "2.5.5",
+  "version": "2.6.0",
   "description": "OpenSource WhatsApp Userbot",
   "type": "module",
   "main": "./release/index.js",
