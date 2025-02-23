@@ -56,12 +56,12 @@ export async function Message(client: Client, messages: WAMessage) {
         isAdmin: async function () {
             const metadata = await this.groupMetadata(this.jid);
             const allAdmins = metadata.participants.filter((v) => v.admin !== null).map((v) => v.id);
-            return !Array.isArray(allAdmins) ? Array.from(allAdmins) : allAdmins.includes(this.sender)
+            return !Array.isArray(allAdmins) ? Array.from(allAdmins) : allAdmins.includes(this.sender);
         },
         isBotAdmin: async function () {
             const metadata = await this.groupMetadata(this.jid);
             const allAdmins = metadata.participants.filter((v) => v.admin !== null).map((v) => v.id);
-            return !Array.isArray(allAdmins) ? Array.from(allAdmins) : allAdmins.includes(this.owner)
+            return !Array.isArray(allAdmins) ? Array.from(allAdmins) : allAdmins.includes(this.owner);
         },
         send: async function (content: ContentType, options: Partial<sendMessageOptionals> = {}) {
             const jid = options.jid ?? this.jid;

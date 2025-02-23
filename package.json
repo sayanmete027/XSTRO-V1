@@ -1,13 +1,13 @@
 {
   "name": "xstro",
-  "version": "2.6.0",
+  "version": "2.6.1",
   "description": "OpenSource WhatsApp Userbot",
   "type": "module",
   "main": "./release/index.js",
   "scripts": {
     "start": "node ./release/bot",
     "build": "tsc && babel release --out-dir release",
-    "dev": "node --loader ts-node/esm bot.mts",
+    "dev": "ts-node --esm bot.mts",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix"
   },

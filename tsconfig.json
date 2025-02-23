@@ -13,9 +13,9 @@
     "forceConsistentCasingInFileNames": true,
     "paths": {
       "*": ["./node_modules/*", "./src/*"],
-      "#default": ["./src/index.mjs"] // Add this to map #default
+      "#default": ["./src/index.mjs"]
     },
-    "typeRoots": ["./node_modules/@types", "./types"],
+    "typeRoots": ["./node_modules/@types", "./src/types.mts"],
     "baseUrl": ".", // Required for "paths" to work
     "allowSyntheticDefaultImports": true
   },

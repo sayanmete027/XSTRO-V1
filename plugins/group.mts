@@ -37,7 +37,7 @@ Module(
         if (!(await message.isBotAdmin())) {
             return message.send("I am not an Admin.");
         }
-        if(!match) { 
+        if (!match) {
             return message.send("Provide a participant to kick.");
         }
         const user = message.user(match);

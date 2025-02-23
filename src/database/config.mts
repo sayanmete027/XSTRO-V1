@@ -7,30 +7,35 @@ async function initConfigDb(): Promise<void> {
     await db.exec(`
     CREATE TABLE IF NOT EXISTS config (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
-      prefix TEXT DEFAULT '.',
-      mode INTEGER DEFAULT 1,
-      autoRead INTEGER DEFAULT 0,
-      autoStatusRead INTEGER DEFAULT 0,
-      autolikestatus INTEGER DEFAULT 0,
-      disablegc INTEGER DEFAULT 0,
-      disabledm INTEGER DEFAULT 0,
-      cmdReact INTEGER DEFAULT 1,
-      cmdRead INTEGER DEFAULT 0,
-      savebroadcast INTEGER DEFAULT 0,
-      disabledCmds TEXT DEFAULT '[]',
-      sudo TEXT DEFAULT '[]',
-      bannedusers TEXT DEFAULT '[]'
+      key TEXT NOT NULL,
+      value TEXT NOT NULL,
+      UNIQUE(key)
     );
   `);
 
     const exists = await db.get("SELECT id FROM config LIMIT 1");
     if (!exists) {
-        await db.run(`
-      INSERT INTO config 
-        (prefix, mode, autoRead, autoStatusRead, autolikestatus, disablegc, disabledm, cmdReact, cmdRead, savebroadcast, disabledCmds, sudo, bannedusers)
-      VALUES 
-        ('.', 1, 0, 0, 0, 0, 0, 1, 0, 0, '[]', '[]', '[]')
-    `);
+        const defaultConfig = [
+            { key: "prefix", value: "." },
+            { key: "mode", value: "1" },
+            { key: "autoRead", value: "0" },
+            { key: "autoStatusRead", value: "0" },
+            { key: "autolikestatus", value: "0" },
+            { key: "disablegc", value: "0" },
+            { key: "disabledm", value: "0" },
+            { key: "cmdReact", value: "1" },
+            { key: "cmdRead", value: "0" },
+            { key: "savebroadcast", value: "0" },
+            { key: "disabledCmds", value: "[]" },
+            { key: "sudo", value: "[]" },
+            { key: "bannedusers", value: "[]" },
+        ];
+
+        const stmt = await db.prepare("INSERT INTO config (key, value) VALUES (?, ?)");
+        for (const config of defaultConfig) {
+            await stmt.run(config.key, config.value);
+        }
+        await stmt.finalize();
     }
 }
 
@@ -38,22 +43,23 @@ export async function getConfig(): Promise<Config> {
     const db: Database = await getDb();
     await initConfigDb();
 
-    const row = await db.get("SELECT * FROM config LIMIT 1");
+    const rows = await db.all("SELECT key, value FROM config");
+    const configMap = Object.fromEntries(rows.map((row) => [row.key, row.value]));
 
     return {
-        prefix: Array.isArray(row.prefix) ? row.prefix : Array.from(row.prefix),
-        mode: Boolean(row.mode),
-        autoRead: Boolean(row.autoRead),
-        autoStatusRead: Boolean(row.autoStatusRead),
-        autolikestatus: Boolean(row.autolikestatus),
-        disablegc: Boolean(row.disablegc),
-        disabledm: Boolean(row.disabledm),
-        cmdReact: Boolean(row.cmdReact),
-        cmdRead: Boolean(row.cmdRead),
-        savebroadcast: Boolean(row.savebroadcast),
-        disabledCmds: JSON.parse(row.disabledCmds),
-        sudo: JSON.parse(row.sudo),
-        bannedusers: JSON.parse(row.bannedusers),
+        prefix: Array.from(configMap.prefix) || ".",
+        mode: Boolean(parseInt(configMap.mode || "1")),
+        autoRead: Boolean(parseInt(configMap.autoRead || "0")),
+        autoStatusRead: Boolean(parseInt(configMap.autoStatusRead || "0")),
+        autolikestatus: Boolean(parseInt(configMap.autolikestatus || "0")),
+        disablegc: Boolean(parseInt(configMap.disablegc || "0")),
+        disabledm: Boolean(parseInt(configMap.disabledm || "0")),
+        cmdReact: Boolean(parseInt(configMap.cmdReact || "1")),
+        cmdRead: Boolean(parseInt(configMap.cmdRead || "0")),
+        savebroadcast: Boolean(parseInt(configMap.savebroadcast || "0")),
+        disabledCmds: JSON.parse(configMap.disabledCmds || "[]"),
+        sudo: JSON.parse(configMap.sudo || "[]"),
+        bannedusers: JSON.parse(configMap.bannedusers || "[]"),
     };
 }
 
@@ -80,15 +86,22 @@ export async function editConfig(updates: Partial<Config>): Promise<Config | nul
     const keys = Object.keys(updates).filter((key) => allowedKeys.includes(key as keyof Config));
     if (!keys.length) return null;
 
-    const setClause = keys.map((key) => `${key} = ?`).join(", ");
-    const values = keys.map((key) => {
-        const val = updates[key as keyof Config];
-        if (typeof val === "boolean") return val ? 1 : 0;
-        if (Array.isArray(val)) return JSON.stringify(val);
-        return val;
-    });
+    const stmt = await db.prepare("INSERT OR REPLACE INTO config (key, value) VALUES (?, ?)");
+    for (const key of keys) {
+        const value = updates[key as keyof Config];
+        let dbValue: string;
 
-    await db.run(`UPDATE config SET ${setClause} WHERE id = (SELECT id FROM config LIMIT 1)`, ...values);
+        if (typeof value === "boolean") {
+            dbValue = value ? "1" : "0";
+        } else if (Array.isArray(value)) {
+            dbValue = JSON.stringify(value);
+        } else {
+            dbValue = String(value);
+        }
+
+        await stmt.run(key, dbValue);
+    }
+    await stmt.finalize();
 
     return getConfig();
 }

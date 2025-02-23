@@ -1,5 +1,9 @@
-import { AnyMediaMessageContent, AnyMessageContent, AnyRegularMessageContent, WAProto, WASocket, GroupMetadata, WAMessage } from "baileys";
-
+import { WAProto, WASocket, GroupMetadata, WAMessage } from "baileys";
+export interface ParticipantActivity {
+    pushName: string | null;
+    messageCount: number;
+    participant: string;
+}
 export interface Command {
     name: RegExp | string;
     function?: Function;

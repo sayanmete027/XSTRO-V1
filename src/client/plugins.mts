@@ -16,7 +16,7 @@ export function Module(cmd: Partial<Command>, func: Function): Command {
     return fullCmd;
 }
 
-export async function runCommand(message: MessageType, client: Client): Promise<void> {
+export async function runCommand(message: MessageType): Promise<void> {
     if (!message.text) return;
 
     for (const cmd of commands) {
@@ -29,7 +29,7 @@ export async function runCommand(message: MessageType, client: Client): Promise<
             }
         } catch (err) {
             const cmdName = cmd.name.toString().toLowerCase().split(/\W+/)[2];
-            await message.send(`\`\`\`─━❲ ERROR REPORT ❳━─\n\nFrom: ${cmdName}\nDetails: ${err.message}\`\`\``, {jid: message.owner});
+            await message.send(`\`\`\`─━❲ ERROR REPORT ❳━─\n\nFrom: ${cmdName}\nDetails: ${err.message}\`\`\``, { jid: message.owner });
         }
     }
 }
