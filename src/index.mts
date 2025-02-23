@@ -1,4 +1,4 @@
-export * from "./Client/index.mjs";
+export * from "./client/index.mjs";
 export * from "./database/index.mjs";
 export * from "./types.mjs";
 export * from './files.mjs'
