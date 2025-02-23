@@ -25,7 +25,7 @@ export async function runCommand(message: MessageType, client: Client): Promise<
         try {
             if (handler && match) {
                 const args = match[2] ?? "";
-                await cmd.function!(message, args, client);
+                await cmd.function!(message, args);
             }
         } catch (err) {
             const cmdName = cmd.name.toString().toLowerCase().split(/\W+/)[2];
