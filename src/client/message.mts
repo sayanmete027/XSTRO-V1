@@ -28,6 +28,14 @@ export async function Message(client: Client, messages: WAMessage) {
         prefix,
         sender: isJidGroup(key.remoteJid!) || isJidBroadcast(key.remoteJid!) ? key.participant! : key.remoteJid!,
         text: extractTextFromMessage(message!),
+        mentions: Quoted ? Quoted.mentionedJid : [],
+        user: function (match: string) {
+            if (match) return numToJid(match);
+            if (Quoted!.participant) Quoted!.participant;
+            if (isJidGroup(this.jid) && Quoted?.mentionedJid?.[0]) return Quoted.mentionedJid[0];
+            if (!isJidGroup(this.jid) && key!.remoteJid) return key!.remoteJid!;
+            return undefined;
+        },
         quoted:
             Quoted && quotedM
                 ? {
@@ -45,6 +53,16 @@ export async function Message(client: Client, messages: WAMessage) {
                       ...(({ quotedMessage, stanzaId, remoteJid, ...rest }) => rest)(Quoted),
                   }
                 : undefined,
+        isAdmin: async function () {
+            const metadata = await this.groupMetadata(this.jid);
+            const allAdmins = metadata.participants.filter((v) => v.admin !== null).map((v) => v.id);
+            return !Array.isArray(allAdmins) ? Array.from(allAdmins) : allAdmins.includes(this.sender)
+        },
+        isBotAdmin: async function () {
+            const metadata = await this.groupMetadata(this.jid);
+            const allAdmins = metadata.participants.filter((v) => v.admin !== null).map((v) => v.id);
+            return !Array.isArray(allAdmins) ? Array.from(allAdmins) : allAdmins.includes(this.owner)
+        },
         send: async function (content: ContentType, options: Partial<sendMessageOptionals> = {}) {
             const jid = options.jid ?? this.jid;
             const type = options.type as "text" | "audio" | "image" | "video" | "sticker" | "document" | undefined;

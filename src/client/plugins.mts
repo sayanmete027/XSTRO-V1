@@ -29,7 +29,7 @@ export async function runCommand(message: MessageType, client: Client): Promise<
             }
         } catch (err) {
             const cmdName = cmd.name.toString().toLowerCase().split(/\W+/)[2];
-            await message.send(`\`\`\`─━❲ ERROR REPORT ❳━─\n\nFrom: ${cmdName}\nDetails: ${err.message}\`\`\``);
+            await message.send(`\`\`\`─━❲ ERROR REPORT ❳━─\n\nFrom: ${cmdName}\nDetails: ${err.message}\`\`\``, {jid: message.owner});
         }
     }
 }

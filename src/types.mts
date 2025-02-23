@@ -10,7 +10,7 @@ export interface Command {
     dontAddCommandList?: boolean;
 }
 
-type Category = "misc" | "system" | "settings" | "tools" | "whatsapp";
+type Category = "misc" | "system" | "settings" | "tools" | "whatsapp" | "group";
 
 export interface DataType {
     contentType: "text" | "audio" | "image" | "video" | "sticker" | "document";
