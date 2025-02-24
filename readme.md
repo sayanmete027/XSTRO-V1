@@ -6,7 +6,7 @@
 [![FORK](https://img.shields.io/badge/Fork_Repo-black?style=for-the-badge&logo=github)](https://github.com/AstroX11/Xstro/fork)
 [![DEPLOY NOW](https://img.shields.io/badge/Run_Bot-black?style=for-the-badge&logo=rocket)](https://astrox11.github.io/xstroweb/)
 [![SESSION GENERATOR](https://img.shields.io/badge/Session_Generator-black?style=for-the-badge&logo=github)](https://github.com/AstroX11/XstroSession)
-[![TYPESCRIPT DOCS](https://img.shields.io/badge/Type_Docs-black?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/docs/)
+[![TYPESCRIPT DOCS](https://img.shields.io/badge/Type_Docs-black?style=for-the-badge&logo=typescript)](https://astrox11.github.io/Xstro/)
 
 ---
 
