@@ -33,13 +33,6 @@ export async function Store(): Promise<void> {
         )
     `);
     await db.exec(`
-        CREATE TABLE IF NOT EXISTS phone_number_shares (
-            lid TEXT,
-            jid TEXT,
-            PRIMARY KEY (lid, jid)
-        )
-    `);
-    await db.exec(`
         CREATE TABLE IF NOT EXISTS presences (
             id TEXT,
             participant TEXT,
@@ -182,17 +175,6 @@ export async function updateChat(chatUpdate: ChatUpdate): Promise<void> {
         WHERE id = ?
     `,
         [chatUpdate.lastMessageRecvTimestamp, JSON.stringify(chatUpdate), chatUpdate.id]
-    );
-}
-
-export async function savePhoneNumberShare(share: { lid: string; jid: string }): Promise<void> {
-    const db: Database = await getDb();
-    await db.run(
-        `
-        INSERT OR REPLACE INTO phone_number_shares (lid, jid)
-        VALUES (?, ?)
-    `,
-        [share.lid, share.jid]
     );
 }
 

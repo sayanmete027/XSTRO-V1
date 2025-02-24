@@ -8,7 +8,7 @@ import {
     useSQLiteAuthState,
     groupMetadata,
     saveGroupMetadata,
-    /**loadMessage,**/ Message,
+    Message,
     runCommand,
     evaluator,
     Store,
@@ -32,7 +32,6 @@ import {
     upsertContacts,
     deleteChats,
     updatePresence,
-    savePhoneNumberShare,
     updateMessages,
 } from "#default";
 import config from "../../config.mjs";
@@ -58,11 +57,7 @@ export const client = async (database: string = "database.db"): Promise<WASocket
         logger,
         browser: Browsers.macOS("Desktop"),
         emitOwnEvents: true,
-        cachedGroupMetadata: async (jid) => await groupMetadata(jid),
-        // getMessage: async (key) => {
-        //     const store = await loadMessage(key?.id!);
-        //     return store ? WAProto.Message.fromObject(store) : { conversation: undefined };
-        // },
+        cachedGroupMetadata: async (jid) => await groupMetadata(jid)
     });
 
     conn.ev.process(async (events) => {
@@ -207,12 +202,6 @@ export const client = async (database: string = "database.db"): Promise<WASocket
             const presence = events["presence.update"];
             if (presence) {
                 await updatePresence(presence);
-            }
-        }
-        if (events["chats.phoneNumberShare"]) {
-            const shareNums = events["chats.phoneNumberShare"];
-            if (shareNums) {
-                await savePhoneNumberShare(shareNums);
             }
         }
     });

@@ -47,3 +47,46 @@ Module(
         await message.groupParticipantsUpdate(message.jid, [user], "remove");
     }
 );
+
+Module(
+    {
+        name: "gname",
+        fromMe: false,
+        isGroup: true,
+        desc: "Update Group Name",
+        type: "group",
+    },
+    async (message: MessageType, match: string) => {
+        if (!match) {
+            return message.send("Provide A New Group Name");
+        }
+        if (!(await message.isAdmin())) {
+            return message.send("You are not Admin");
+        }
+        if (!(await message.isBotAdmin())) {
+            return message.send("I am not Admin");
+        }
+        await message.groupUpdateSubject(message.jid, match);
+        return message.send("Group Name Update");
+    }
+);
+
+Module(
+    {
+        name: "gdesc",
+        fromMe: false,
+        isGroup: true,
+        desc: "Update Group Description",
+        type: "group",
+    },
+    async (message: MessageType, match?: string) => {
+        if (!(await message.isAdmin())) {
+            return message.send("You are not Admin");
+        }
+        if (!(await message.isBotAdmin())) {
+            return message.send("I am not Admin");
+        }
+        await message.groupUpdateDescription(message.jid, match);
+        return message.send("Group Description Updated");
+    }
+);

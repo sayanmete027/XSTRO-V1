@@ -58,9 +58,9 @@ if (cluster.isPrimary) {
 
     startServer().catch((err) => console.error("Server failed:", err));
 
-    // Event handlers like these won’t show up in TypeDoc either
-    process.on("unhandledRejection", (reason) => {
-        console.error("Runtime error:", reason);
+    process.on("unhandledRejection", (reason: Error, promise: Promise<unknown>) => {
+        console.error("Unhandled Rejection at:", promise);
+        console.error("Reason:", reason.stack || reason);
     });
 
     process.on("exit", () => {
