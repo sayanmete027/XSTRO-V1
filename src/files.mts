@@ -6,13 +6,13 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 export async function loadPlugins(): Promise<void> {
-    const pluginsDir = join(__dirname, "../../plugins");
+    const pluginsDir = join(__dirname, "../plugins");
 
     const files = await readdir(pluginsDir, { withFileTypes: true });
     await Promise.all(
         files.map(async (file) => {
             const fullPath: string = join(pluginsDir, file.name);
-            if (extname(file.name) === ".js" || extname(file.name) === ".mts") {
+            if (extname(file.name) === ".js" || extname(file.name) === ".js") {
                 try {
                     const fileUrl: string = pathToFileURL(fullPath).href;
                     await import(fileUrl);

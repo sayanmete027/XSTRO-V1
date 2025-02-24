@@ -1,4 +1,4 @@
-import { Client, Command, MessageType } from "#default";
+import { Command, MessageType } from "#default";
 
 export const commands: Command[] = [];
 

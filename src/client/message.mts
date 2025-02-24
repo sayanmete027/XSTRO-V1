@@ -1,4 +1,5 @@
 import { Client, ContentType, extractTextFromMessage, getConfig, getDataType, numToJid, sendMessageOptionals } from "#default";
+import { Boom } from "@hapi/boom/lib/index.js";
 import { AnyMessageContent, downloadMediaMessage, getContentType, isJidBroadcast, isJidGroup, normalizeMessageContent, WAContextInfo, WAMessage } from "baileys";
 import { writeFile } from "fs/promises";
 
@@ -140,6 +141,13 @@ export async function Message(client: Client, messages: WAMessage) {
                 return await writeFile(message.key.id!, media);
             }
             return media;
+        },
+        forward: async function (jid: string, message: WAMessage, opts?: { quoted: WAMessage }) {
+            if (!message || !jid) {
+                throw new Boom("Illegal there must be a Vaild Web Message and a Jid");
+            }
+            const m = await sendMessage(jid, { forward: message, ...opts }, { ...opts });
+            return Message(client, m!);
         },
         ...msg,
         ...(({ logger, ws, authState, signalRepository, user, ...rest }) => rest)(client),
