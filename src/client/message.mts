@@ -1,6 +1,6 @@
 import { Client, ContentType, extractTextFromMessage, getConfig, getDataType, numToJid, sendMessageOptionals } from "#default";
 import { Boom } from "@hapi/boom/lib/index.js";
-import { AnyMessageContent, downloadMediaMessage, getContentType, isJidBroadcast, isJidGroup, normalizeMessageContent, WAContextInfo, WAMessage } from "baileys";
+import { AnyMessageContent, downloadMediaMessage, getContentType, isJidBroadcast, isJidGroup, normalizeMessageContent, WAContextInfo, WAMessage, WAMessageContent } from "baileys";
 import { writeFile } from "fs/promises";
 
 export async function Message(client: Client, messages: WAMessage) {
@@ -128,10 +128,9 @@ export async function Message(client: Client, messages: WAMessage) {
             return Message(client, m!);
         },
         edit: async function (text: string) {
-            const key = this.quoted ? this.quoted.key : this.key;
             const msg = await client.sendMessage(this.jid, {
                 text: text,
-                edit: key,
+                edit: this.quoted ? this.quoted.key : this.key,
             });
             return Message(client, msg!);
         },
@@ -147,6 +146,18 @@ export async function Message(client: Client, messages: WAMessage) {
                 throw new Boom("Illegal there must be a Vaild Web Message and a Jid");
             }
             const m = await sendMessage(jid, { forward: message, ...opts }, { ...opts });
+            return Message(client, m!);
+        },
+        react: async function (emoji: string, message?: WAMessage) {
+            const emojiRegex = /\p{Emoji}/u;
+            if (!emoji || !emojiRegex.test(emoji)) {
+                throw new Boom("Illegal, there must be an emoji");
+            }
+            const m = await sendMessage(this.jid, { react: { text: emoji, key: message?.key ? this.quoted?.key : this.key } });
+            return Message(client, m!);
+        },
+        delete: async function (message?: WAMessage) {
+            const m = await sendMessage(this.jid, { delete: message!.key ? this.quoted!.key : this!.key });
             return Message(client, m!);
         },
         ...msg,

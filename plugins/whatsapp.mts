@@ -122,9 +122,9 @@ Module(
             return message.send("Reply to an image, video, or audio message");
         }
 
-        const msgTypes = ['imageMessage', 'videoMessage', 'audioMessage'];
+        const msgTypes = ["imageMessage", "videoMessage", "audioMessage"];
         const quotedMsg = message.quoted.message;
-        
+
         for (const type of msgTypes) {
             if (quotedMsg[type]) {
                 quotedMsg[type].viewOnce = true;

@@ -2,63 +2,68 @@ import * as http from "http";
 import cluster from "cluster";
 import { client, loadPlugins } from "#default";
 
-if (cluster.isPrimary) {
-    let isRestarting: boolean = false;
+/**
+ * @module WorkerCluster
+ * Top-level module for managing a clustered HTTP server with worker processes.
+ * Handles worker creation, restarts, and basic server functionality.
+ */
 
-    const createWorker = (): void => {
+if (cluster.isPrimary) {
+    /**
+     * Creates a new worker process and sets up its lifecycle management.
+     * Listens for kill or restart messages from the worker to either shut down
+     * the app or replace the worker with a new one.
+     */
+    const createWorker = () => {
         const worker = cluster.fork();
 
-        worker.on("message", (message: string) => {
-            if (message === "app.kill") {
-                console.log("Shutting down Xstro...");
+        worker.on("message", (msg) => {
+            if (msg === "app.kill") {
+                console.log("Shutting down...");
                 worker.kill();
                 process.exit(0);
-            } else if (message === "restart") {
-                console.log("Restarting...");
-                isRestarting = true;
-                worker.kill();
             }
-        });
-
-        worker.on("exit", () => {
-            if (!isRestarting) console.log("Restarting...");
-            isRestarting = false;
-            createWorker();
+            if (msg === "restart") {
+                console.log("Restarting...");
+                worker.kill();
+                createWorker();
+            }
         });
     };
 
     createWorker();
 
-    ["SIGINT", "SIGTERM"].forEach((sig: string) => {
+    // Signal handlers don’t get picked up by TypeDoc since they’re not functions
+    // with a name, but for completeness:
+    ["SIGINT", "SIGTERM"].forEach((sig) => {
         process.on(sig, () => {
-            for (const id in cluster.workers) {
-                cluster.workers[id]?.kill();
-            }
             process.exit(0);
         });
     });
 } else {
-    const startServer = async (): Promise<void> => {
+    /**
+     * Initializes an HTTP server in a worker process.
+     * Loads plugins, connects to the database, and starts a server that
+     * responds with an "alive" status on the root URL.
+     */
+    const startServer = async () => {
         console.log("Starting...");
         await loadPlugins();
         await client("database.db");
 
-        http.createServer((req: http.IncomingMessage, res: http.ServerResponse) => {
+        http.createServer((req, res) => {
             res.end(JSON.stringify({ alive: req.url === "/" }));
         }).listen(process.env.PORT || 8000);
     };
 
-    startServer().catch((err) => {
-        console.error("Failed to start server:", err);
-    });
+    startServer().catch((err) => console.error("Server failed:", err));
 
-    process.on("unhandledRejection", (reason: unknown, promise: Promise<unknown>) => {
-        console.error("RUNTIME ERROR:", promise, "CAUSED BY:", reason);
+    // Event handlers like these won’t show up in TypeDoc either
+    process.on("unhandledRejection", (reason) => {
+        console.error("Runtime error:", reason);
     });
 
     process.on("exit", () => {
-        if (process.send) {
-            process.send("restart");
-        }
+        process.send?.("restart");
     });
 }

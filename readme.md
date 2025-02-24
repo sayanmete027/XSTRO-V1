@@ -1,186 +1,151 @@
 # `Xstro WA Bot`
 
-> [!Important]  
-> Open-source WhatsApp bot designed to handle various tasks and perform automated services for both basic and business users. I disclaim any and all liability for any misuse of this software. It is for educational purposes only—please use it responsibly.
+> [!IMPORTANT]  
+> An open-source WhatsApp bot built to automate tasks and provide useful services for both casual users and businesses. I’m not liable for any misuse of this software—it’s designed for **educational purposes only**. Please use it responsibly!
 
 [![FORK](https://img.shields.io/badge/Fork_Repo-black?style=for-the-badge&logo=github)](https://github.com/AstroX11/Xstro/fork)
-[![DEPLOY NOW](https://img.shields.io/badge/Deploy_Bot-black?style=for-the-badge&logo=)](https://astrox11.github.io/xstroweb/)
+[![DEPLOY NOW](https://img.shields.io/badge/Run_Bot-black?style=for-the-badge&logo=rocket)](https://astrox11.github.io/xstroweb/)
+[![SESSION GENERATOR](https://img.shields.io/badge/Session_Generator-black?style=for-the-badge&logo=github)](https://github.com/AstroX11/XstroSession)
+[![TYPESCRIPT DOCS](https://img.shields.io/badge/Type_Docs-black?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/docs/)
 
-### Features and Development
+---
 
-> [!Note]
-> Below is a comprehensive and easy-to-understand guide on how to create your custom functionalities and specifications. Some of you might wonder why I didn't add fun features like games, etc. It's a WhatsApp bot, and those features are not the focus of this project. Implement those at your end if needed.
+## What It Does
 
-### Create your own session
+`Xstro WA Bot` is a flexible WhatsApp bot that lets you automate messaging, manage group chats, and handle media—all through simple commands or custom triggers. It’s built with TypeScript and uses SQLite3 for lightweight data storage, making it easy to tweak for personal or business use.
 
-1. [Session Generator](https://github.com/AstroX11/XstroSession)
-2. [Session Encryptor](https://github.com/AstroX11/session-maker-crypto)
+---
 
-- A detailed usage guide is provided in the repositories on how to use them properly. Also, use PostgreSQL to save sessions. Again, if you try to steal your users' sessions using such methods, I condemn you and your tactics, as I strongly oppose this and any method of social engineering.
+## Features
 
-### How can I create a command?
+| Feature              | Description                                                 |
+| -------------------- | ----------------------------------------------------------- |
+| `Send Message`       | Send text, images, or other media to chats.                 |
+| `Delete Message`     | Remove a message if you’re an admin in a group.             |
+| `Edit Message`       | Update the text of a message you’ve already sent.           |
+| `React to a Message` | Add an emoji reaction to any message.                       |
+| `Save Message`       | Store messages (text or media) for later use.               |
+| `Download a Message` | Save media like photos or videos from messages.             |
+| `Custom Store`       | Uses SQLite3 to store bot data and authentication securely. |
 
-It's easy, but first, I want you to know and understand the `Types` of our command structure and serialized messages.
+---
 
-```ts
-/** Values of our Command Definitions **/
+## Getting Started
 
-interface Command {
-  name: RegExp | string;
-  function?: Function;
-  fromMe?: boolean;
-  isGroup?: boolean;
-  desc: string | undefined;
-  type: string | undefined;
-  dontAddCommandList?: boolean;
-}
-```
+1. **Clone the Repo**  
+   Grab the code from [GitHub](https://github.com/AstroX11/Xstro):
 
-```ts
-/** Values of our Message Definitions **/
-import { WAProto, WASocket } from 'baileys';
+   ```bash
+   git clone https://github.com/AstroX11/Xstro.git
+   cd Xstro
+   ```
 
-export interface Message {
-    key: {
-        remoteJid: string;
-        fromMe: boolean;
-        id: string;
-        participant?: string | undefined;
-    };
-    jid: string;
-    pushName: string | null | undefined;
-    messageTimestamp: number | Long.Long;
-    owner: string;
-    message: WAProto.IMessage | undefined;
-    type: string;
-    device: string;
-    sender: string | null | undefined;
-    prefix: string[];
-    mod: boolean;
-    ban: boolean;
-    sudo: boolean;
-    text: string | null | undefined;
-    quoted?: {
-        key: {
-            remoteJid: string;
-            fromMe: boolean;
-            id: string;
-            participant?: string | undefined;
-        };
-        message: WAProto.IMessage | undefined,
-        type: string | undefined;
-        sender: string | undefined;
-        device: string;
-        ban: boolean;
-        sudo: boolean;
-        text: string | null | undefined;
-        image: boolean;
-        video: boolean;
-        audio: boolean;
-        document: boolean;
-        viewonce: boolean;
-    };
-    send: (content: Buffer | string, options?: any) => Promise<Message | any>;
-    edit: (content: string) => Promise<Message>;
-    forward: (jid: string, message: any, opts?: any) => Promise<any>;
-    send: (text: string) => Promise<Message>;
-    downloadM: (message: any, file?: boolean) => Promise<ArrayBuffer | any>;
-    delete: () => Promise<Message>;
-    react: (emoji: string) => Promise<Message>;
-    user: (match: string) => Promise<string | false>;
-    error: (error: Error, cmd: string | RegExp) => Promise<void | any>,
-    client: WASocket
-}
-```
+2. **Install Dependencies**  
+   You’ll need Node.js installed. Then run:
 
-### How do I use them now?
+   ```bash
+   npm install
+   ```
+
+3. **Set Up Authentication**  
+   Use the [XstroSession](https://github.com/AstroX11/XstroSession) tool to link your WhatsApp account to the bot.
+
+4. **Start the Bot**  
+   Launch it with:
+   ```bash
+   npm start
+   ```
+
+Check [the deployment page](https://astrox11.github.io/xstroweb/) for more setup tips.
+
+---
+
+## Command Creation
+
+You can create custom commands to make the bot do what you want. Here’s how:
+
+### Simple Command
 
 ```ts
-/** Import the Module function and Message Types **/
-import { Module, Message } from '../src/index.mjs'
+import { Module } from "#default";
 
-/** Define a Module, a command register **/
+// A basic "hi" command
 Module(
   {
-    name: 'hello', // name of the command
-    fromMe: false, // is the command for sudo users? make it true if it should respond only to sudo users
-    isGroup: false, // use this only if you want the command to work in a group!
-    desc: 'Greetings', // provide the description of the command if you want it to appear on the list
-    type: 'system', // specify the type or category which the command falls under
+    name: "hi", // What users type to trigger it
+    fromMe: false, // Anyone can use it, not just the bot owner
+    isGroup: false, // Works in private chats and groups
+    type: "greetings", // Groups it under "greetings" category
   },
-  async (message: Message) => {
-    await message.send('hi, I just replied to you') // send a message; this send function supports only text, image, video, and audio
+  async (message) => {
+    await message.send("Hello"); // Replies with "Hello"
   }
 );
 ```
 
-#### Send a Message
+### Command with Arguments
 
 ```ts
-await message.send('hi')
+import { Module } from "#default";
+
+// A "hi" command that checks for "bot" as an argument
+Module(
+  {
+    name: "hi",
+    fromMe: false,
+    isGroup: false,
+    type: "greetings",
+  },
+  async (message, args) => {
+    // args is what the user types after the command (e.g., ".hi bot")
+    if (args.includes("bot")) {
+      await message.send(`${message.pushName} Hello Beep Bo Bi`);
+    } else {
+      await message.send("Try saying '.hi bot'!");
+    }
+  }
+);
 ```
 
-#### Edit a Message
+The `message` object has tons of handy methods—`send`, `react`, `delete`, etc. Dig into the code to see more!
+
+---
+
+## Custom Events
+
+Want the bot to respond to specific messages without a command? Use event listeners:
 
 ```ts
-const msg = await message.send('hi') // Make sure to define a returnable instance of serialize in order to callback the edit to edit this message; otherwise, it would edit the message you sent yourself, not the target message.
-await msg.edit('hello') // Edits it to the new value (String only)
-```
-
-#### Forward a Message
-
-```ts
-const jid = `12345678990@whatsapp.net`
-const msg = await message.send('Hello, this is an instance that will be forwarded')
-await message.forward(jid, msg, {quoted: msg}) // forwards the message; jid and the message are mandatory, quoted is an optional parameter
-```
-
-#### Basic Reply
-
-```ts
-await message.send('Okay, you got it!') // Just send to a message; it supports only text
-```
-
-#### Download a Message
-
-```ts
-const msg = await message.send(ImageBuffer) // sends an image, could be video, audio
-
-await message.downloadM(msg) // Downloads the message as a buffer
-
-/** If you want to save the downloaded file **/
-await message.downloadM(msg, true)
-```
-
-#### Delete a Message
-
-```ts
-await message.delete() // deletes your message; if you send to a message when you call this, it would delete the replied message and not yours
-```
-
-#### React to a Message
-
-```ts
-await message.react('😍') // react to a message; if you send to a message, it would react to that and not the one you sent
-```
-
-### Custom Events
-
-```ts
-/** Import the Types **/
-import { Message } from '../../../src/index.mjs';
-
-export async function greetingsListener(message: Message) {
-  if (message.text.startsWith('Good Morning')) {
-    // you can add regex for that if checker
-    return message.send(`${message.pushName}, Good Day`)
+export async function greetingsListener(message) {
+  // Listens for messages starting with "Good Morning"
+  if (message.text.startsWith("Good Morning")) {
+    return message.send(`${message.pushName}, Good Day`);
   }
 }
 ```
 
-> [!Tip]
-> These custom events depend on the type of Baileys event listeners. Make sure you create them based on the correct one; otherwise, they won't work.
+Add this to your bot, and it’ll reply automatically whenever someone says "Good Morning"—no prefix needed.
 
-## Start Contributing
+---
 
-Want to help? Fork the repository, create a pull request, and make sure everything works.
+## Contribution
+
+[![PULL REQUEST](https://img.shields.io/badge/Pull_Request-black?style=for-the-badge&logo=github)](https://github.com/AstroX11/Xstro/pulls)
+
+`Xstro WA Bot`! How to contribute:
+
+1. **Fork the Repo**  
+   Make your own copy [here](https://github.com/AstroX11/Xstro/fork).
+
+2. **Make Changes**  
+   Fix bugs, add features, or improve the docs. Examples:
+
+   - New commands (e.g., a weather checker).
+   - Better error handling.
+   - Clearer examples in this README.
+   - Make you use Eslint, else your request will be closed.
+
+3. **Submit a Pull Request**  
+   Push your changes and open a [pull request](https://github.com/AstroX11/Xstro/pulls). Tell us what you did and why it’s useful.
+
+Questions? Open an [issue](https://github.com/AstroX11/Xstro/issues)!
