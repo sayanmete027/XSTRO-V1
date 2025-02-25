@@ -178,7 +178,7 @@ Module(
         };
 
         const canDeleteDirectly = message.isGroup ? (await message.isBotAdmin()) || quoted.key.fromMe === true : quoted.key.fromMe;
-        
+
         if (canDeleteDirectly) {
             await message.delete(quoted);
         } else {

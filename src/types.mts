@@ -42,10 +42,6 @@ export type Config = {
     disabledCmds: string[];
     sudo: string[];
     banned: string[];
-    antilink: {
-        jid: string;
-        status: boolean;
-    }[];
 };
 
 export type sendMessageOptionals = {
