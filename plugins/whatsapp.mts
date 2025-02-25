@@ -1,4 +1,4 @@
-import { MessageType, Module } from "#default";
+import { isMediaMessage, MessageType, Module } from "#default";
 
 Module(
     {
@@ -134,5 +134,55 @@ Module(
         }
 
         return message.send("Message converted to view-once");
+    }
+);
+
+Module(
+    {
+        name: "edit",
+        fromMe: true,
+        desc: "Edit your own message",
+        type: "whatsapp",
+    },
+    async (message: MessageType, match: string) => {
+        if (!message.quoted) {
+            return message.send("Reply a message from you.");
+        }
+        if (!message.quoted.key.fromMe) {
+            return message.send("That Message is not fromMe");
+        }
+        if (!match) {
+            return message.send(`Usage: ${message.prefix}edit hello there`);
+        }
+        return await message.edit(match);
+    }
+);
+
+Module(
+    {
+        name: "dlt",
+        fromMe: false,
+        desc: "Delete a message for ourselves and from other participants if the bot is an admin",
+        type: "group",
+    },
+    async (message: MessageType) => {
+        if (!message.quoted) {
+            return message.send("Reply A Message");
+        }
+
+        const quoted = message.quoted;
+        const deleteForMeConfig = {
+            deleteMedia: isMediaMessage(quoted),
+            key: quoted.key,
+            timestamp: Date.now(),
+        };
+
+        const canDeleteDirectly = message.isGroup ? await message.isBotAdmin() : quoted.key.fromMe;
+
+        if (canDeleteDirectly) {
+            await message.delete(quoted);
+        } else {
+            await message.chatModify({ deleteForMe: deleteForMeConfig }, message.jid);
+        }
     }
 );

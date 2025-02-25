@@ -69,3 +69,9 @@ export type Client = WASocket;
 export type MediaMessageType = "imageMessage" | "videoMessage" | "audioMessage" | "documentMessage";
 export type GroupData = GroupMetadata;
 export type ContentType = Buffer | string;
+
+export interface Article {
+    title: string;
+    description: string;
+    link: string;
+}

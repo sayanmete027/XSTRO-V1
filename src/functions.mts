@@ -1,6 +1,6 @@
-import { DataType } from "#default";
+import { DataType, MediaMessageType, MessageType } from "#default";
 import { Boom } from "@hapi/boom/lib/index.js";
-import { jidNormalizedUser, WAMessageContent } from "baileys";
+import { getContentType, jidNormalizedUser, WAMessage, WAMessageContent } from "baileys";
 import { fileTypeFromBuffer } from "file-type";
 import got, { Options as gotOps } from "got";
 
@@ -127,48 +127,49 @@ export const getDataType = async (content: Buffer | string): Promise<DataType> =
 
 export const extractTextFromMessage = function (message: WAMessageContent) {
     if (!message) return undefined;
-    if (message!.extendedTextMessage) {
-        return message.extendedTextMessage!.text ?? message!.extendedTextMessage!.description ?? message!.extendedTextMessage!.title;
+
+    if (message?.extendedTextMessage) {
+        return message?.extendedTextMessage?.text ?? message?.extendedTextMessage?.description ?? message?.extendedTextMessage?.title;
     }
-    if (message!.videoMessage) {
-        return message!.videoMessage!.caption;
+    if (message?.videoMessage) {
+        return message?.videoMessage?.caption;
     }
-    if (message!.imageMessage) {
-        return message!.imageMessage!.caption;
+    if (message?.imageMessage) {
+        return message?.imageMessage?.caption;
     }
-    if (message!.conversation) {
-        return message.conversation;
+    if (message?.conversation) {
+        return message?.conversation;
     }
-    if (message!.eventMessage) {
-        return `${message!.eventMessage!.name}\n${message!.eventMessage!.description}`;
+    if (message?.eventMessage) {
+        return `${message?.eventMessage?.name}\n${message?.eventMessage?.description}`;
     }
-    if (message!.pollCreationMessageV3) {
-        return `${message!.pollCreationMessageV3!.name}\n${message!.pollCreationMessageV3!.options!.map((opt) => opt.optionName).toString()}`;
+    if (message?.pollCreationMessageV3) {
+        return `${message?.pollCreationMessageV3?.name}\n${message?.pollCreationMessageV3?.options?.map((opt) => opt.optionName).toString()}`;
     }
-    if (message!.pollCreationMessage) {
-        return `${message!.pollCreationMessage!.name}\n${message.pollCreationMessage.options!.map((opt) => opt.optionName).toString()}`;
+    if (message?.pollCreationMessage) {
+        return `${message?.pollCreationMessage?.name}\n${message?.pollCreationMessage?.options?.map((opt) => opt.optionName).toString()}`;
     }
-    if (message!.pollCreationMessageV2) {
-        return `${message!.pollCreationMessageV2!.name}\n${message.pollCreationMessageV2.options!.map((opt) => opt.optionName).toString()}`;
+    if (message?.pollCreationMessageV2) {
+        return `${message?.pollCreationMessageV2?.name}\n${message?.pollCreationMessageV2?.options?.map((opt) => opt.optionName).toString()}`;
     }
-    if (message!.documentMessage) {
-        return message!.documentMessage!.caption;
+    if (message?.documentMessage) {
+        return message?.documentMessage?.caption;
     }
-    if (message!.protocolMessage) {
-        if (message!.protocolMessage!.editedMessage!.extendedTextMessage) {
-            return message.protocolMessage!.editedMessage!.extendedTextMessage.text;
+    if (message?.protocolMessage) {
+        if (message?.protocolMessage?.editedMessage?.extendedTextMessage) {
+            return message?.protocolMessage?.editedMessage?.extendedTextMessage?.text;
         }
-        if (message!.protocolMessage!.editedMessage!.videoMessage) {
-            return message!.protocolMessage!.editedMessage!.videoMessage!.caption;
+        if (message?.protocolMessage?.editedMessage?.videoMessage) {
+            return message?.protocolMessage?.editedMessage?.videoMessage?.caption;
         }
-        if (message!.protocolMessage!.editedMessage!.imageMessage) {
-            return message!.protocolMessage!.editedMessage!.imageMessage!.caption;
+        if (message?.protocolMessage?.editedMessage?.imageMessage) {
+            return message?.protocolMessage?.editedMessage?.imageMessage?.caption;
         }
-        if (message!.protocolMessage!.editedMessage!.conversation) {
-            return message!.protocolMessage!.editedMessage!.conversation;
+        if (message?.protocolMessage?.editedMessage?.conversation) {
+            return message?.protocolMessage?.editedMessage?.conversation;
         }
-        if (message!.protocolMessage!.editedMessage!.documentMessage) {
-            return message!.protocolMessage!.editedMessage!.documentMessage!.caption;
+        if (message?.protocolMessage?.editedMessage?.documentMessage) {
+            return message?.protocolMessage?.editedMessage?.documentMessage?.caption;
         }
     }
 };
@@ -192,4 +193,11 @@ export const fetchJson = async function (url: string, options?: gotOps): Promise
     } catch (error) {
         throw new Boom(error.message);
     }
+};
+
+const mediaMessagesTypes: MediaMessageType[] = ["imageMessage", "videoMessage", "audioMessage", "documentMessage"];
+
+export const isMediaMessage = function (message: WAMessage): boolean {
+    const content = getContentType(message!.message!);
+    return typeof content === "string" && mediaMessagesTypes.includes(content as MediaMessageType);
 };

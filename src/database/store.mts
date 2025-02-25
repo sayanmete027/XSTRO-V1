@@ -6,7 +6,6 @@ import {
     PresenceData,
     Contact,
     WAMessageKey,
-    WAMessageUpdate,
     WAMessage,
     MessageUpsertType,
     WACallEvent,
@@ -18,9 +17,6 @@ import {
     WAProto,
     GroupParticipant,
 } from "baileys";
-import { Boom } from "@hapi/boom";
-import { LabelAssociation, LabelAssociationType, MessageLabelAssociation } from "baileys/lib/Types/LabelAssociation.js";
-import { Label } from "baileys/lib/Types/Label.js";
 import { groupMetadata, ParticipantActivity } from "#default";
 
 export async function Store(): Promise<void> {
@@ -63,17 +59,6 @@ export async function Store(): Promise<void> {
             data JSON,
             requestId TEXT,
             upsertType TEXT,
-            PRIMARY KEY (remoteJid, id, fromMe)
-        )
-    `);
-    await db.exec(`
-        CREATE TABLE IF NOT EXISTS message_media (
-            remoteJid TEXT,
-            id TEXT,
-            fromMe INTEGER,
-            ciphertext BLOB,
-            iv BLOB,
-            error TEXT,
             PRIMARY KEY (remoteJid, id, fromMe)
         )
     `);
@@ -124,31 +109,11 @@ export async function Store(): Promise<void> {
         )
     `);
     await db.exec(`
-        CREATE TABLE IF NOT EXISTS blocklist (
-            jid TEXT PRIMARY KEY
-        )
-    `);
-    await db.exec(`
         CREATE TABLE IF NOT EXISTS calls (
             id TEXT PRIMARY KEY,
             chatId TEXT,
             fromJid TEXT,
             data JSON
-        )
-    `);
-    await db.exec(`
-        CREATE TABLE IF NOT EXISTS labels (
-            id TEXT PRIMARY KEY,
-            data JSON
-        )
-    `);
-    await db.exec(`
-        CREATE TABLE IF NOT EXISTS label_associations (
-            type TEXT,
-            chatId TEXT,
-            messageId TEXT,
-            labelId TEXT,
-            PRIMARY KEY (type, chatId, messageId, labelId)
         )
     `);
 }
@@ -178,18 +143,6 @@ export async function updateChat(chatUpdate: ChatUpdate): Promise<void> {
     );
 }
 
-export async function deleteChats(chatIds: string[]): Promise<void> {
-    const db: Database = await getDb();
-    const placeholders = chatIds.map(() => "?").join(",");
-    await db.run(
-        `
-        DELETE FROM chats 
-        WHERE id IN (${placeholders})
-    `,
-        chatIds
-    );
-}
-
 export async function updatePresence(presenceUpdate: { id: string; presences: { [participant: string]: PresenceData } }): Promise<void> {
     const db: Database = await getDb();
     const stmt = await db.prepare(`
@@ -200,22 +153,6 @@ export async function updatePresence(presenceUpdate: { id: string; presences: { 
     try {
         for (const [participant, presence] of Object.entries(presenceUpdate.presences)) {
             await stmt.run([presenceUpdate.id, participant, presence.lastKnownPresence, presence.lastSeen]);
-        }
-    } finally {
-        await stmt.finalize();
-    }
-}
-
-export async function upsertContacts(contacts: Contact[]): Promise<void> {
-    const db: Database = await getDb();
-    const stmt = await db.prepare(`
-        INSERT OR REPLACE INTO contacts (id, lid, name, notify, verifiedName, imgUrl, status)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
-    `);
-
-    try {
-        for (const contact of contacts) {
-            await stmt.run([contact.id, contact.lid, contact.name, contact.notify, contact.verifiedName, contact.imgUrl, contact.status]);
         }
     } finally {
         await stmt.finalize();
@@ -245,60 +182,16 @@ export async function updateContacts(contactUpdates: Partial<Contact>[]): Promis
     }
 }
 
-export async function deleteMessages(deleteRequest: { keys: WAMessageKey[] } | { jid: string; all: true }): Promise<void> {
-    const db: Database = await getDb();
-
-    if ("keys" in deleteRequest) {
-        const stmt = await db.prepare(`
-            DELETE FROM messages 
-            WHERE remoteJid = ? AND id = ? AND fromMe = ?
-        `);
-        try {
-            for (const key of deleteRequest.keys) {
-                await stmt.run([key.remoteJid, key.id, key.fromMe ? 1 : 0]);
-            }
-        } finally {
-            await stmt.finalize();
-        }
-    } else if ("all" in deleteRequest && deleteRequest.all) {
-        await db.run(
-            `
-            DELETE FROM messages 
-            WHERE remoteJid = ?
-        `,
-            [deleteRequest.jid]
-        );
-    }
-}
-
-export async function updateMessages(messageUpdates: WAMessageUpdate[]): Promise<void> {
+export async function upsertContacts(contacts: Contact[]): Promise<void> {
     const db: Database = await getDb();
     const stmt = await db.prepare(`
-        UPDATE messages 
-        SET 
-            data = ?
-        WHERE remoteJid = ? AND id = ? AND fromMe = ?
+        INSERT OR REPLACE INTO contacts (id, lid, name, notify, verifiedName, imgUrl, status)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
     `);
 
     try {
-        for (const msgUpdate of messageUpdates) {
-            await stmt.run([JSON.stringify(msgUpdate.update), msgUpdate.key.remoteJid, msgUpdate.key.id, msgUpdate.key.fromMe ? 1 : 0]);
-        }
-    } finally {
-        await stmt.finalize();
-    }
-}
-
-export async function updateMessageMedia(mediaUpdates: { key: WAMessageKey; media?: { ciphertext: Uint8Array; iv: Uint8Array }; error?: Boom }[]): Promise<void> {
-    const db: Database = await getDb();
-    const stmt = await db.prepare(`
-        INSERT OR REPLACE INTO message_media (remoteJid, id, fromMe, ciphertext, iv, error)
-        VALUES (?, ?, ?, ?, ?, ?)
-    `);
-
-    try {
-        for (const update of mediaUpdates) {
-            await stmt.run([update.key.remoteJid, update.key.id, update.key.fromMe ? 1 : 0, update.media?.ciphertext, update.media?.iv, update.error ? update.error.message : null]);
+        for (const contact of contacts) {
+            await stmt.run([contact.id, contact.lid, contact.name, contact.notify, contact.verifiedName, contact.imgUrl, contact.status]);
         }
     } finally {
         await stmt.finalize();
@@ -434,49 +327,6 @@ export async function saveGroupJoinRequest(request: { id: string; author: string
     );
 }
 
-export async function setBlocklist(blocklist: { blocklist: string[] }): Promise<void> {
-    const db: Database = await getDb();
-    await db.run(`DELETE FROM blocklist`);
-    const stmt = await db.prepare(`
-        INSERT INTO blocklist (jid)
-        VALUES (?)
-    `);
-
-    try {
-        for (const jid of blocklist.blocklist) {
-            await stmt.run([jid]);
-        }
-    } finally {
-        await stmt.finalize();
-    }
-}
-
-export async function updateBlocklist(update: { blocklist: string[]; type: "add" | "remove" }): Promise<void> {
-    const db: Database = await getDb();
-    if (update.type === "add") {
-        const stmt = await db.prepare(`
-            INSERT OR IGNORE INTO blocklist (jid)
-            VALUES (?)
-        `);
-        try {
-            for (const jid of update.blocklist) {
-                await stmt.run([jid]);
-            }
-        } finally {
-            await stmt.finalize();
-        }
-    } else if (update.type === "remove") {
-        const placeholders = update.blocklist.map(() => "?").join(",");
-        await db.run(
-            `
-            DELETE FROM blocklist 
-            WHERE jid IN (${placeholders})
-        `,
-            update.blocklist
-        );
-    }
-}
-
 export async function saveCalls(calls: WACallEvent[]): Promise<void> {
     const db: Database = await getDb();
     const stmt = await db.prepare(`
@@ -493,49 +343,6 @@ export async function saveCalls(calls: WACallEvent[]): Promise<void> {
     }
 }
 
-export async function editLabel(label: Label): Promise<void> {
-    const db: Database = await getDb();
-    await db.run(
-        `
-        INSERT OR REPLACE INTO labels (id, data)
-        VALUES (?, ?)
-    `,
-        [label.id, JSON.stringify(label)]
-    );
-}
-
-export async function updateLabelAssociation(association: { association: LabelAssociation; type: "add" | "remove" }): Promise<void> {
-    const db: Database = await getDb();
-    if (association.type === "add") {
-        await db.run(
-            `
-            INSERT OR IGNORE INTO label_associations (type, chatId, messageId, labelId)
-            VALUES (?, ?, ?, ?)
-        `,
-            [
-                association.association.type,
-                association.association.chatId,
-                association.association.type === LabelAssociationType.Message ? (association.association as MessageLabelAssociation).messageId : null,
-                association.association.labelId,
-            ]
-        );
-    } else if (association.type === "remove") {
-        await db.run(
-            `
-            DELETE FROM label_associations 
-            WHERE type = ? AND chatId = ? AND messageId = ? AND labelId = ?
-        `,
-            [
-                association.association.type,
-                association.association.chatId,
-                association.association.type === LabelAssociationType.Message ? (association.association as MessageLabelAssociation).messageId : null,
-                association.association.labelId,
-            ]
-        );
-    }
-}
-
-// 1. Load a specific message by ID
 export async function loadMessage(id: string): Promise<any> {
     const db: Database = await getDb();
     const message = await db.get(
@@ -551,7 +358,6 @@ export async function loadMessage(id: string): Promise<any> {
 
 export async function fetchParticipantsActivity(jid: string, endDate?: number): Promise<ParticipantActivity[]> {
     const db: Database = await getDb();
-
     const groupData: GroupMetadata | undefined = await groupMetadata(jid);
 
     if (!groupData || !groupData.participants) {
@@ -576,7 +382,6 @@ export async function fetchParticipantsActivity(jid: string, endDate?: number): 
     }
 
     const messages = await db.all(query, params);
-
     const activityMap: Map<string, number> = new Map();
     const pushNameMap: Map<string, string> = new Map();
 
@@ -599,7 +404,6 @@ export async function fetchParticipantsActivity(jid: string, endDate?: number): 
     }));
 
     results.sort((a, b) => b.messageCount - a.messageCount);
-
     return results;
 }
 
@@ -610,8 +414,6 @@ export async function getChatSummary(jid: string): Promise<{
     mostActiveParticipant: string | null;
 }> {
     const db: Database = await getDb();
-
-    // Get total messages and last timestamp
     const chatStats = await db.get(
         `
         SELECT 
@@ -622,8 +424,6 @@ export async function getChatSummary(jid: string): Promise<{
         `,
         [jid]
     );
-
-    // Get participant count
     const participantCount = await db.get(
         `
         SELECT COUNT(DISTINCT participant) AS count
@@ -632,8 +432,6 @@ export async function getChatSummary(jid: string): Promise<{
         `,
         [jid]
     );
-
-    // Get most active participant
     const mostActive = await db.get(
         `
         SELECT participant
@@ -668,7 +466,6 @@ export async function getAllMessagesFromChat(jid: string): Promise<any[]> {
     return messages.map((msg) => JSON.parse(msg.data));
 }
 
-// 5. Get message count by status (bonus function)
 export async function getMessageStatusCount(jid: string): Promise<
     {
         status: string;

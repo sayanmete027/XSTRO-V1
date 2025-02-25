@@ -14,7 +14,8 @@ export async function Message(client: Client, messages: WAMessage) {
     const owner = numToJid(user!.id);
     const mtype = getContentType(message);
     function hasContextInfo(msg: any): msg is { contextInfo: WAContextInfo } {
-        return msg && "contextInfo" in msg && typeof msg !== "string";
+        if (!msg || typeof msg !== "object" || msg === null) return false;
+        return "contextInfo" in msg && msg.contextInfo !== null && typeof msg.contextInfo === "object";
     }
     const messageContent = message?.[mtype!];
     const Quoted = hasContextInfo(messageContent) ? messageContent.contextInfo : undefined;
@@ -25,6 +26,7 @@ export async function Message(client: Client, messages: WAMessage) {
         message,
         mtype,
         jid: key.remoteJid!,
+        isGroup: isJidGroup(key.remoteJid!),
         owner: owner,
         prefix,
         sender: isJidGroup(key.remoteJid!) || isJidBroadcast(key.remoteJid!) ? key.participant! : key.remoteJid!,

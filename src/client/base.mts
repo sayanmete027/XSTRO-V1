@@ -1,4 +1,4 @@
-import { makeWASocket, makeCacheableSignalKeyStore, DisconnectReason, Browsers, WAProto, WASocket } from "baileys";
+import { makeWASocket, makeCacheableSignalKeyStore, DisconnectReason, Browsers, WASocket } from "baileys";
 import { Boom } from "@hapi/boom";
 import * as P from "pino";
 import { EventEmitter } from "events";
@@ -15,24 +15,16 @@ import {
     upsertChat,
     upsertMessages,
     updateChat,
-    setBlocklist,
     saveCalls,
-    editLabel,
-    updateLabelAssociation,
-    updateBlocklist,
     saveGroupJoinRequest,
     updateGroupParticipants,
     updateGroups,
     upsertGroups,
     updateMessageReceipts,
     saveMessageReactions,
-    updateMessageMedia,
-    deleteMessages,
     updateContacts,
-    upsertContacts,
-    deleteChats,
     updatePresence,
-    updateMessages,
+    upsertContacts,
 } from "#default";
 import config from "../../config.mjs";
 
@@ -80,12 +72,6 @@ export const client = async (database: string = "database.db"): Promise<WASocket
                 }
             }
         }
-        if (events["messages.update"]) {
-            const messageUpdates = events["messages.update"];
-            if (messageUpdates) {
-                await updateMessages(messageUpdates);
-            }
-        }
         if (events["chats.upsert"]) {
             const chatUpserts = events["chats.upsert"];
             if (chatUpserts) {
@@ -102,34 +88,10 @@ export const client = async (database: string = "database.db"): Promise<WASocket
                 }
             }
         }
-        if (events["blocklist.set"]) {
-            const blocklist = events["blocklist.set"];
-            if (blocklist) {
-                await setBlocklist(blocklist);
-            }
-        }
-        if (events["blocklist.update"]) {
-            const blocklistUpdates = events["blocklist.update"];
-            if (blocklistUpdates) {
-                await updateBlocklist(blocklistUpdates);
-            }
-        }
         if (events["call"]) {
             const calls = events["call"];
             if (calls) {
                 await saveCalls(calls);
-            }
-        }
-        if (events["labels.edit"]) {
-            const editedLabels = events["labels.edit"];
-            if (editedLabels) {
-                await editLabel(editedLabels);
-            }
-        }
-        if (events["labels.association"]) {
-            const associations = events["labels.association"];
-            if (associations) {
-                await updateLabelAssociation(associations);
             }
         }
         if (events["group.join-request"]) {
@@ -168,18 +130,6 @@ export const client = async (database: string = "database.db"): Promise<WASocket
                 await saveMessageReactions(reactions);
             }
         }
-        if (events["messages.media-update"]) {
-            const mediaUpdates = events["messages.media-update"];
-            if (mediaUpdates) {
-                await updateMessageMedia(mediaUpdates);
-            }
-        }
-        if (events["messages.delete"]) {
-            const deletedMsg = events["messages.delete"];
-            if (deletedMsg) {
-                await deleteMessages(deletedMsg);
-            }
-        }
         if (events["contacts.update"]) {
             const contactUpdates = events["contacts.update"];
             if (contactUpdates) {
@@ -190,12 +140,6 @@ export const client = async (database: string = "database.db"): Promise<WASocket
             const contactUpsert = events["contacts.upsert"];
             if (contactUpsert) {
                 await upsertContacts(contactUpsert);
-            }
-        }
-        if (events["chats.delete"]) {
-            const deletedChats = events["chats.delete"];
-            if (deletedChats) {
-                await deleteChats(deletedChats);
             }
         }
         if (events["presence.update"]) {
