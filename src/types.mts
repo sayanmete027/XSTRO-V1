@@ -14,7 +14,7 @@ export interface Command {
     dontAddCommandList?: boolean;
 }
 
-type Category = "misc" | "system" | "settings" | "tools" | "whatsapp" | "group";
+type Category = "misc" | "system" | "settings" | "tools" | "whatsapp" | "group" | "news";
 
 export interface DataType {
     contentType: "text" | "audio" | "image" | "video" | "sticker" | "document";
