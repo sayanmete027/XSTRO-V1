@@ -1,4 +1,4 @@
-import { durationToTimestamp, MessageType, Module } from "#default";
+import { MessageType, Module } from "#default";
 
 Module(
     {
@@ -103,21 +103,5 @@ Module(
         const { key } = message.quoted;
         if (!key.id) return;
         return await message.chatModify({ star: { messages: [{ id: key.id, fromMe: key.fromMe }], star: false } }, message.jid);
-    }
-);
-
-Module(
-    {
-        name: "cmute",
-        fromMe: true,
-        desc: "Mute any chat",
-        type: "chats",
-    },
-    async (message: MessageType, match?: string) => {
-        let muteDuration;
-        if (!match) muteDuration = null;
-        await message.send(`This contact has be muted from your notifications forever, you can use ${message.prefix}cmute 3hours to mute for a sepeific amount of time.`);
-        if (match) muteDuration = durationToTimestamp(match);
-        await message.chatModify({ mute: muteDuration }, message.jid);
     }
 );

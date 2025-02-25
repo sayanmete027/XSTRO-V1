@@ -201,35 +201,3 @@ export const isMediaMessage = function (message: WAMessage): boolean {
     const content = getContentType(message!.message!);
     return typeof content === "string" && mediaMessagesTypes.includes(content as MediaMessageType);
 };
-
-export function durationToTimestamp(durationStr: string): number | null {
-    const cleanedStr = durationStr.trim().toLowerCase();
-
-    const timeUnits: { [key: string]: number } = {
-        hour: 3600,
-        hours: 3600,
-        min: 60,
-        mins: 60,
-        sec: 1,
-        secs: 1,
-        second: 1,
-        seconds: 1,
-        day: 86400,
-        days: 86400,
-    };
-
-    const match = cleanedStr.match(/^(\d+)([a-z]+)$/);
-
-    if (!match) {
-        return null;
-    }
-
-    const [, numberStr, unit] = match;
-    const number = parseInt(numberStr, 10);
-
-    if (unit in timeUnits) {
-        return number * timeUnits[unit];
-    }
-
-    return null;
-}
