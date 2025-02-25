@@ -10,15 +10,18 @@ export async function voxnews(): Promise<string> {
         const html = await fetchJson("https://www.vox.com/");
         const $ = cheerio.load(html);
         const newsItems: { title: string; url: string }[] = [];
+        const seenTitles = new Set<string>();
+        const seenUrls = new Set<string>();
 
         $("a.qcd9z1.hd0te9s").each((i, element) => {
             const $element = $(element);
             const title = $element.text().trim();
             const url = $element.attr("href");
             const absoluteUrl = url ? (url.startsWith("http") ? url : `https://www.vox.com${url}`) : "";
-
-            if (title && absoluteUrl) {
+            if (title && absoluteUrl && !seenTitles.has(title) && !seenUrls.has(absoluteUrl)) {
                 newsItems.push({ title, url: absoluteUrl });
+                seenTitles.add(title);
+                seenUrls.add(absoluteUrl);
             }
         });
 
