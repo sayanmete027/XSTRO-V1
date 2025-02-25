@@ -1,9 +1,27 @@
 import { WAProto, WASocket, GroupMetadata, WAMessage } from "baileys";
-export interface ParticipantActivity {
-    pushName: string | null;
-    messageCount: number;
-    participant: string;
+
+// WhatsApp Core Types
+export type Client = WASocket;
+export type GroupData = GroupMetadata;
+
+// Message Content Types
+export type sendTypes = "text" | "audio" | "image" | "video" | "sticker" | "document";
+export type MediaMessageType = "imageMessage" | "videoMessage" | "audioMessage" | "documentMessage";
+export type ContentType = Buffer | string;
+export type Category = "misc" | "system" | "settings" | "tools" | "whatsapp" | "group" | "news";
+
+// Data Structures
+export interface DataType {
+    contentType: "text" | "audio" | "image" | "video" | "sticker" | "document";
+    mimeType: string;
 }
+
+export interface MediaTypeInfo {
+    mimeType: string;
+    contentType: "text" | "audio" | "image" | "video" | "sticker" | "document";
+}
+
+// Command System
 export interface Command {
     name: RegExp | string;
     function?: Function;
@@ -14,13 +32,7 @@ export interface Command {
     dontAddCommandList?: boolean;
 }
 
-type Category = "misc" | "system" | "settings" | "tools" | "whatsapp" | "group" | "news";
-
-export interface DataType {
-    contentType: "text" | "audio" | "image" | "video" | "sticker" | "document";
-    mimeType: string;
-}
-
+// Bot Configuration
 export type BOTINFO = {
     name: string;
     version: number;
@@ -44,7 +56,8 @@ export type Config = {
     banned: string[];
 };
 
-export type sendMessageOptionals = {
+// Message Sending
+export interface sendMessageOptionals {
     jid: string;
     contextInfo?: WAProto.IContextInfo;
     mentions?: string[];
@@ -58,18 +71,16 @@ export type sendMessageOptionals = {
     gifPlayback?: boolean;
     quoted?: WAMessage;
     ephemeralExpiration?: number | string;
-};
-
-export interface MediaTypeInfo {
-    mimeType: string;
-    contentType: "text" | "audio" | "image" | "video" | "sticker" | "document";
 }
-export type sendTypes = "text" | "audio" | "image" | "video" | "sticker" | "document";
-export type Client = WASocket;
-export type MediaMessageType = "imageMessage" | "videoMessage" | "audioMessage" | "documentMessage";
-export type GroupData = GroupMetadata;
-export type ContentType = Buffer | string;
 
+// Group Activity
+export interface ParticipantActivity {
+    pushName: string | null;
+    messageCount: number;
+    participant: string;
+}
+
+// News/Article Structure
 export interface Article {
     title: string;
     description: string;
