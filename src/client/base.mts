@@ -57,7 +57,7 @@ export const client = async (database: string = "database.db"): Promise<WASocket
         logger,
         browser: Browsers.macOS("Desktop"),
         emitOwnEvents: true,
-        cachedGroupMetadata: async (jid) => await groupMetadata(jid)
+        cachedGroupMetadata: async (jid) => await groupMetadata(jid),
     });
 
     conn.ev.process(async (events) => {

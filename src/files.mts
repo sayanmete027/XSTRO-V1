@@ -1,6 +1,7 @@
 import { pathToFileURL, fileURLToPath } from "url";
 import { join, extname, dirname } from "path";
 import { readdir } from "fs/promises";
+import { logger } from "#default";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -22,5 +23,5 @@ export async function loadPlugins(): Promise<void> {
             }
         })
     );
-    console.log("Plugins Synced");
+    logger.info("Plugins Synced");
 }

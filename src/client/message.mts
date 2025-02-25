@@ -1,6 +1,6 @@
 import { Client, ContentType, extractTextFromMessage, getConfig, getDataType, numToJid, sendMessageOptionals } from "#default";
 import { Boom } from "@hapi/boom/lib/index.js";
-import { AnyMessageContent, downloadMediaMessage, getContentType, isJidBroadcast, isJidGroup, normalizeMessageContent, WAContextInfo, WAMessage, WAMessageContent } from "baileys";
+import { AnyMessageContent, downloadMediaMessage, getContentType, isJidBroadcast, isJidGroup, normalizeMessageContent, WAContextInfo, WAMessage } from "baileys";
 import { writeFile } from "fs/promises";
 
 export async function Message(client: Client, messages: WAMessage) {

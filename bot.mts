@@ -1,6 +1,6 @@
 import * as http from "http";
 import cluster from "cluster";
-import { client, loadPlugins } from "#default";
+import { client, loadPlugins, logger } from "#default";
 
 /**
  * @module WorkerCluster
@@ -19,12 +19,12 @@ if (cluster.isPrimary) {
 
         worker.on("message", (msg) => {
             if (msg === "app.kill") {
-                console.log("Shutting down...");
+                logger.info("Shutting down...");
                 worker.kill();
                 process.exit(0);
             }
             if (msg === "restart") {
-                console.log("Restarting...");
+                logger.info("Restarting...");
                 worker.kill();
                 createWorker();
             }
@@ -47,7 +47,7 @@ if (cluster.isPrimary) {
      * responds with an "alive" status on the root URL.
      */
     const startServer = async () => {
-        console.log("Starting...");
+        logger.info("Starting...");
         await loadPlugins();
         await client("database.db");
 

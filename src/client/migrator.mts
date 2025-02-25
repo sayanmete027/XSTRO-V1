@@ -4,7 +4,7 @@
  */
 
 import sqlite3 from "sqlite3";
-import { getSessionId, setSessionId } from "#default";
+import { getSessionId, logger, setSessionId } from "#default";
 import fs from "fs/promises";
 import path from "path";
 
@@ -16,7 +16,7 @@ export async function SessionMigrator(Sessionfolder: string, SessionDataBasePath
     try {
         const sId = await getSessionId();
         if (!Sessionfolder || !SessionDataBasePath || sId === SESSION_ID) {
-            console.log("No Migration");
+            logger.info("No Migration");
             return;
         }
 
@@ -70,7 +70,7 @@ export async function SessionMigrator(Sessionfolder: string, SessionDataBasePath
         await setSessionId(SESSION_ID);
         return sessionData;
     } catch {
-        console.log("No Migration");
+        logger.error("No Migration");
         return;
     }
 }
