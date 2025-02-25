@@ -163,11 +163,11 @@ Module(
         name: "dlt",
         fromMe: false,
         desc: "Delete a message for ourselves and from other participants if the bot is an admin",
-        type: "group",
+        type: "whatsapp",
     },
     async (message: MessageType) => {
         if (!message.quoted) {
-            return message.send("Reply A Message");
+            return message.send("Reply a message");
         }
 
         const quoted = message.quoted;
@@ -177,8 +177,8 @@ Module(
             timestamp: Date.now(),
         };
 
-        const canDeleteDirectly = message.isGroup ? await message.isBotAdmin() : quoted.key.fromMe;
-
+        const canDeleteDirectly = message.isGroup ? (await message.isBotAdmin()) || quoted.key.fromMe === true : quoted.key.fromMe;
+        
         if (canDeleteDirectly) {
             await message.delete(quoted);
         } else {

@@ -41,7 +41,11 @@ export type Config = {
     savebroadcast: boolean;
     disabledCmds: string[];
     sudo: string[];
-    bannedusers: string[];
+    banned: string[];
+    antilink: {
+        jid: string;
+        status: boolean;
+    }[];
 };
 
 export type sendMessageOptionals = {

@@ -21,6 +21,7 @@ async function initConfigDb(): Promise<void> {
             { key: "autoRead", value: "0" },
             { key: "autoStatusRead", value: "0" },
             { key: "autolikestatus", value: "0" },
+            { key: "antilink", value: JSON.stringify([]) },
             { key: "disablegc", value: "0" },
             { key: "disabledm", value: "0" },
             { key: "cmdReact", value: "1" },
@@ -28,7 +29,7 @@ async function initConfigDb(): Promise<void> {
             { key: "savebroadcast", value: "0" },
             { key: "disabledCmds", value: "[]" },
             { key: "sudo", value: "[]" },
-            { key: "bannedusers", value: "[]" },
+            { key: "banned", value: "[]" },
         ];
 
         const stmt = await db.prepare("INSERT INTO config (key, value) VALUES (?, ?)");
@@ -46,12 +47,20 @@ export async function getConfig(): Promise<Config> {
     const rows = await db.all("SELECT key, value FROM config");
     const configMap = Object.fromEntries(rows.map((row) => [row.key, row.value]));
 
+    const antilinkValue = JSON.parse(configMap.antilink || JSON.stringify([]));
+
     return {
         prefix: Array.from(configMap.prefix) || ".",
         mode: Boolean(parseInt(configMap.mode || "1")),
         autoRead: Boolean(parseInt(configMap.autoRead || "0")),
         autoStatusRead: Boolean(parseInt(configMap.autoStatusRead || "0")),
         autolikestatus: Boolean(parseInt(configMap.autolikestatus || "0")),
+        antilink: Array.isArray(antilinkValue)
+            ? antilinkValue.map((item) => ({
+                  jid: item.jid || "",
+                  status: Boolean(item.status),
+              }))
+            : [],
         disablegc: Boolean(parseInt(configMap.disablegc || "0")),
         disabledm: Boolean(parseInt(configMap.disabledm || "0")),
         cmdReact: Boolean(parseInt(configMap.cmdReact || "1")),
@@ -59,7 +68,7 @@ export async function getConfig(): Promise<Config> {
         savebroadcast: Boolean(parseInt(configMap.savebroadcast || "0")),
         disabledCmds: JSON.parse(configMap.disabledCmds || "[]"),
         sudo: JSON.parse(configMap.sudo || "[]"),
-        bannedusers: JSON.parse(configMap.bannedusers || "[]"),
+        banned: JSON.parse(configMap.banned || "[]"),
     };
 }
 
@@ -80,7 +89,8 @@ export async function editConfig(updates: Partial<Config>): Promise<Config | nul
         "savebroadcast",
         "disabledCmds",
         "sudo",
-        "bannedusers",
+        "banned",
+        "antilink",
     ];
 
     const keys = Object.keys(updates).filter((key) => allowedKeys.includes(key as keyof Config));
@@ -91,7 +101,14 @@ export async function editConfig(updates: Partial<Config>): Promise<Config | nul
         const value = updates[key as keyof Config];
         let dbValue: string;
 
-        if (typeof value === "boolean") {
+        if (key === "antilink" && Array.isArray(value)) {
+            dbValue = JSON.stringify(
+                value.map((item: { jid?: string; status?: boolean }) => ({
+                    jid: item.jid ?? "",
+                    status: Boolean(item.status),
+                }))
+            );
+        } else if (typeof value === "boolean") {
             dbValue = value ? "1" : "0";
         } else if (Array.isArray(value)) {
             dbValue = JSON.stringify(value);
