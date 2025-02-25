@@ -8,17 +8,17 @@ export type GroupData = GroupMetadata;
 export type sendTypes = "text" | "audio" | "image" | "video" | "sticker" | "document";
 export type MediaMessageType = "imageMessage" | "videoMessage" | "audioMessage" | "documentMessage";
 export type ContentType = Buffer | string;
-export type Category = "misc" | "system" | "settings" | "tools" | "whatsapp" | "group" | "news";
+export type Category = "misc" | "system" | "settings" | "tools" | "whatsapp" | "group" | "news" | "chats";
 
 // Data Structures
 export interface DataType {
-    contentType: "text" | "audio" | "image" | "video" | "sticker" | "document";
+    contentType: sendTypes;
     mimeType: string;
 }
 
 export interface MediaTypeInfo {
     mimeType: string;
-    contentType: "text" | "audio" | "image" | "video" | "sticker" | "document";
+    contentType: sendTypes;
 }
 
 // Command System
@@ -32,7 +32,6 @@ export interface Command {
     dontAddCommandList?: boolean;
 }
 
-// Bot Configuration
 export type BOTINFO = {
     name: string;
     version: number;
@@ -61,7 +60,7 @@ export interface sendMessageOptionals {
     jid: string;
     contextInfo?: WAProto.IContextInfo;
     mentions?: string[];
-    type?: "text" | "audio" | "image" | "video" | "sticker" | "document";
+    type?: sendTypes;
     mimetype?: string;
     disappearingMessagesInChat?: boolean | number;
     fileName?: string;
