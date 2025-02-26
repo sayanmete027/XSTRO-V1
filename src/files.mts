@@ -11,7 +11,7 @@ export async function loadPlugins(
     shouldMerge: boolean = false, // Default to false
     extensions: string[] = [".mjs"] // Default to .mjs, but allow additional extensions
 ): Promise<void> {
-    const defaultPluginsDir = join(__dirname, "../plugins");
+    const defaultPluginsDir = join(__dirname, "./plugins");
     const pluginsDirs: string[] = [];
 
     // Handle custom plugin paths

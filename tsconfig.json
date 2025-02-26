@@ -27,7 +27,7 @@
     "src/**/*.json",
     "types/**/*",
     "index.mts",
-    "bot.mts"
+    "src/main.mts"
   ],
   "exclude": [
     "app.json",

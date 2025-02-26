@@ -1,4 +1,4 @@
-import { MessageType, Module, commands, formatBytes, getRandom, runtime } from "#core";
+import { MessageType, Module, commands, formatBytes, runtime } from "#core";
 import { platform, totalmem, freemem } from "os";
 
 Module(
@@ -12,17 +12,18 @@ Module(
     async (message: MessageType) => {
         const cmds = commands.filter((cmd) => cmd.name && !cmd.dontAddCommandList && !cmd.name.toString().includes("undefined")).length;
         let menuInfo = `\`\`\`
-╭─── ${process.env.BOT_INFO!.split(";")[1] ?? `χѕтяσ м∂`} ────
-│ Prefix: ${getRandom(message.prefix)}
+╭─── ${process.env?.BOT_INFO ? process.env.BOT_INFO?.split?.(";")[1] : `χѕтяσ м∂`} ────
+│ User: @${message.sender}
 │ Owner: ${process.env.BOT_INFO!.split(";")[0] ?? `αѕтяσχ11`}		
 │ Plugins: ${cmds}
+│ Mode: ${message.mode ? "Private" : "Public"}
 │ Uptime: ${runtime(process.uptime())}
 │ Platform: ${platform()}
 │ Ram: ${formatBytes(totalmem() - freemem())}
 │ Day: ${new Date().toLocaleDateString("en-US", { weekday: "long" })}
 │ Date: ${new Date().toLocaleDateString("en-US")}
 │ Time: ${new Date().toLocaleTimeString("en-US", { timeZone: process.env.TZ })}
-│ Version: ${(await import("../package.json")).default.version}
+│ Node V: ${process.version}
 ╰─────────────\`\`\`\n`;
 
         const commandsByType = commands
@@ -49,7 +50,7 @@ Module(
             });
             menuInfo += `╰────────────\n`;
         });
-        return await message.send(menuInfo.trim());
+        return await message.send(menuInfo.trim(), { mentions: [message.sender] });
     }
 );
 

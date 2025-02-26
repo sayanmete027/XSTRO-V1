@@ -39,8 +39,9 @@ export interface PluginConfig {
 }
 
 export interface SystemConfig {
-    bot_name: string;
-    owner: string;
+    DATABASE_URL?: string;
+    BOT_INFO?: string;
+    PORT?: number | undefined;
 }
 
 export type Config = {
