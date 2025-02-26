@@ -33,7 +33,7 @@ jobs:
       run: yarn
 
     - name: Build
-      run: yarn run build:all
+      run: yarn run docs
 
     - name: Publish to Pages
       uses: peaceiris/actions-gh-pages@v3
