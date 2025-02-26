@@ -1,4 +1,4 @@
-import { XstroServer } from "./release/index.mjs";
+import { XstroServer } from "xstro";
 
 const recommededConfig = {
     PORT: undefined /** Change or leave empty for custom ports */,
