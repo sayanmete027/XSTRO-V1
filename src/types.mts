@@ -33,11 +33,21 @@ export interface Command {
 }
 
 export type BOTINFO = {
-    name: string;
-    version: number;
-    created: Date;
-    attrbuites: string[];
+    name?: string;
+    sudo?: string[];
+    warn?: string | number | undefined;
+    version?: string;
 };
+
+export interface PluginConfig {
+    paths?: string | string[];
+    shouldMerge?: boolean;
+    extensions?: string[];
+}
+
+export interface SystemConfig {
+    botinfo: BOTINFO;
+}
 
 export type Config = {
     prefix: string[];

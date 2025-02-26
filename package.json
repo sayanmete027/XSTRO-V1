@@ -3,14 +3,13 @@
   "version": "2.7.1",
   "description": "OpenSource WhatsApp Userbot",
   "type": "module",
-  "main": "./release/src/index.mjs",
+  "main": "main.js",
   "scripts": {
-    "start": "node ./release/bot.mjs",
+    "start": "node main.js",
     "build": "tsc && babel release --out-dir release",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "docs": "typedoc",
-    "test": "jest",
     "check-vulnerabilities": "npm audit",
     "release": "release-it",
     "changelog:last": "conventional-changelog -p angular -r 2",
@@ -20,10 +19,11 @@
   "imports": {
     "#core": "./release/src/index.mjs"
   },
+  "exports": {
+    "import": "./release/src/index.mjs"
+  },
   "files": [
-    "lib",
-    "plugins",
-    "sql"
+    "release"
   ],
   "license": "MIT",
   "keywords": [
@@ -47,7 +47,6 @@
     "eslint": "^9.18.0",
     "eslint-config-prettier": "^10.0.1",
     "eslint-plugin-prettier": "^5.2.3",
-    "jest": "^29.7.0",
     "prettier": "^3.1.0",
     "release-it": "^18.1.2",
     "ts-jest": "^29.1.1",
