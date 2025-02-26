@@ -1,3 +1,7 @@
+## [2.8.5](https://github.com/AstroX11/xstro/compare/v2.8.0...v2.8.5) (2025-02-26)
+
+
+
 # [2.8.0](https://github.com/AstroX11/xstro/compare/v2.7.1...v2.8.0) (2025-02-26)
 
 
