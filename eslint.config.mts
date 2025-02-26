@@ -6,7 +6,7 @@ const eslintConfig: FlatConfig.Config = {
     languageOptions: {
         ecmaVersion: "latest" as const,
         sourceType: "module" as const,
-        parser: tsParser, // Add this if linting TS files
+        parser: tsParser,
         globals: {},
     },
     plugins: {
