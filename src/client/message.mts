@@ -10,8 +10,9 @@ export async function Message(client: Client, messages: WAMessage) {
     };
     const { key, message, ...msg } = normalizedMessages;
     const { user, sendMessage } = client;
-    const { prefix } = await getConfig();
+    const { prefix, mode, sudo } = await getConfig();
     const owner = numToJid(user!.id);
+    const sender = isJidGroup(key.remoteJid!) || isJidBroadcast(key.remoteJid!) ? key.participant! : key.remoteJid!;
     const mtype = getContentType(message);
     function hasContextInfo(msg: any): msg is { contextInfo: WAContextInfo } {
         if (!msg || typeof msg !== "object" || msg === null) return false;
@@ -29,9 +30,11 @@ export async function Message(client: Client, messages: WAMessage) {
         isGroup: isJidGroup(key.remoteJid!),
         owner: owner,
         prefix,
-        sender: isJidGroup(key.remoteJid!) || isJidBroadcast(key.remoteJid!) ? key.participant! : key.remoteJid!,
+        sender: sender,
         text: extractTextFromMessage(message!),
         mentions: Quoted ? Quoted.mentionedJid : [],
+        mode,
+        sudo: sudo.includes(sender) || sender === owner,
         user: function (match: string) {
             if (match) return numToJid(match);
             if (Quoted!.participant) Quoted!.participant;

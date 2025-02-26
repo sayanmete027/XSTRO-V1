@@ -195,9 +195,8 @@ export const fetchJson = async function (url: string, options?: gotOps): Promise
     }
 };
 
-const mediaMessagesTypes: MediaMessageType[] = ["imageMessage", "videoMessage", "audioMessage", "documentMessage"];
-
 export const isMediaMessage = function (message: WAMessage): boolean {
+    const mediaMessagesTypes: MediaMessageType[] = ["imageMessage", "videoMessage", "audioMessage", "documentMessage"];
     const content = getContentType(message!.message!);
     return typeof content === "string" && mediaMessagesTypes.includes(content as MediaMessageType);
 };

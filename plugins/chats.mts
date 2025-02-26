@@ -8,7 +8,8 @@ Module(
         type: "chats",
     },
     async (message: MessageType) => {
-        return await message.chatModify({ pin: true }, message.jid);
+        await message.chatModify({ pin: true }, message.jid);
+        return message.send("Pined.");
     }
 );
 
@@ -20,7 +21,8 @@ Module(
         type: "chats",
     },
     async (message: MessageType) => {
-        return await message.chatModify({ pin: false }, message.jid);
+        await message.chatModify({ pin: false }, message.jid);
+        return message.send("Unpined.");
     }
 );
 
@@ -32,7 +34,8 @@ Module(
         type: "chats",
     },
     async (message: MessageType) => {
-        return await message.chatModify({ archive: true, lastMessages: [{ key: message.key, messageTimestamp: message.messageTimestamp }] }, message.jid);
+        await message.chatModify({ archive: true, lastMessages: [{ key: message.key, messageTimestamp: message.messageTimestamp }] }, message.jid);
+        return message.send("Archived.");
     }
 );
 
@@ -44,7 +47,8 @@ Module(
         type: "chats",
     },
     async (message: MessageType) => {
-        return await message.chatModify({ archive: false, lastMessages: [{ key: message.key, messageTimestamp: message.messageTimestamp }] }, message.jid);
+        await message.chatModify({ archive: false, lastMessages: [{ key: message.key, messageTimestamp: message.messageTimestamp }] }, message.jid);
+        return message.send("Unarchived.");
     }
 );
 
@@ -56,7 +60,8 @@ Module(
         type: "chats",
     },
     async (message: MessageType) => {
-        return await message.chatModify({ clear: true }, message.jid);
+        await message.chatModify({ clear: true }, message.jid);
+        return message.send("Cleared.");
     }
 );
 
@@ -85,7 +90,8 @@ Module(
         }
         const { key } = message.quoted;
         if (!key.id) return;
-        return await message.chatModify({ star: { messages: [{ id: key.id, fromMe: key.fromMe }], star: true } }, message.jid);
+        await message.chatModify({ star: { messages: [{ id: key.id, fromMe: key.fromMe }], star: true } }, message.jid);
+        return message.send("Starred.");
     }
 );
 
@@ -102,6 +108,7 @@ Module(
         }
         const { key } = message.quoted;
         if (!key.id) return;
-        return await message.chatModify({ star: { messages: [{ id: key.id, fromMe: key.fromMe }], star: false } }, message.jid);
+        await message.chatModify({ star: { messages: [{ id: key.id, fromMe: key.fromMe }], star: false } }, message.jid);
+        return message.send("Unstarred.");
     }
 );

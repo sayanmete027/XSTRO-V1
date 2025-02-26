@@ -24,7 +24,10 @@ export async function runCommand(message: MessageType): Promise<void> {
         const match = message.text.slice(handler?.length || 0).match(cmd.name);
         try {
             if (handler && match) {
+                if (!message.sudo && (message.mode || cmd.fromMe)) return;
+                if (cmd.isGroup && !message.isGroup) return;
                 const args = match[2] ?? "";
+                await message.react("⚽");
                 await cmd.function!(message, args);
             }
         } catch (err) {
