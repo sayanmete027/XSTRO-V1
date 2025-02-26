@@ -1,6 +1,5 @@
 import * as http from "http";
 import { client, logger, loadPlugins, PluginConfig, SystemConfig } from "#core";
-import { config } from "./config.mjs";
 
 export class XstroServer {
     private database?: string;
@@ -10,12 +9,8 @@ export class XstroServer {
     constructor(database?: string, pluginConfig: PluginConfig = {}) {
         this.database = database;
         this.systemConfig = {
-            botinfo: {
-                name: this.systemConfig?.botinfo.name || config.BOT_INFO.split(";")[1],
-                sudo: this.systemConfig?.botinfo.sudo || config.BOT_INFO.split(";")[0].split(","),
-                warn: this.systemConfig?.botinfo.warn || 3,
-                version: this.systemConfig?.botinfo.version || "1.0.0",
-            },
+            bot_name: this.systemConfig?.bot_name || process.env.BOT_INFO!.split(";")[1],
+            owner: this.systemConfig?.owner || process.env.BOT_INFO!.split(";")[0],
         };
         this.pluginConfig = {
             paths: pluginConfig.paths,

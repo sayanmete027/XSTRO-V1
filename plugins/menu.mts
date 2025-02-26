@@ -1,4 +1,3 @@
-import config from "../config.mjs";
 import { MessageType, Module, commands, formatBytes, getRandom, runtime } from "#core";
 import { platform, totalmem, freemem } from "os";
 
@@ -13,17 +12,17 @@ Module(
     async (message: MessageType) => {
         const cmds = commands.filter((cmd) => cmd.name && !cmd.dontAddCommandList && !cmd.name.toString().includes("undefined")).length;
         let menuInfo = `\`\`\`
-╭─── ${config.BOT_INFO.split(";")[1]} ────
+╭─── ${process.env.BOT_INFO!.split(";")[1] ?? `χѕтяσ м∂`} ────
 │ Prefix: ${getRandom(message.prefix)}
-│ Owner: ${config.BOT_INFO.split(";")[0]}		
+│ Owner: ${process.env.BOT_INFO!.split(";")[0] ?? `αѕтяσχ11`}		
 │ Plugins: ${cmds}
 │ Uptime: ${runtime(process.uptime())}
 │ Platform: ${platform()}
 │ Ram: ${formatBytes(totalmem() - freemem())}
 │ Day: ${new Date().toLocaleDateString("en-US", { weekday: "long" })}
 │ Date: ${new Date().toLocaleDateString("en-US")}
-│ Time: ${new Date().toLocaleTimeString("en-US", { timeZone: config.TIME_ZONE })}
-│ Version: ${config.VERSION}
+│ Time: ${new Date().toLocaleTimeString("en-US", { timeZone: process.env.TZ })}
+│ Version: ${(await import("../package.json")).default.version}
 ╰─────────────\`\`\`\n`;
 
         const commandsByType = commands

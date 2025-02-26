@@ -32,13 +32,6 @@ export interface Command {
     dontAddCommandList?: boolean;
 }
 
-export type BOTINFO = {
-    name?: string;
-    sudo?: string[];
-    warn?: string | number | undefined;
-    version?: string;
-};
-
 export interface PluginConfig {
     paths?: string | string[];
     shouldMerge?: boolean;
@@ -46,7 +39,8 @@ export interface PluginConfig {
 }
 
 export interface SystemConfig {
-    botinfo: BOTINFO;
+    bot_name: string;
+    owner: string;
 }
 
 export type Config = {

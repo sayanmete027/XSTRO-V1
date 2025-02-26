@@ -26,13 +26,12 @@ import {
     updatePresence,
     upsertContacts,
 } from "#core";
-import config from "../../config.mjs";
 
 EventEmitter.defaultMaxListeners = 10000;
 process.setMaxListeners(10000);
 
 export const logger = P.pino({
-    level: config.DEBUG ? "info" : "silent",
+    level: process.env.DEBUG ? "info" : "silent",
 });
 
 export const client = async (database: string = "database.db"): Promise<WASocket> => {
