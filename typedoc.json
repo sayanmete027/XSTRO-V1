@@ -2,11 +2,11 @@
     "entryPoints": ["./src/index.mts", "./bot.mts"],
     "out": "./docs",
     "tsconfig": "./tsconfig.json",
-    "exclude": ["**/node_modules/**", "**/*.json", "./release/**"],
+    "exclude": ["**/*.json", "./release/**"],
     "excludePrivate": true,
     "excludeProtected": true,
     "includeVersion": true,
-    "readme": "./README.md",
+    "readme": "readme.md",
     "name": "xstro",
     "plugin": ["typedoc-plugin-mdn-links"]
   }
