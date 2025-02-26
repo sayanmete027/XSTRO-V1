@@ -1,4 +1,4 @@
-import { Client, ContentType, extractTextFromMessage, getConfig, getDataType, numToJid, sendMessageOptionals } from "#default";
+import { Client, ContentType, extractTextFromMessage, getConfig, getDataType, numToJid, sendMessageOptionals } from "#core";
 import { Boom } from "@hapi/boom/lib/index.js";
 import { AnyMessageContent, downloadMediaMessage, getContentType, isJidBroadcast, isJidGroup, normalizeMessageContent, WAContextInfo, WAMessage } from "baileys";
 import { writeFile } from "fs/promises";

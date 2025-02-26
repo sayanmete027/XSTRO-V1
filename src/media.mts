@@ -4,10 +4,10 @@
 // import sharp from "sharp";
 // import { exec } from "child_process";
 // import { promisify } from "util";
-// import { FileTypeFromBuffer, getMimeType } from "#default";
+// import { FileTypeFromBuffer, getMimeType } from "#core";
 // import Crypto from "crypto";
 // import webp from "node-webpmux";
-// import { LANG } from "#default";
+// import { LANG } from "#core";
 
 // const execAsync = promisify(exec);
 // const { writeFileSync, existsSync, readFileSync, mkdirSync } = fs;

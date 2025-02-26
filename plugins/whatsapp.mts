@@ -1,4 +1,4 @@
-import { isMediaMessage, MessageType, Module } from "#default";
+import { isMediaMessage, MessageType, Module } from "#core";
 
 Module(
     {

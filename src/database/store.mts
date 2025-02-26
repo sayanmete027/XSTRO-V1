@@ -17,7 +17,7 @@ import {
     WAProto,
     GroupParticipant,
 } from "baileys";
-import { groupMetadata, ParticipantActivity } from "#default";
+import { groupMetadata, ParticipantActivity } from "#core";
 
 export async function Store(): Promise<void> {
     const db: Database = await getDb();

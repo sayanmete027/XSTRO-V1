@@ -1,6 +1,6 @@
 import { Database } from "sqlite";
 import { getDb } from "./database.mjs";
-import { Config } from "#default";
+import { Config } from "#core";
 
 async function initConfigDb(): Promise<void> {
     const db: Database = await getDb();

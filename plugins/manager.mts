@@ -1,1 +1,1 @@
-import { editConfig, getConfig, MessageType, Module } from "#default";
+import { editConfig, getConfig, MessageType, Module } from "#core";

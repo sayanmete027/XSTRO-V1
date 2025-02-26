@@ -1,5 +1,5 @@
 import config from "../config.mjs";
-import { MessageType, Module, commands, formatBytes, getRandom, runtime } from "#default";
+import { MessageType, Module, commands, formatBytes, getRandom, runtime } from "#core";
 import { platform, totalmem, freemem } from "os";
 
 Module(

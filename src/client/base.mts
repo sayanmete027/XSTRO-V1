@@ -25,7 +25,7 @@ import {
     updateContacts,
     updatePresence,
     upsertContacts,
-} from "#default";
+} from "#core";
 import config from "../../config.mjs";
 
 EventEmitter.defaultMaxListeners = 10000;

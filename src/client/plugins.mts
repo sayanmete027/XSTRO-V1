@@ -1,4 +1,4 @@
-import { Command, MessageType } from "#default";
+import { Command, MessageType } from "#core";
 
 export const commands: Command[] = [];
 
@@ -27,7 +27,7 @@ export async function runCommand(message: MessageType): Promise<void> {
                 if (!message.sudo && (message.mode || cmd.fromMe)) return;
                 if (cmd.isGroup && !message.isGroup) return;
                 const args = match[2] ?? "";
-                await message.react("⚽");
+                await message.react("⏳");
                 await cmd.function!(message, args);
             }
         } catch (err) {

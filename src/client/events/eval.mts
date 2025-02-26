@@ -1,4 +1,4 @@
-import { MessageType } from "#default";
+import { MessageType } from "#core";
 import util from "util";
 
 export async function evaluator(message: MessageType) {

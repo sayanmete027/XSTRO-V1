@@ -1,4 +1,4 @@
-import { MessageType, Module, voxnews, wabetanews } from "#default";
+import { MessageType, Module, voxnews, wabetanews } from "#core";
 
 Module(
     {

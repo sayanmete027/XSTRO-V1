@@ -1,4 +1,4 @@
-import { MessageType, Module } from "#default";
+import { MessageType, Module } from "#core";
 
 Module(
     {

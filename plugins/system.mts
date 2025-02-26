@@ -1,4 +1,4 @@
-import { Module, MessageType, runtime } from "#default";
+import { Module, MessageType, runtime } from "#core";
 
 Module(
     {

@@ -1,6 +1,6 @@
 import { Database } from "sqlite";
 import { getDb } from "./database.mjs";
-import { GroupData } from "#default";
+import { GroupData } from "#core";
 
 async function initMetadataDb(): Promise<void> {
     const db: Database = await getDb();

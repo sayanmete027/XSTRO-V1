@@ -3,9 +3,9 @@
   "version": "2.7.0",
   "description": "OpenSource WhatsApp Userbot",
   "type": "module",
-  "main": "./release/index.js",
+  "main": "./release/src/index.mjs",
   "scripts": {
-    "start": "node ./release/bot",
+    "start": "node ./release/bot.mjs",
     "build": "tsc && babel release --out-dir release",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
@@ -14,7 +14,7 @@
     "check-vulnerabilities": "npm audit"
   },
   "imports": {
-    "#default": "./release/src/index.mjs"
+    "#core": "./release/src/index.mjs"
   },
   "files": [
     "lib",

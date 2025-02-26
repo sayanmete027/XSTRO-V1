@@ -1,6 +1,6 @@
 import * as http from "http";
 import cluster from "cluster";
-import { client, loadPlugins, logger } from "#default";
+import { client, loadPlugins, logger } from "#core";
 
 /**
  * @module WorkerCluster

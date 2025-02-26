@@ -4,7 +4,7 @@
  */
 
 import sqlite3 from "sqlite3";
-import { getSessionId, logger, setSessionId } from "#default";
+import { getSessionId, logger, setSessionId } from "#core";
 import fs from "fs/promises";
 import path from "path";
 
