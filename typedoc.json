@@ -1,5 +1,5 @@
 {
-    "entryPoints": ["./src/index.mts"],
+    "entryPoints": ["./index.mts"],
     "out": "./docs",
     "tsconfig": "./tsconfig.json",
     "exclude": ["**/*.json", "./release/**"],
