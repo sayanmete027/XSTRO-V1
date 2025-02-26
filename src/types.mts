@@ -32,12 +32,6 @@ export interface Command {
     dontAddCommandList?: boolean;
 }
 
-export interface PluginConfig {
-    paths?: string | string[];
-    shouldMerge?: boolean;
-    extensions?: string[];
-}
-
 export interface SystemConfig {
     DATABASE_URL?: string;
     BOT_INFO?: string;
